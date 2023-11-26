@@ -41,6 +41,7 @@ class MimicDataset(torch.utils.data.Dataset):
             self.image_data = self.image_data.reshape(-1, 100, 100)
             self.image_data = torch.from_numpy(self.image_data).float()
             self.image_data = self.image_data.unsqueeze(1)
+            
         if self.tabular:
             self.tabular_data = self.data.iloc[:, 10000:].values
             self.tabular_data = torch.from_numpy(self.tabular_data).float()
