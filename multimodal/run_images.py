@@ -19,12 +19,10 @@ import seaborn as sns
 os.chdir('../')
 current_path = os.getcwd()
 print('Current path: ', current_path)
-parent_path = os.path.dirname(current_path)
-print('Parent path: ', parent_path)
 
 pretrained_model = 'resnet50'
 num_epochs = 2
-verbose = False
+verbose = True
 learning_rate = 0.001
 
 # if main == __ name __:
