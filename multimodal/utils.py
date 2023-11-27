@@ -1,6 +1,7 @@
 from data import *
 
 def train_model(model, num_epochs, train_dataloader, criterion, optimizer, device, verbose = False):
+    print('Training model...')
     model.to(device)
     for epoch in range(num_epochs):
         model.train()  
@@ -36,6 +37,7 @@ def train_model(model, num_epochs, train_dataloader, criterion, optimizer, devic
     return model
 
 def test_model(model, test_dataloader, device):
+    print('Testing model...')
     model.eval()
     correct_predictions = 0
     total_predictions = 0
