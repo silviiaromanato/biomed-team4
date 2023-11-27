@@ -93,6 +93,6 @@ if __name__ == '__main__':
 
         # Train and test model
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        model = train_model(model, num_epochs, train_dataloader, criterion, optimizer, device, verbose = False)
+        model = train_model(model, num_epochs, train_dataloader, criterion, optimizer, device, verbose = verbose)
         model = test_model(model, test_dataloader, device)
         torch.save(model.state_dict(), 'Resnet_model.pth')
