@@ -18,7 +18,7 @@ import seaborn as sns
 
 os.chdir('../')
 current_path = os.getcwd()
-print(current_path)
+parent_path = os.path.dirname(current_path)
 
 pretrained_model = 'resnet50'
 num_epochs = 2
@@ -30,16 +30,17 @@ if __name__ == '__main__':
     
     # Reding the data
     print('Reading the data...')
-    info_jpg = pd.read_csv('../dataset/mimic-cxr-2.0.0-metadata.csv')
-    labels_data = pd.read_csv('../dataset/mimic-cxr-2.0.0-chexpert.csv')
-    image_files = list_images('../dataset/files')
+    print
+    info_jpg = pd.read_csv(parent_path + '/dataset/mimic-cxr-2.0.0-metadata.csv')
+    labels_data = pd.read_csv(parent_path + '/dataset/mimic-cxr-2.0.0-chexpert.csv')
+    image_files = list_images(parent_path + '/dataset/files')
     image_labels_mapping = create_image_labels_mapping(image_files, labels_data, info_jpg)
 
     # Create dataframe  
     print('Creating dataframe...')
     df = pd.DataFrame.from_dict(image_labels_mapping, orient='index').reset_index()
     df['dicom_id'] = df['index'].apply(lambda x: x.split('/')[-1].split('.')[0])
-    split = pd.read_csv('../real_data/mimic-cxr-2.0.0-split.csv')
+    split = pd.read_csv(parent_path + '/dataset/mimic-cxr-2.0.0-split.csv')
     df = pd.merge(df, split, on=['subject_id', 'study_id', 'dicom_id'], how = 'left')
 
     # Create training set
