@@ -1,4 +1,52 @@
 from data import *
+from torchvision.models import densenet121, DenseNet121_Weights, ResNet50_Weights, resnet50
+from torchvision import models
+
+class DualInputModel(nn.Module):
+    def __init__(self, model, num_classes):
+        super().__init__()
+
+        if model == 'resnet50':
+            self.features_pa = models.resnet50(weights=ResNet50_Weights.DEFAULT)
+            self.features_lateral = models.resnet50(weights=ResNet50_Weights.DEFAULT)
+
+            # Replace the classifier in both ResNet models
+            # The nn.Identity() layer removes the final classification layer of the ResNet models (classifying 1000 different classes in ImageNet).
+            num_features = self.features_pa.fc.in_features
+            self.features_pa.fc = nn.Identity()
+            self.features_lateral.fc = nn.Identity()
+            
+        elif model == 'densenet121':
+            # Load pre-trained DenseNet models
+            self.features_pa = models.densenet121(weights=DenseNet121_Weights.IMAGENET1K_V1)
+            self.features_lateral = models.densenet121(weights=DenseNet121_Weights.IMAGENET1K_V1)
+        
+            # Replace the classifier in both DenseNet models
+            # The nn.Identity() layer removes the final classification layer of the DenseNet models (classifying 1000 different classes in ImageNet).
+            num_features = self.features_pa.classifier.in_features
+            self.features_pa.classifier = nn.Identity()
+            self.features_lateral.classifier = nn.Identity()
+        
+        # Combine features from both models for classification
+        self.classifier = nn.Sequential(
+            nn.Linear(num_features * 2, 512),
+            nn.ReLU(),
+            nn.Dropout(0.2),
+            nn.Linear(512, num_classes),
+            nn.Softmax(dim=1)
+        )
+
+    def forward(self, x_pa, x_lateral):
+        # Forward pass for both images through their respective DenseNet models
+        features_pa = self.features_pa(x_pa)
+        features_lateral = self.features_lateral(x_lateral)
+        
+        # Concatenate the features
+        combined_features = torch.cat((features_pa, features_lateral), dim=1)
+        
+        # Classify the combined features
+        out = self.classifier(combined_features)
+        return out
 
 class FullyConnectedLayer(nn.Module):
     '''
