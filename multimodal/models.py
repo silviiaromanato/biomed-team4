@@ -1,6 +1,57 @@
 from data import *
 from torchvision.models import densenet121, DenseNet121_Weights, ResNet50_Weights, resnet50
 from torchvision import models
+import torch.nn as nn
+
+
+class Classifier(nn.Module):
+    '''
+    Fully-connected classifier network.
+    Converts an input embedding into a multi-class multi-label prediction.
+    Batch normalization, ReLu, Dropout.   
+
+    Args:
+        embed_size (int): Input embedding size
+        hidden_dims (list): List of hidden layer dimensions
+        num_classes (int): Number of classes to predict
+        num_labels (int): Number of labels to predict
+        dropout_prob (float): Dropout probability
+    '''
+    def __init__(self, 
+                 embed_size, 
+                 hidden_dims,
+                 num_classes=1, 
+                 num_labels=1, 
+                 dropout_prob=0.0):
+        super(Classifier, self).__init__()
+
+        self.hidden_dims = hidden_dims
+        self.num_layers = len(hidden_dims)
+        self.embed_size = embed_size
+        self.num_classes = num_classes
+        self.num_labels = num_labels
+        self.dropout_prob = dropout_prob
+
+        self.relu = nn.ReLU()
+        self.dropout = nn.Dropout(dropout_prob)
+
+        self.layers = nn.ModuleList()
+        self.layers.append(nn.BatchNorm1d(embed_size))
+        for i in range(self.num_layers):
+            self.layers.append(nn.Linear(hidden_dims[i-1], hidden_dims[i]))
+            self.layers.append(nn.BatchNorm1d(hidden_dims[i]))
+            self.layers.append(nn.ReLU())
+            if dropout_prob > 0.0:
+                self.layers.append(nn.Dropout(dropout_prob))
+        self.layers.append(nn.Linear(hidden_dims[-1], num_classes))
+        self.layers.append(nn.Sigmoid())
+
+    def forward(self, x):
+        for layer in self.layers:
+            x = layer(x)
+        return x
+    
+
 
 class DualInputModel(nn.Module):
     def __init__(self, model, num_classes):
