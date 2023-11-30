@@ -85,7 +85,8 @@ class MedicalImagesDataset(Dataset):
         # Organize paths by subject_id and study_id
         self.organized_paths = self._organize_paths()
         # Filter out pairs where both images are None
-        self.organized_paths = {k: v for k, v in self.organized_paths.items() if v['PA'] is not None or v['Lateral'] is not None}
+        self.organized_paths = {k: v for k, v in self.organized_paths.items() \
+                                if v['PA'] is not None or v['Lateral'] is not None}
 
     def _organize_paths(self):
         organized = {}
