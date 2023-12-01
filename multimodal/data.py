@@ -85,8 +85,7 @@ class MedicalImagesDataset(Dataset):
         # Organize paths by subject_id and study_id
         self.organized_paths = self._organize_paths()
         # Filter out pairs where both images are None
-        self.organized_paths = {k: v for k, v in self.organized_paths.items() \
-                                if v['PA'] is not None or v['Lateral'] is not None}
+        self.organized_paths = {k: v for k, v in self.organized_paths.items() if v['PA'] is not None or v['Lateral'] is not None}
 
     def _organize_paths(self):
         organized = {}
@@ -145,6 +144,7 @@ class MedicalImagesDataset(Dataset):
         label_tensor = torch.tensor(label_values, dtype=torch.float32)
 
         return pa_image, lateral_image, label_tensor
+
     
 
 def create_image_labels_mapping(image_files, labels_data, info_data):
