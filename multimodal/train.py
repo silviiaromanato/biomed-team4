@@ -1,3 +1,7 @@
+'''
+Training and evaluation functions. 
+'''
+
 from data import *
 
 def train_model(model, num_epochs, train_dataloader, criterion, optimizer, device, verbose = False):
@@ -116,5 +120,15 @@ def train(model, train_loader, val_loader, criterion, optimizer, num_epochs=10, 
             if len(data) == 2:
                 outputs = model(inputs)
             elif len(data) == 3:
-                outputs
+                outputs#
 
+
+# TO BE IMPLEMENTED
+
+def train(model, criterion, optimizer, scheduler, train_data, val_data, num_epochs): 
+    pass
+    #return train_results
+
+def eval(model, criterion, test_data): 
+    pass
+    #return eval_results

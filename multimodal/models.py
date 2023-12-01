@@ -1,20 +1,25 @@
+'''
+Models for Multi-Modal Diagnosis from Radiology Images and Tabular metadata.
+Vision encoders: ResNet50, DenseNet121, ViT
+Tabular encoder: Fully-connected network
+Joint encoder: Vision + Tabular encoders
+'''
+
 from data import *
-from torchvision.models import densenet121, DenseNet121_Weights, ResNet50_Weights, resnet50
+
+from torchvision.models import DenseNet121_Weights, ResNet50_Weights
 from transformers import ViTForImageClassification
 from torchvision import models
 import torch.nn as nn
 import torch
 
-
-NUM_LABELS = 3 # Neutral, Positive, Negative
-NUM_CLASSES = 15 # Radiology diagnoses
 class FullyConnectedLayer(nn.Module):
     '''
     Single fully-connected Layer
     with batch normalization, dropout and ReLu activation.
     '''
     def __init__(self, 
-                 input_dim, 
+                 input_dim,
                  output_dim, 
                  dropout_prob=0.0, 
                  batch_norm=True):
@@ -153,6 +158,8 @@ class JointEncoder(nn.Module):
                  tabular = True,
                  tabular_params = None,
                  vision = None,
+                 num_labels=3,
+                 num_classes=15  
                  ):
         super(JointEncoder, self).__init__()
 
@@ -170,7 +177,7 @@ class JointEncoder(nn.Module):
         if tabular:
             self.tabular_encoder = FullyConnectedNetwork(**tabular_params)
         
-        self.classifier = ClassifierHead(num_labels=NUM_LABELS, num_classes=NUM_CLASSES)
+        self.classifier = ClassifierHead(num_labels=num_labels, num_classes=num_classes)
 
     def forward(self, x_pa=None, x_lateral=None, x_tab=None):
         '''
@@ -200,16 +207,3 @@ class JointEncoder(nn.Module):
         # Classify embeddings
         output = self.classifier(embedding)
         return output
-
-def grid_search(tabular=None, vision=None): 
-    '''
-    
-    '''
-
-    
-
-
-
-
-if __name__ == '__main__': 
-    pass
