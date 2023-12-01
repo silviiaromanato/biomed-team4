@@ -157,6 +157,9 @@ class JointEncoder(nn.Module):
                  ):
         super(JointEncoder, self).__init__()
 
+        self.tabular = tabular
+        self.vision_type = vision_type
+
         if not tabular and not vision_type: 
             raise ValueError('Must specify tabular and/or vision encoder.')
         
@@ -170,31 +173,35 @@ class JointEncoder(nn.Module):
         
         self.classifier = ClassifierHead(num_labels=num_labels, num_classes=num_classes)
 
-    def forward(self, image_pa=None, image_lateral=None, tabular=None):
+    def forward(self, x_pa=None, x_lateral=None, x_tab=None):
         '''
         Args:
-            image_pa (tensor): PA image
-            image_lateral (tensor): Lateral image
-            tabular (tensor): Tabular features
+            x_pa (tensor): PA image
+            x_lateral (tensor): Lateral image
+            x_tab (tensor): Tabular features
         '''
         # Generate embeddings (image and/or tabular)
-        if self.vision_encoder:
-            if image_pa is None or image_lateral is None:
-                raise ValueError('Must provide image input.')
-            image_embedding = self.vision_encoder(image_pa, image_lateral)
-        if self.tabular_encoder:
-            if tabular is None:
-                raise ValueError('Must provide tabular input.')
-            tabular_embedding = self.tabular_encoder(tabular)
+        if self.vision_type:
+            if x_pa is None or x_lateral is None:
+                raise ValueError('Vision encoder is specified but no images are provided.')
+            image_embedding = self.vision_encoder(x_pa, x_lateral)
+        if self.tabular:
+            if x_tab is None:
+                raise ValueError('Tabular encoder is specified but no tabular data is provided.')
+            tabular_embedding = self.tabular_encoder(x_tab)
 
         # Concatenate embeddings
-        if self.vision_encoder and self.tabular_encoder:
+        if self.vision_type and self.tabular:
             embedding = torch.cat((image_embedding, tabular_embedding), dim=1)
-        elif self.vision_encoder:
+        elif self.vision_type:
             embedding = image_embedding
-        elif self.tabular_encoder:
+        elif self.tabular:
             embedding = tabular_embedding
         
         # Classify embeddings
         output = self.classifier(embedding)
         return output
+    
+
+if "__name__" == "__main__":
+    print("Hello world!")
