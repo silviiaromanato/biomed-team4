@@ -187,7 +187,7 @@ def create_image_labels_mapping(image_files, labels_data, info_data):
     return image_labels_mapping
         
 def train_val_test_split(dataset, val_size=0.2, test_size=0.2, 
-                         batch_size=32, shuffle=True, num_workers=4, seed=0, device='cpu'):
+                         batch_size=32, shuffle=True, num_workers=4, seed=0):
     '''
     Split dataset into train, validation, and test sets.
     '''
@@ -205,12 +205,11 @@ def train_val_test_split(dataset, val_size=0.2, test_size=0.2,
     val_sampler = torch.utils.data.SubsetRandomSampler(val_indices)
     test_sampler = torch.utils.data.SubsetRandomSampler(test_indices)
     train_loader = torch.utils.data.DataLoader(
-        dataset, batch_size=batch_size, sampler=train_sampler, num_workers=num_workers, device=device)
+        dataset, batch_size=batch_size, sampler=train_sampler, num_workers=num_workers)
     val_loader = torch.utils.data.DataLoader(
-        dataset, batch_size=batch_size, sampler=val_sampler, num_workers=num_workers, device=device)
+        dataset, batch_size=batch_size, sampler=val_sampler, num_workers=num_workers)
     test_loader = torch.utils.data.DataLoader(
-        dataset, batch_size=batch_size, sampler=test_sampler, num_workers=num_workers, device=device)
-    
+        dataset, batch_size=batch_size, sampler=test_sampler, num_workers=num_workers)
     return train_loader, val_loader, test_loader
 
 
@@ -308,7 +307,7 @@ class MedicalImagesTabularDataset(Dataset):
         return pa_image, lateral_image, label_tensor, tabular_tensor
     
     
-def load_data(data_dir, tabular=True, vision=None, batch_size=32, num_workers=4, seed=0, device='cpu'):
+def load_data(data_dir, tabular=True, vision=None, batch_size=32, num_workers=4, seed=0):
     '''
     Load data from data_dir.
 

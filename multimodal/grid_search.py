@@ -91,7 +91,7 @@ def grid_search(tabular=False,
 
     # Load data (TODO)
     train_data, val_data, test_data = load_data(
-        DATA_DIR, batch_size=64, num_workers=4, seed=seed, device=device)
+        DATA_DIR, batch_size=64, num_workers=4, seed=seed)
 
     # Define loss function, optimizer and scheduler
     criterion = nn.CrossEntropyLoss()
@@ -99,12 +99,12 @@ def grid_search(tabular=False,
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.1)
 
     # Train model (TODO)
-    train_results = train(model, criterion, optimizer, scheduler, train_data, val_data, num_epochs=num_epochs)
+    train_results = train(model, criterion, optimizer, scheduler, train_data, val_data, num_epochs=num_epochs, device=device)
     wandb.log(train_results)
 
-    # Evaluate model (TODO)
-    eval_results = eval(model, criterion, test_data)
-    wandb.log(eval_results)
+    # Evaluate model on test set (TODO)
+    test_results = test(model, test_data, device=device)
+    wandb.log(test_results)
 
     # Save model checkpoint
     save_path = os.path.join(CHECKPOINTS_DIR, 'final/' + wandb.run.name + '.pt')

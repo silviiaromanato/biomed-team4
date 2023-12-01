@@ -1,10 +1,12 @@
 '''
 Training and evaluation functions. 
+
+TODO: Add validation set, scheduler and log results to W&B. 
 '''
 
 from data import *
 
-def train_model(model, num_epochs, train_dataloader, criterion, optimizer, device, verbose = False):
+def train(model, criterion, optimizer, scheduler, train_data, val_data, num_epochs, device='cpu', verbose=False):
     print('Training model...')
     model.to(device)
     for epoch in range(num_epochs):
@@ -13,7 +15,7 @@ def train_model(model, num_epochs, train_dataloader, criterion, optimizer, devic
         correct_predictions = 0
         total_predictions = 0
 
-        for i, (x_pa, x_lateral, labels) in enumerate(train_dataloader):
+        for i, (x_pa, x_lateral, labels) in enumerate(train_data):
             # Forward pass
             inputs = x_lateral.to(device), x_pa.to(device)
             outputs = model(inputs[0], inputs[1])
@@ -33,20 +35,24 @@ def train_model(model, num_epochs, train_dataloader, criterion, optimizer, devic
             correct_predictions += (predicted == labels).sum().item()
             total_predictions += labels.size(0)
 
-        epoch_loss = running_loss / len(train_dataloader)
+        epoch_loss = running_loss / len(train_data)
         epoch_accuracy = 100 * correct_predictions / total_predictions
 
         print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {epoch_loss:.4f}, Accuracy: {epoch_accuracy:.2f}%')
 
-    return model
+    train_results = {
+        'train_loss': epoch_loss,
+        'train_accuracy': epoch_accuracy
+    }
+    return train_results
 
-def test_model(model, test_dataloader, device):
+def test(model, test_data, device='cpu'):
     print('Testing model...')
     model.eval()
     correct_predictions = 0
     total_predictions = 0
     with torch.no_grad():
-        for i, (x_pa, x_lateral, labels) in enumerate(test_dataloader):
+        for i, (x_pa, x_lateral, labels) in enumerate(test_data):
             inputs = x_lateral.to(device), x_pa.to(device)
             labels = labels.to(device)
             outputs = model(inputs[0], inputs[1])
@@ -59,76 +65,3 @@ def test_model(model, test_dataloader, device):
         print(f'Test Accuracy: {test_accuracy:.2f}%')
     
     return test_accuracy, model
-
-def train(model, train_loader, val_loader, criterion, optimizer, num_epochs=10, device='cpu'):
-    '''
-    Train model.
-    '''
-    model.to(device)
-    train_losses = []
-    train_accuracies = []
-    train_f1s = []
-    val_losses = []
-    val_accuracies = []
-    val_f1s = []
-    for epoch in tqdm(range(num_epochs)):
-        model.train()
-        running_loss = 0.0
-        running_accuracy = 0.0
-        running_f1 = 0.0
-        for i, data in enumerate(train_loader):
-            if len(data) == 2:
-                inputs, labels = data
-                inputs = inputs.to(device)
-                labels = labels.to(device)
-            elif len(data) == 3:
-                inputs1, inputs2, labels = data
-                inputs1 = inputs1.to(device)
-                inputs2 = inputs2.to(device)
-                labels = labels.to(device)
-            optimizer.zero_grad()
-            if len(data) == 2:
-                outputs = model(inputs)
-            elif len(data) == 3:
-                outputs = model(inputs1, inputs2)
-            loss = criterion(outputs, labels)
-            loss.backward()
-            optimizer.step()
-            running_loss += loss.item()
-            outputs = outputs.detach().cpu().numpy()
-            outputs = np.argmax(outputs, axis=1)
-            labels = labels.detach().cpu().numpy()
-            running_accuracy += accuracy_score(labels, outputs)
-            running_f1 += f1_score(labels, outputs)
-        train_losses.append(running_loss/len(train_loader))
-        train_accuracies.append(running_accuracy/len(train_loader))
-        train_f1s.append(running_f1/len(train_loader))
-        model.eval()
-        running_loss = 0.0
-        running_accuracy = 0.0
-        running_f1 = 0.0
-        for i, data in enumerate(val_loader):
-            if len(data) == 2:
-                inputs, labels = data
-                inputs = inputs.to(device)
-                labels = labels.to(device)
-            elif len(data) == 3:
-                inputs1, inputs2, labels = data
-                inputs1 = inputs1.to(device)
-                inputs2 = inputs2.to(device)
-                labels = labels.to(device)
-            if len(data) == 2:
-                outputs = model(inputs)
-            elif len(data) == 3:
-                outputs#
-
-
-# TO BE IMPLEMENTED
-
-def train(model, criterion, optimizer, scheduler, train_data, val_data, num_epochs): 
-    pass
-    #return train_results
-
-def eval(model, criterion, test_data): 
-    pass
-    #return eval_results
