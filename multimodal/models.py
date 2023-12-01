@@ -114,15 +114,16 @@ class DualVisionEncoder(nn.Module):
         if vision_type == 'resnet50':
             self.model_pa = models.resnet50(weights=ResNet50_Weights.DEFAULT)
             self.model_lateral = models.resnet50(weights=ResNet50_Weights.DEFAULT)
-            self.num_features = self.model_pa.fc.in_features
+            self.num_features = self.model_pa.fc.in_features # 2048
+            ''' DenseNet produces 1024-dimensional feature vectors. '''
         elif vision_type == 'densenet121':
             self.model_pa = models.densenet121(weights=DenseNet121_Weights.IMAGENET1K_V1)
             self.model_lateral = models.densenet121(weights=DenseNet121_Weights.IMAGENET1K_V1)
-            self.num_features = self.model_pa.classifier.in_features
-        elif vision_type == 'vit':
+            self.num_features = self.model_pa.classifier.in_features # 1024
+        elif vision_type == 'vit': 
             self.model_pa = ViTForImageClassification.from_pretrained('google/vit-base-patch16-224')
             self.model_lateral = ViTForImageClassification.from_pretrained('google/vit-base-patch16-224')
-            self.num_features = self.model_pa.classifier.in_features
+            self.num_features = self.model_pa.classifier.in_features # 768
         else: 
             raise ValueError(f'Vision encoder type {vision_type} not supported.')
 
@@ -203,5 +204,5 @@ class JointEncoder(nn.Module):
         return output
     
 
-if "__name__" == "__main__":
-    print("Hello world!")
+if __name__ == '__main__': 
+    pass

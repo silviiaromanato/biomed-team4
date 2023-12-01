@@ -6,7 +6,7 @@ import random
 import math
 from tqdm import tqdm
 from torchvision import transforms
-from PIL import Image
+from PIL import Image, ImageOps
 from torch.utils.data import Dataset, DataLoader
 import os
 
