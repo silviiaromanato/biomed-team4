@@ -105,27 +105,27 @@ class DualVisionEncoder(nn.Module):
     Uses one vision encoder for each image, then concatenates the features.
 
     Args:
-        vision_type (str): Type of vision encoder (resnet50, densenet121 or vit)
+        vision (str): Type of vision encoder (resnet50, densenet121 or vit)
     '''
-    def __init__(self, vision_type : str):
+    def __init__(self, vision : str):
         super().__init__()
 
         # Load two pre-trained visual encoders
-        if vision_type == 'resnet50':
+        if vision == 'resnet50':
             self.model_pa = models.resnet50(weights=ResNet50_Weights.DEFAULT)
             self.model_lateral = models.resnet50(weights=ResNet50_Weights.DEFAULT)
             self.num_features = self.model_pa.fc.in_features # 2048
             ''' DenseNet produces 1024-dimensional feature vectors. '''
-        elif vision_type == 'densenet121':
+        elif vision == 'densenet121':
             self.model_pa = models.densenet121(weights=DenseNet121_Weights.IMAGENET1K_V1)
             self.model_lateral = models.densenet121(weights=DenseNet121_Weights.IMAGENET1K_V1)
             self.num_features = self.model_pa.classifier.in_features # 1024
-        elif vision_type == 'vit': 
+        elif vision == 'vit': 
             self.model_pa = ViTForImageClassification.from_pretrained('google/vit-base-patch16-224')
             self.model_lateral = ViTForImageClassification.from_pretrained('google/vit-base-patch16-224')
             self.num_features = self.model_pa.classifier.in_features # 768
         else: 
-            raise ValueError(f'Vision encoder type {vision_type} not supported.')
+            raise ValueError(f'Vision encoder type {vision} not supported.')
 
         # Remove last classification layer (1000 classes in ImageNet)
         self.model_pa = nn.Sequential(*list(self.model_pa.children())[:-1])
@@ -145,34 +145,32 @@ class JointEncoder(nn.Module):
     Args:
         tabular (bool): Whether to use tabular data
         tabular_params (dict): Parameters for tabular encoder {dim_input, hidden_dims, dropout_prob, batch_norm}
-        vision_type (str): Type of vision encoder (Default: None --> No vision encoder)
+        vision (str): Type of vision encoder (Default: None --> No vision encoder)
         num_labels (int): Number of labels for each class
         num_classes (int): Number of classes
     '''
     def __init__(self, 
                  tabular = True,
                  tabular_params = None,
-                 vision_type = None,
-                 num_labels=3, 
-                 num_classes=15
+                 vision = None,
                  ):
         super(JointEncoder, self).__init__()
 
         self.tabular = tabular
-        self.vision_type = vision_type
+        self.vision = vision
 
-        if not tabular and not vision_type: 
+        if not tabular and not vision: 
             raise ValueError('Must specify tabular and/or vision encoder.')
         
-        if vision_type and vision_type not in ['resnet50', 'densenet121', 'vit']:
-            raise ValueError(f'Vision encoder type {vision_type} not supported.')
-        if vision_type:
-            self.vision_encoder = DualVisionEncoder(vision_type)
+        if vision and vision not in ['resnet50', 'densenet121', 'vit']:
+            raise ValueError(f'Vision encoder type {vision} not supported.')
+        if vision:
+            self.vision_encoder = DualVisionEncoder(vision)
 
         if tabular:
             self.tabular_encoder = FullyConnectedNetwork(**tabular_params)
         
-        self.classifier = ClassifierHead(num_labels=num_labels, num_classes=num_classes)
+        self.classifier = ClassifierHead(num_labels=NUM_LABELS, num_classes=NUM_CLASSES)
 
     def forward(self, x_pa=None, x_lateral=None, x_tab=None):
         '''
@@ -182,27 +180,36 @@ class JointEncoder(nn.Module):
             x_tab (tensor): Tabular features
         '''
         # Generate embeddings (image and/or tabular)
-        if self.vision_type:
+        if self.vision:
             if x_pa is None or x_lateral is None:
                 raise ValueError('Vision encoder is specified but no images are provided.')
-            image_embedding = self.vision_encoder(x_pa, x_lateral)
+            vision_embedding = self.vision_encoder(x_pa, x_lateral)
         if self.tabular:
             if x_tab is None:
                 raise ValueError('Tabular encoder is specified but no tabular data is provided.')
             tabular_embedding = self.tabular_encoder(x_tab)
 
         # Concatenate embeddings
-        if self.vision_type and self.tabular:
-            embedding = torch.cat((image_embedding, tabular_embedding), dim=1)
-        elif self.vision_type:
-            embedding = image_embedding
+        if self.vision and self.tabular:
+            embedding = torch.cat((vision_embedding, tabular_embedding), dim=1)
+        elif self.vision:
+            embedding = vision_embedding
         elif self.tabular:
             embedding = tabular_embedding
         
         # Classify embeddings
         output = self.classifier(embedding)
         return output
+
+def grid_search(tabular=None, vision=None): 
+    '''
     
+    '''
+
+    
+
+
+
 
 if __name__ == '__main__': 
     pass

@@ -1,0 +1,21 @@
+# Grid Search: ResNet + Tabular
+program: multimodal/grid_search.py
+method: grid
+project: BioMedTeam4
+metric:
+  goal: minimize
+  name: val_loss
+command:
+ - ${env}
+ - python3
+ - ${program}
+ - ${args}
+parameters:
+  tabular: 
+    value: 1
+  vision: 
+    value: 'resnet'
+  device: 
+    value: 'cuda:0'
+  seed:
+    values: [1, 2, 3]
