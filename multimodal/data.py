@@ -142,8 +142,6 @@ class MedicalImagesDataset(Dataset):
 
         return pa_image, lateral_image, label_tensor
 
-    
-
 def create_image_labels_mapping(image_files, labels_data, info_data):
     """
     Create a mapping from image files to their corresponding labels and view positions.
@@ -212,7 +210,6 @@ def train_val_test_split(dataset, val_size=0.2, test_size=0.2,
         dataset, batch_size=batch_size, sampler=test_sampler, num_workers=num_workers)
     return train_loader, val_loader, test_loader
 
-
 class MedicalImagesTabularDataset(Dataset):
     def __init__(self, data_dict, tabular_data, size=224, transform_images=None, transform_tabular=None):
         self.data_dict = data_dict
@@ -229,9 +226,9 @@ class MedicalImagesTabularDataset(Dataset):
         # Organize paths by subject_id and study_id
         self.organized_paths = self._organize_paths()
         print(f'Number of samples: {len(self.organized_paths)}')
+
         # Filter out pairs where both images are None
-        self.organized_paths = {k: v for k, v in self.organized_paths.items() if v['PA'] is not None and v['Lateral'] is not None and not self.tabular[(self.tabular['subject_id'] == k[0]) & (self.tabular['study_id'] == k[1])].empty}
-        print(f'Number of samples after filtering: {len(self.organized_paths)}')
+        self.organized_paths = {k: v for k, v in self.organized_paths.items() if v['PA'] is not None and v['LATERAL'] is not None}
 
     def _organize_paths(self):
         organized = {}
@@ -242,10 +239,10 @@ class MedicalImagesTabularDataset(Dataset):
             key = (subject_id, study_id)
 
             if key not in organized:
-                organized[key] = {'PA': None, 'Lateral': None}
+                organized[key] = {'PA': None, 'LATERAL': None}
 
             view_position = self.data_dict[path]['ViewPosition']
-            if view_position in ['PA', 'Lateral']:
+            if view_position in ['PA', 'LATERAL']:
                 organized[key][view_position] = path
 
         return organized
@@ -270,15 +267,19 @@ class MedicalImagesTabularDataset(Dataset):
     def __getitem__(self, idx):
         if idx >= len(self.organized_paths):
             raise IndexError("Index out of range")
+        
+        # et the study and subject id you are wokin with
         subject_study_pair = list(self.organized_paths.keys())[idx]
+
+        # Get the paths for the PA and Lateral images
         pa_path = self.organized_paths[subject_study_pair]['PA']
-        lateral_path = self.organized_paths[subject_study_pair]['Lateral']
+        lateral_path = self.organized_paths[subject_study_pair]['LATERAL']
 
         # Load and process PA and Lateral images
         pa_image = self._load_and_process_image(pa_path)
         lateral_image = self._load_and_process_image(lateral_path)
 
-        # Use one of the available paths to get labels (assuming they are the same for both views)
+        # Use one of the available paths to get labels
         labels_path = pa_path if pa_path else lateral_path
 
         if not labels_path:
@@ -294,18 +295,10 @@ class MedicalImagesTabularDataset(Dataset):
         tabular_row = self.tabular[(self.tabular['subject_id'] == subject_id) & 
                                    (self.tabular['study_id'] == study_id)]
 
-        if not tabular_row.empty:
-            tabular_row = tabular_row.iloc[0]
-        else:
-            # Skip this patient if tabular data is missing ? or return the images ?
-            print(f'No tabular data for subject {subject_id} and study {study_id}')
-            return None
-
-        tabular_row = tabular_row.drop(['subject_id', 'study_id', 'dicom_id', 'split'])        
+        tabular_row = tabular_row.drop(['subject_id', 'study_id'], axis=1).values       
         tabular_tensor = torch.tensor(tabular_row, dtype=torch.float32)
 
         return pa_image, lateral_image, label_tensor, tabular_tensor
-    
     
 def load_data(data_dir, tabular=True, vision=None, batch_size=32, num_workers=4, seed=0):
     '''
