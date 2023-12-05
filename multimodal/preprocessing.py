@@ -31,7 +31,8 @@ def preprocess_data():
 
         #----------------------------------- PREPROCESS ADMISSIONS AND PATIENTS -----------------------------------#
 
-        admissions_cleaned = admissions.drop(columns=['dischtime', 'deathtime', 'discharge_location', 'edregtime', 'edouttime', 'hospital_expire_flag'])
+        admissions_cleaned = admissions.drop(columns=[
+            'dischtime', 'deathtime', 'discharge_location', 'edregtime', 'edouttime', 'hospital_expire_flag'])
         patients_cleaned = patients.drop(columns=['dod'])
 
         # Merge the two tables
@@ -139,7 +140,9 @@ def preprocess_data():
         return pd.read_csv(PATH_PREPROCESSED_DATA)
     
 def split_data(data, train_size=0.75, val_size=0.1, test_size=0.15):
-    if not os.path.exists(PATH_DATA_TRAIN) or not os.path.exists(PATH_DATA_VAL) or not os.path.exists(PATH_DATA_TEST) or not os.path.exists(PATH_LABELS_TRAIN) or not os.path.exists(PATH_LABELS_VAL) or not os.path.exists(PATH_LABELS_TEST):
+    if not os.path.exists(PATH_DATA_TRAIN) or not os.path.exists(PATH_DATA_VAL) \
+        or not os.path.exists(PATH_DATA_TEST) or not os.path.exists(PATH_LABELS_TRAIN) \
+            or not os.path.exists(PATH_LABELS_VAL) or not os.path.exists(PATH_LABELS_TEST):
         PATH_LABEL = '../data/mimic-cxr/mimic-cxr-2.0.0-chexpert.csv'
         labels = pd.read_csv(PATH_LABEL)
         tab_data = preprocess_data()
@@ -147,8 +150,8 @@ def split_data(data, train_size=0.75, val_size=0.1, test_size=0.15):
         labels = labels.replace(1, 2)
         # replace all -1 with 1
         labels = labels.replace(-1, 1)
-        # replace all NaN with 0
-        labels = labels.fillna(0)
+        # replace all NaN with 1
+        labels = labels.fillna(1)
 
         # Get all the unique study_ids
         study_ids = tab_data['study_id'].unique()
@@ -208,7 +211,9 @@ def split_data(data, train_size=0.75, val_size=0.1, test_size=0.15):
 
 
 def load_data():
-    # Load admissions, patients, and icustays
+    '''
+    Load admissions, patients, and icustays
+    '''
     admissions = pd.read_csv(MIMIC_PATH+'admissions.csv.gz')
     patients = pd.read_csv(MIMIC_PATH+'patients.csv.gz')
     services = pd.read_csv(MIMIC_PATH+'services.csv.gz')
