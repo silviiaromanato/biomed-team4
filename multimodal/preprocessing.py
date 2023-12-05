@@ -21,7 +21,8 @@ PATH_LABELS_TRAIN = '../data/processed_data/labels_train.csv'
 PATH_LABELS_VAL = '../data/processed_data/labels_val.csv'
 PATH_LABELS_TEST = '../data/processed_data/labels_test.csv'
 
-PATH_IMAGES = '../data/mimic-cxr/'
+PATH_IMAGES = '../data/'
+PATH_CXR = '../data/mimic-cxr/'
 
 def preprocess_data():
     # check if preprocessed data already exists
@@ -216,9 +217,9 @@ def load_data():
     return admissions, patients, services, metadata
 
 def load_images_data():
-    labels_data = pd.read_csv(PATH_IMAGES + 'mimic-cxr-2.0.0-chexpert.csv')
+    labels_data = pd.read_csv(PATH_CXR + 'mimic-cxr-2.0.0-chexpert.csv')
     image_files = list_images(PATH_IMAGES + 'files')
-    info_jpg = pd.read_csv(PATH_IMAGES + 'mimic-cxr-2.0.0-metadata.csv')
+    info_jpg = pd.read_csv(PATH_CXR + 'mimic-cxr-2.0.0-metadata.csv')
     return labels_data, image_files, info_jpg
 
 def filter_images(labels_data, image_files, info_jpg, tab_data):
