@@ -28,11 +28,12 @@ def preprocess_data():
     # check if preprocessed data already exists
     if not os.path.exists(PATH_PREPROCESSED_DATA):
         # load data
-        admissions, patients, services, metadata = load_data()
+        admissions, patients, services, metadata = load_tabular_data()
 
         #----------------------------------- PREPROCESS ADMISSIONS AND PATIENTS -----------------------------------#
 
-        admissions_cleaned = admissions.drop(columns=['dischtime', 'deathtime', 'discharge_location', 'edregtime', 'edouttime', 'hospital_expire_flag'])
+        admissions_cleaned = admissions.drop(columns=[
+            'dischtime', 'deathtime', 'discharge_location', 'edregtime', 'edouttime', 'hospital_expire_flag'])
         patients_cleaned = patients.drop(columns=['dod'])
 
         # Merge the two tables
@@ -140,16 +141,15 @@ def preprocess_data():
         return pd.read_csv(PATH_PREPROCESSED_DATA)
     
 def split_data(data, train_size=0.75, val_size=0.1, test_size=0.15):
-    if not os.path.exists(PATH_DATA_TRAIN) or not os.path.exists(PATH_DATA_VAL) or not os.path.exists(PATH_DATA_TEST) or not os.path.exists(PATH_LABELS_TRAIN) or not os.path.exists(PATH_LABELS_VAL) or not os.path.exists(PATH_LABELS_TEST):
+    if not os.path.exists(PATH_DATA_TRAIN) or not os.path.exists(PATH_DATA_VAL) \
+        or not os.path.exists(PATH_DATA_TEST) or not os.path.exists(PATH_LABELS_TRAIN) \
+            or not os.path.exists(PATH_LABELS_VAL) or not os.path.exists(PATH_LABELS_TEST):
         PATH_LABEL = '../data/mimic-cxr/mimic-cxr-2.0.0-chexpert.csv'
         labels = pd.read_csv(PATH_LABEL)
         tab_data = preprocess_data()
-        # replace all 1 with 2
-        labels = labels.replace(1, 2)
-        # replace all -1 with 1
-        labels = labels.replace(-1, 1)
-        # replace all NaN with 0
-        labels = labels.fillna(0)
+        labels = labels.replace(1, 2)   # Positive: 1 -> 2
+        labels = labels.replace(-1, 1)  # Uncertain: -1 -> 1
+        labels = labels.fillna(0)       # Missing == Negative: NaN -> 0
 
         # Get all the unique study_ids
         study_ids = tab_data['study_id'].unique()
@@ -186,10 +186,8 @@ def split_data(data, train_size=0.75, val_size=0.1, test_size=0.15):
         labels_test.to_csv('../data/processed_data/labels_test.csv', index=False)
 
         # Check proportions of total, train, val, and test sets
-        print('Total set: ', len(tab_data))
-        print('Percent train: ', len(tab_data_train) / len(tab_data))
-        print('Percent val: ', len(tab_data_val) / len(tab_data))
-        print('Percent test: ', len(tab_data_test) / len(tab_data))
+        print(f'Total: {len(tab_data)}\nTrain: {len(tab_data_train)/len(tab_data)}%\
+              \nVal: {len(tab_data_val)/len(tab_data)}%\nTest: {len(tab_data_test)/len(tab_data)}%')
 
     else:   
         tab_data_train = pd.read_csv(PATH_DATA_TRAIN)
@@ -208,8 +206,10 @@ def split_data(data, train_size=0.75, val_size=0.1, test_size=0.15):
     return tab_data_train, tab_data_val, tab_data_test, labels_train, labels_val, labels_test
 
 
-def load_data():
-    # Load admissions, patients, and icustays
+def load_tabular_data():
+    '''
+    Load admissions, patients, and icustays
+    '''
     admissions = pd.read_csv(MIMIC_PATH+'admissions.csv.gz')
     patients = pd.read_csv(MIMIC_PATH+'patients.csv.gz')
     services = pd.read_csv(MIMIC_PATH+'services.csv.gz')
