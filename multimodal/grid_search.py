@@ -9,6 +9,7 @@ import os
 import wandb
 from autoparse import autoparse
 import torch.optim as optim
+import argparse
 
 from data import *
 from train import *
@@ -112,6 +113,18 @@ def grid_search(tabular=False,
 
 
 if __name__ == '__main__':
-    kwargs = autoparse(grid_search, verbose=False)
-    grid_search(**kwargs)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--tabular', action='store_true', default=False)
+    parser.add_argument('--vision', type=str, default=None)
+    parser.add_argument('--hidden_dims', nargs='+', type=int, default=None)
+    parser.add_argument('--dropout_prob', type=float, default=0.0)
+    parser.add_argument('--batch_norm', action='store_true', default=False)
+    parser.add_argument('--lr', type=float, default=0.001)
+    parser.add_argument('--num_epochs', type=int, default=10)
+    parser.add_argument('--device', type=str, default='cpu')
+    parser.add_argument('--seed', type=int, default=0)
+    args = parser.parse_args()
+
+    #kwargs = autoparse(grid_search, verbose=False)
+    grid_search(**vars(args))
     

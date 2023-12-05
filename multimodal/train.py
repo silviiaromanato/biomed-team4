@@ -5,6 +5,7 @@ TODO: Add validation set, scheduler and log results to W&B.
 '''
 
 from data import *
+import torch
 
 def train(model, criterion, optimizer, scheduler, train_data, val_data, num_epochs, device='cpu', verbose=False):
     print('Training model...')
@@ -25,6 +26,7 @@ def train(model, criterion, optimizer, scheduler, train_data, val_data, num_epoc
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
+            scheduler.step()
 
             # Statistics
             running_loss += loss.item()

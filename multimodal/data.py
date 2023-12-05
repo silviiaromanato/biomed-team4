@@ -70,78 +70,6 @@ class MimicDataset(torch.utils.data.Dataset):
         elif self.tabular:
             return self.tabular_data[idx], self.labels[idx]
         
-class MedicalImagesDataset(Dataset):
-    def __init__(self, data_dict, size=224, transform=None):
-        self.data_dict = data_dict
-        self.transform = transform
-        self.size = size
-        self.classes = ['Atelectasis', 'Cardiomegaly', 'Consolidation', 'Edema', 
-                        'Enlarged Cardiomediastinum', 'Fracture', 'Lung Lesion', 
-                        'Lung Opacity', 'No Finding', 'Pleural Effusion', 
-                        'Pleural Other', 'Pneumonia', 'Pneumothorax', 'Support Devices']
-        # Organize paths by subject_id and study_id
-        self.organized_paths = self._organize_paths()
-        # Filter out pairs where both images are None
-        self.organized_paths = {k: v for k, v in self.organized_paths.items() if v['PA'] is not None or v['Lateral'] is not None}
-
-    def _organize_paths(self):
-        organized = {}
-        for path in self.data_dict.keys():
-            parts = path.split(os.sep)
-            subject_id = parts[-3][1:]
-            study_id = parts[-2][1:]
-            key = (subject_id, study_id)
-
-            if key not in organized:
-                organized[key] = {'PA': None, 'Lateral': None}
-
-            view_position = self.data_dict[path]['ViewPosition']
-            if view_position in ['PA', 'Lateral']:
-                organized[key][view_position] = path
-
-        return organized
-
-    def __len__(self):
-        return len(self.organized_paths)
-
-    def _load_and_process_image(self, path):
-        if path:
-            image = Image.open(path).convert('RGB')
-        else:
-            # Create a blank (black) image if path is None
-            image = Image.new('RGB', (self.size, self.size))
-
-        image = image.resize((self.size, self.size))
-
-        if self.transform:
-            image = self.transform(image)
-        else:
-            image = transforms.ToTensor()(image)
-
-        return image
-
-    def __getitem__(self, idx):
-        subject_study_pair = list(self.organized_paths.keys())[idx]
-        pa_path = self.organized_paths[subject_study_pair]['PA']
-        lateral_path = self.organized_paths[subject_study_pair]['Lateral']
-
-        # Load and process PA and Lateral images
-        pa_image = self._load_and_process_image(pa_path)
-        lateral_image = self._load_and_process_image(lateral_path)
-
-        # Use one of the available paths to get labels (assuming they are the same for both views)
-        labels_path = pa_path if pa_path else lateral_path
-
-        if not labels_path:
-            # Skip this patient if both PA and Lateral images are missing
-            return None
-
-        labels = self.data_dict[labels_path]
-        label_values = [labels[class_name] if not np.isnan(labels[class_name]) else 0 for class_name in self.classes]
-        label_tensor = torch.tensor(label_values, dtype=torch.float32)
-
-        return pa_image, lateral_image, label_tensor
-
 def create_image_labels_mapping(image_files, labels_data, info_data):
     """
     Create a mapping from image files to their corresponding labels and view positions.
@@ -300,15 +228,16 @@ class MedicalImagesTabularDataset(Dataset):
 
         return pa_image, lateral_image, label_tensor, tabular_tensor
     
+
 def load_data(data_dir, tabular=True, vision=None, batch_size=32, num_workers=4, seed=0):
     '''
     Load data from data_dir.
 
     TO CHECK!
     '''
-    dataset = MimicDataset(data_dir, 
-                           tabular=tabular,
-                           vision=False if vision is None else True)
-    train_loader, val_loader, test_loader = train_val_test_split(dataset, val_size=0.2, test_size=0.2, 
-                         batch_size=batch_size, shuffle=True, num_workers=num_workers, seed=seed, device=device)
+    dataset = MedicalImagesTabularDataset(...)
+    train_loader, val_loader, test_loader = train_val_test_split(
+        dataset, val_size=0.2, test_size=0.2, 
+        batch_size=batch_size, shuffle=True, 
+        num_workers=num_workers, seed=seed)
     return train_loader, val_loader, test_loader

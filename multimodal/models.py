@@ -150,7 +150,7 @@ class JointEncoder(nn.Module):
     Args:
         tabular (bool): Whether to use tabular data
         tabular_params (dict): Parameters for tabular encoder {dim_input, hidden_dims, dropout_prob, batch_norm}
-        vision (str): Type of vision encoder (Default: None --> No vision encoder)
+        vision (str): Type of vision encoder 'densenet121', 'resnet50' or 'vit'. Default: None --> No vision encoder
         num_labels (int): Number of labels for each class
         num_classes (int): Number of classes
     '''
