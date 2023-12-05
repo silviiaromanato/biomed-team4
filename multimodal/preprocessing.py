@@ -148,7 +148,7 @@ def split_data(data, train_size=0.75, val_size=0.1, test_size=0.15):
         tab_data = preprocess_data()
         labels = labels.replace(1, 2)   # Positive: 1 -> 2
         labels = labels.replace(-1, 1)  # Uncertain: -1 -> 1
-        labels = labels.fillna(1)       # Missing: NaN -> 1
+        labels = labels.fillna(0)       # Missing == Negative: NaN -> 0
 
         # Get all the unique study_ids
         study_ids = tab_data['study_id'].unique()
