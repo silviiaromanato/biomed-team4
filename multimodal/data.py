@@ -302,11 +302,10 @@ class MultimodalDataset(Dataset):
     Dataset class for MIMIC-CXR and MIMIC-IV.
     Handles both tabular data and images.
     '''
-    def __init__(self, data_dict, tabular, size=224, transform_images=None, transform_tabular=None):
+    def __init__(self, data_dict, tabular, size=224, transform_images=None):
         self.data_dict = data_dict
         self.tabular = tabular
         self.transform_img = transform_images
-        self.transform_tab = transform_tabular
         self.size = size
         
         self.classes = ['Atelectasis', 'Cardiomegaly', 'Consolidation', 'Edema', 
