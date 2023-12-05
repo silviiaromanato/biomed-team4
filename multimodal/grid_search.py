@@ -1,13 +1,13 @@
 '''
 Grid search for radiology diagnosis using joint image-tabular encoders. 
 
-You will neeed to install autoparse from GitHub using 
+You might need to install autoparse from GitHub using 
 pip install git+https://github.com/latorrefabian/autoparse.git
 '''
 
 import os
 import wandb
-from autoparse import autoparse
+#from autoparse import autoparse
 import torch.optim as optim
 import argparse
 
@@ -25,6 +25,7 @@ DATA_DIR = os.path.join(BASE_DIR, 'data')
 NUM_LABELS = 3 # Neutral, Positive, Negative
 NUM_CLASSES = 15 # Radiology diagnoses
 TABULAR_DIM = 88 # Number of tabular features
+
 
 def build_group(tabular=False, 
                 vision=None, 

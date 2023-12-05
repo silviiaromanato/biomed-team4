@@ -7,11 +7,13 @@ Joint encoder: Vision + Tabular encoders
 
 from data import *
 
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import torch.optim as optim
+from torchvision import models
 from torchvision.models import DenseNet121_Weights, ResNet50_Weights
 from transformers import ViTForImageClassification
-from torchvision import models
-import torch.nn as nn
-import torch
 
 class FullyConnectedLayer(nn.Module):
     '''
