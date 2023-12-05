@@ -231,7 +231,7 @@ def preprocess_tabular():
     tabular.to_csv(TAB_PATH, index=False)
     return tabular
     
-def preprocess_labels(labels): 
+def preprocess_labels(): 
     '''
     Preprocess labels:
     - Positive: 1 -> 2
@@ -244,7 +244,7 @@ def preprocess_labels(labels):
     labels = labels.fillna(0)      
     return labels
 
-def split_data(tabular, labels, val_size=0.1, test_size=0.15):
+def split(tabular, labels, val_size=0.1, test_size=0.15):
     '''
     Split tabular data and labels into train, val, and test sets.
     '''
@@ -298,9 +298,13 @@ def split_data(tabular, labels, val_size=0.1, test_size=0.15):
 
 
 class MultimodalDataset(Dataset):
-    def __init__(self, data_dict, tabular_data, size=224, transform_images=None, transform_tabular=None):
+    '''
+    Dataset class for MIMIC-CXR and MIMIC-IV.
+    Handles both tabular data and images.
+    '''
+    def __init__(self, data_dict, tabular, size=224, transform_images=None, transform_tabular=None):
         self.data_dict = data_dict
-        self.tabular = tabular_data
+        self.tabular = tabular
         self.transform_img = transform_images
         self.transform_tab = transform_tabular
         self.size = size
@@ -396,7 +400,7 @@ def load_data(tabular=True, vision=None, batch_size=32, num_workers=4, seed=0):
 
     # Split tabular and labels into train/val/test sets
     tabular_train, tabular_val, tabular_test, \
-        labels_train, labels_val, labels_test = split_data(tabular, labels)
+        labels_train, labels_val, labels_test = split(tabular, labels)
 
     # Create datasets
     train_dataset = MultimodalDataset(
