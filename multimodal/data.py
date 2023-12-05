@@ -14,10 +14,6 @@ from torchvision import transforms
 
 # ---------------------------------------- GLOBAL VARIABLES ---------------------------------------- #
 
-seed = 42
-np.random.seed(seed)
-torch.manual_seed(seed)
-
 DATA_PATH = '../data/'
 TABULAR_PATH = os.path.join(DATA_PATH, 'mimic-iv')
 IMAGES_PATH = os.path.join(DATA_PATH, 'mimic-cxr')
@@ -63,9 +59,9 @@ def load_images_data():
     '''
     Load image data: labels, image files, image metadata
     '''
-    labels_data = pd.read_csv(IMAGES_PATH + 'mimic-cxr-2.0.0-chexpert.csv')
-    image_files = list_images(IMAGES_PATH + 'files')
-    metadata = pd.read_csv(IMAGES_PATH + 'mimic-cxr-2.0.0-metadata.csv')
+    labels_data = pd.read_csv(LABELS_PATH)
+    image_files = list_images(os.path.join(IMAGES_PATH, 'files'))
+    metadata = pd.read_csv(METADATA_PATH)
     return labels_data, image_files, metadata
 
 
@@ -304,11 +300,21 @@ class MultimodalDataset(Dataset):
     Dataset class for MIMIC-CXR and MIMIC-IV.
     Handles both tabular data and images.
     '''
-    def __init__(self, data_dict, tabular, size=224, transform_images=None):
+    def __init__(self, data_dict, tabular, size=256, transform=True):
         self.data_dict = data_dict
         self.tabular = tabular
-        self.transform_img = transform_images
         self.size = size
+
+        if transform: 
+            self.img_transform = transforms.Compose([
+                transforms.Resize((size, size)),    # Resize images to the size expected by model
+                transforms.ToTensor(),              # Convert images to PyTorch tensors
+                transforms.Normalize(               # Normalize with ImageNet mean and std
+                    mean=[0.485, 0.456, 0.406],    
+                    std=[0.229, 0.224, 0.225])
+            ])
+        else: 
+            self.img_transform = transforms.ToTensor()
         
         self.classes = ['Atelectasis', 'Cardiomegaly', 'Consolidation', 'Edema', 
                         'Enlarged Cardiomediastinum', 'Fracture', 'Lung Lesion', 
@@ -347,10 +353,7 @@ class MultimodalDataset(Dataset):
         else:
             image = Image.new('RGB', (self.size, self.size))
         image = image.resize((self.size, self.size))
-        if self.transform_img:
-            image = self.transform(image)
-        else:
-            image = transforms.ToTensor()(image)
+        image = self.img_transform(image)
         return image
 
     def __getitem__(self, idx):
@@ -386,31 +389,52 @@ class MultimodalDataset(Dataset):
         tabular_tensor = torch.tensor(tabular_row, dtype=torch.float32)
 
         return pa_image, lateral_image, label_tensor, tabular_tensor
-    
 
-def load_data(tabular=True, vision=None, batch_size=32, num_workers=4, seed=0):
+
+def load_data(image_size=256):
     '''
     Main function to load data.
     1 - Load and pre-process tabular data and labels
     2 - Split into train/val/test sets
     3 - Create data loaders
     '''
-    # Pre-process tabular data and labels
+
+    # Set random seed
+    np.random.seed(42)
+    torch.manual_seed(42)
+
+    # Load and pre-process tabular data and labels
     tabular = preprocess_tabular()
     labels = preprocess_labels()
 
     # Split tabular and labels into train/val/test sets
-    tabular_train, tabular_val, tabular_test, \
-        labels_train, labels_val, labels_test = split(tabular, labels)
+    tab_train, tab_val, tab_test, lab_train, lab_val, lab_test = split(tabular, labels)
+    
+    # Load image labels, files and metadata
+    labels_data, image_data, info_data = load_images_data()
+
+    # Get intersection of tabular and image data
+    tab_data_train, image_dict_train = filter_images(labels_data, image_data, info_data, tab_train)
+    tab_data_val, image_dict_val = filter_images(labels_data, image_data, info_data, tab_val)
+    tab_data_test, image_dict_test = filter_images(labels_data, image_data, info_data, tab_test)
 
     # Create datasets
-    train_dataset = MultimodalDataset(...)
-    val_dataset = MultimodalDataset(...)
-    test_dataset = MultimodalDataset(...)
-    
+    train_dataset = MultimodalDataset(image_dict_train, tab_data_train, size=image_size)
+    val_dataset = MultimodalDataset(image_dict_val, tab_data_val, size=image_size)
+    test_dataset = MultimodalDataset(image_dict_test, tab_data_test, size=image_size)
+
     # Create data loaders
-    loader_params = {'batch_size': batch_size, 'num_workers': num_workers, 'shuffle': True}
+    loader_params = {'batch_size': 32, 'num_workers': 4, 'shuffle': True}
     train_loader = DataLoader(train_dataset, **loader_params)
     val_loader = DataLoader(val_dataset, **loader_params)
     test_loader = DataLoader(test_dataset, **loader_params)
+
+    # Test data loaders
+    for pa_image, lateral_image, label_tensor, tabular_tensor in train_loader:
+        print(pa_image.shape)
+        print(lateral_image.shape)
+        print(label_tensor.shape)
+        print(tabular_tensor.shape)
+        break
+
     return train_loader, val_loader, test_loader
