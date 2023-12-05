@@ -23,53 +23,20 @@ import torch.optim as optim
 
 from sklearn.metrics import confusion_matrix, roc_curve, auc, precision_recall_curve, average_precision_score, f1_score, accuracy_score, precision_score, recall_score
 
+
 def list_images(base_path):
     """
     Recursively lists all image files starting from the base path.
     Assumes that images have extensions typical for image files (e.g., .jpg, .jpeg, .png).
     """
     image_files = []
-    for subdir, dirs, files in os.walk(base_path):
+    for subdir, _, files in os.walk(base_path):
         for file in files:
             if file.lower().endswith(('.png', '.jpg', '.jpeg')):
                 image_files.append(os.path.join(subdir, file))
     return image_files
 
-class MimicDataset(torch.utils.data.Dataset):
-    '''
-    MIMIC Dataset. 
-    Enables image and/or tabular data.
-    '''
-    def __init__(self, data_path, image=True, tabular=True):
-        self.data_path = data_path
-        self.image = image
-        self.tabular = tabular
-        
-        self.data = pd.read_csv(data_path)
-        self.labels = self.data['target'].values
-        self.data.drop(['target'], axis=1, inplace=True)
-        
-        if self.image:
-            self.image_data = self.data.iloc[:, :10000].values
-            self.image_data = self.image_data.reshape(-1, 100, 100)
-            self.image_data = torch.from_numpy(self.image_data).float()
-            self.image_data = self.image_data.unsqueeze(1)
-            
-        if self.tabular:
-            self.tabular_data = self.data.iloc[:, 10000:].values
-            self.tabular_data = torch.from_numpy(self.tabular_data).float()
-        
-    def __len__(self):
-        return len(self.data)
-    
-    def __getitem__(self, idx):
-        if self.image and self.tabular:
-            return self.image_data[idx], self.tabular_data[idx], self.labels[idx]
-        elif self.image:
-            return self.image_data[idx], self.labels[idx]
-        elif self.tabular:
-            return self.tabular_data[idx], self.labels[idx]
-        
+
 def create_image_labels_mapping(image_files, labels_data, info_data):
     """
     Create a mapping from image files to their corresponding labels and view positions.
@@ -112,31 +79,6 @@ def create_image_labels_mapping(image_files, labels_data, info_data):
 
     return image_labels_mapping
         
-def train_val_test_split(dataset, val_size=0.2, test_size=0.2, 
-                         batch_size=32, shuffle=True, num_workers=4, seed=0):
-    '''
-    Split dataset into train, validation, and test sets.
-    '''
-    np.random.seed(seed)
-    torch.manual_seed(seed)
-    dataset_size = len(dataset)
-    indices = list(range(dataset_size))
-    if shuffle:
-        np.random.shuffle(indices)
-    val_split = int(np.floor(val_size * dataset_size))
-    test_split = int(np.floor(test_size * dataset_size))
-    train_indices, val_indices, test_indices = \
-        indices[val_split+test_split:], indices[:val_split], indices[val_split:test_split]
-    train_sampler = torch.utils.data.SubsetRandomSampler(train_indices)
-    val_sampler = torch.utils.data.SubsetRandomSampler(val_indices)
-    test_sampler = torch.utils.data.SubsetRandomSampler(test_indices)
-    train_loader = torch.utils.data.DataLoader(
-        dataset, batch_size=batch_size, sampler=train_sampler, num_workers=num_workers)
-    val_loader = torch.utils.data.DataLoader(
-        dataset, batch_size=batch_size, sampler=val_sampler, num_workers=num_workers)
-    test_loader = torch.utils.data.DataLoader(
-        dataset, batch_size=batch_size, sampler=test_sampler, num_workers=num_workers)
-    return train_loader, val_loader, test_loader
 
 class MedicalImagesTabularDataset(Dataset):
     def __init__(self, data_dict, tabular_data, size=224, transform_images=None, transform_tabular=None):
@@ -228,6 +170,32 @@ class MedicalImagesTabularDataset(Dataset):
 
         return pa_image, lateral_image, label_tensor, tabular_tensor
     
+
+def train_val_test_split(dataset, val_size=0.2, test_size=0.2, 
+                         batch_size=32, shuffle=True, num_workers=4, seed=0):
+    '''
+    Split dataset into train, validation, and test sets.
+    '''
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    dataset_size = len(dataset)
+    indices = list(range(dataset_size))
+    if shuffle:
+        np.random.shuffle(indices)
+    val_split = int(np.floor(val_size * dataset_size))
+    test_split = int(np.floor(test_size * dataset_size))
+    train_indices, val_indices, test_indices = \
+        indices[val_split+test_split:], indices[:val_split], indices[val_split:test_split]
+    train_sampler = torch.utils.data.SubsetRandomSampler(train_indices)
+    val_sampler = torch.utils.data.SubsetRandomSampler(val_indices)
+    test_sampler = torch.utils.data.SubsetRandomSampler(test_indices)
+    train_loader = torch.utils.data.DataLoader(
+        dataset, batch_size=batch_size, sampler=train_sampler, num_workers=num_workers)
+    val_loader = torch.utils.data.DataLoader(
+        dataset, batch_size=batch_size, sampler=val_sampler, num_workers=num_workers)
+    test_loader = torch.utils.data.DataLoader(
+        dataset, batch_size=batch_size, sampler=test_sampler, num_workers=num_workers)
+    return train_loader, val_loader, test_loader
 
 def load_data(data_dir, tabular=True, vision=None, batch_size=32, num_workers=4, seed=0):
     '''
