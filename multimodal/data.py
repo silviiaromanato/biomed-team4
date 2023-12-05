@@ -297,6 +297,8 @@ def split(tabular, labels, val_size=0.1, test_size=0.15):
     return tabular_train, tabular_val, tabular_test, labels_train, labels_val, labels_test
 
 
+# ---------------------------------------- DATA LOADING ---------------------------------------- #
+
 class MultimodalDataset(Dataset):
     '''
     Dataset class for MIMIC-CXR and MIMIC-IV.
@@ -403,21 +405,9 @@ def load_data(tabular=True, vision=None, batch_size=32, num_workers=4, seed=0):
         labels_train, labels_val, labels_test = split(tabular, labels)
 
     # Create datasets
-    train_dataset = MultimodalDataset(
-        data_dict=tabular_train, 
-        tabular_data=labels_train, 
-        transform_images=vision['train'], 
-        transform_tabular=None)
-    val_dataset = MultimodalDataset(
-        data_dict=tabular_val, 
-        tabular_data=labels_val, 
-        transform_images=vision['val'], 
-        transform_tabular=None)
-    test_dataset = MultimodalDataset(
-        data_dict=tabular_test, 
-        tabular_data=labels_test, 
-        transform_images=vision['test'], 
-        transform_tabular=None)
+    train_dataset = MultimodalDataset(...)
+    val_dataset = MultimodalDataset(...)
+    test_dataset = MultimodalDataset(...)
     
     # Create data loaders
     loader_params = {'batch_size': batch_size, 'num_workers': num_workers, 'shuffle': True}
