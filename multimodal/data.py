@@ -11,6 +11,7 @@ import pandas as pd
 from PIL import Image
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
+from transformers import ViTImageProcessor
 
 # ---------------------------------------- GLOBAL VARIABLES ---------------------------------------- #
 
@@ -168,8 +169,9 @@ def filter_images(labels_data, image_files, info_jpg, tab_data):
 
 def preprocess_tabular():
     if os.path.exists(TAB_PATH):
-        print(f'Tabular data already preprocessed. Loading from {TAB_PATH}.')
+        print(f'Loading pre-processed tabular data from {TAB_PATH}.')
         return pd.read_csv(TAB_PATH)
+    print(f'Preprocessing tabular data, saving to {TAB_PATH}.')
 
     # PREPROCESS ADMISSIONS AND PATIENTS
     # Drop columns, merge admissions and patients, convert dates to datetime
@@ -324,21 +326,26 @@ class MultimodalDataset(Dataset):
     Dataset class for MIMIC-CXR and MIMIC-IV.
     Handles both tabular data and images.
     '''
-    def __init__(self, data_dict, tabular, size=256, transform=True):
+    def __init__(self, vision, data_dict, tabular):
+        self.vision = vision
         self.data_dict = data_dict
         self.tabular = tabular
-        self.size = size
+        self.size = 224
 
-        if transform: 
-            self.img_transform = transforms.Compose([
-                transforms.Resize((size, size)),    # Resize images to the size expected by model
-                transforms.ToTensor(),              # Convert images to PyTorch tensors
-                transforms.Normalize(               # Normalize with ImageNet mean and std
+        if vision == 'vit':
+            self.processor = ViTImageProcessor.from_pretrained('google/vit-base-patch16-224')
+            self.transform = lambda x: self.processor(x, return_tensors='pt').pixel_values.squeeze(0)
+
+        elif vision in ['resnet50', 'dense121']:
+            self.transform = transforms.Compose([
+                transforms.Resize((self.size, self.size)),  # Resize to 224x224
+                transforms.ToTensor(),                      # Convert images to PyTorch tensors
+                transforms.Normalize(                       # Normalize with ImageNet mean and std
                     mean=[0.485, 0.456, 0.406],    
                     std=[0.229, 0.224, 0.225])
-            ])
-        else: 
-            self.img_transform = transforms.ToTensor()
+                ])
+        else:
+            raise ValueError(f'Vision encoder {vision} not supported.')
         
         self.classes = ['Atelectasis', 'Cardiomegaly', 'Consolidation', 'Edema', 
                         'Enlarged Cardiomediastinum', 'Fracture', 'Lung Lesion', 
@@ -376,16 +383,28 @@ class MultimodalDataset(Dataset):
             image = Image.open(path).convert('RGB')
         else:
             image = Image.new('RGB', (self.size, self.size))
-        image = image.resize((self.size, self.size))
-        image = self.img_transform(image)
+        if self.vision == 'vit':
+            image = self.processor(image, return_tensors='pt').pixel_values.squeeze(0)
+        image = self.transform(image)
         return image
 
     def __getitem__(self, idx):
         if idx >= len(self.organized_paths):
-            raise IndexError("Index out of range")
+            raise IndexError(f"Index {idx} out of range. Dataset has {len(self.organized_paths)} samples.")
         
         # Get the subject_id and study_id for this index
         subject_study_pair = list(self.organized_paths.keys())[idx]
+
+        # Get tabular data
+        subject_id, study_id = subject_study_pair
+        tabular_row = self.tabular[(self.tabular['subject_id'] == subject_id) & 
+                                   (self.tabular['study_id'] == study_id)]
+
+        tabular_row = tabular_row.drop(['subject_id', 'study_id'], axis=1).values       
+        tabular_tensor = torch.tensor(tabular_row, dtype=torch.float32)
+
+        if not self.vision:
+            return tabular_tensor, None, None, None
 
         # Get the paths for the PA and Lateral images
         pa_path = self.organized_paths[subject_study_pair]['PA']
@@ -404,25 +423,15 @@ class MultimodalDataset(Dataset):
         label_values = [labels[class_name] if not np.isnan(labels[class_name]) else 0 for class_name in self.classes]
         label_tensor = torch.tensor(label_values, dtype=torch.float32)
 
-        # Match with tabular data
-        subject_id, study_id = subject_study_pair
-        tabular_row = self.tabular[(self.tabular['subject_id'] == subject_id) & 
-                                   (self.tabular['study_id'] == study_id)]
-
-        tabular_row = tabular_row.drop(['subject_id', 'study_id'], axis=1).values       
-        tabular_tensor = torch.tensor(tabular_row, dtype=torch.float32)
-
         return pa_image, lateral_image, label_tensor, tabular_tensor
 
 
-def load_data(image_size=256):
+def prepare_data(): 
     '''
-    Main function to load data.
-    1 - Load and pre-process tabular data and labels
-    2 - Split into train/val/test sets
-    3 - Create data loaders
+    Load and pre-process tabular data and labels.
+    Split into train/val/test sets.
+    Filter images based on tabular data.
     '''
-
     # Load and pre-process tabular data and labels
     tabular = preprocess_tabular()
     labels = preprocess_labels()
@@ -438,10 +447,25 @@ def load_data(image_size=256):
     tab_data_val, image_dict_val = filter_images(labels_data, image_files, metadata, tab_val)
     tab_data_test, image_dict_test = filter_images(labels_data, image_files, metadata, tab_test)
 
+    return tab_data_train, tab_data_val, tab_data_test, image_dict_train, image_dict_val, image_dict_test
+
+
+def load_data(vision=None):
+    '''
+    Create data loaders. 
+
+    Arguments: 
+        tabular (bool): Whether to use tabular data
+        vision (str): Type of vision encoder 'resnet50', 'dense121' or 'vit' (Default: None --> No images)
+    '''
+    # Load and pre-process tabular data and labels
+    tab_data_train, tab_data_val, tab_data_test, \
+        image_dict_train, image_dict_val, image_dict_test = prepare_data()
+
     # Create datasets
-    train_dataset = MultimodalDataset(image_dict_train, tab_data_train, size=image_size)
-    val_dataset = MultimodalDataset(image_dict_val, tab_data_val, size=image_size)
-    test_dataset = MultimodalDataset(image_dict_test, tab_data_test, size=image_size)
+    train_dataset = MultimodalDataset(vision, image_dict_train, tab_data_train)
+    val_dataset = MultimodalDataset(vision, image_dict_val, tab_data_val)
+    test_dataset = MultimodalDataset(vision, image_dict_test, tab_data_test)
 
     # Create data loaders
     loader_params = {'batch_size': 32, 'num_workers': 4, 'shuffle': True}
@@ -459,12 +483,7 @@ def load_data(image_size=256):
 
     return train_loader, val_loader, test_loader
 
+
 if __name__ == '__main__': 
-
-    # Preprocess data
-    tabular = preprocess_tabular()
-    labels = preprocess_labels()
-
-    # Split into train/val/test sets
-    tab_train, tab_val, tab_test, lab_train, lab_val, lab_test = split(tabular, labels)
+    prepare_data()
 

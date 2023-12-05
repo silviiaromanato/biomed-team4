@@ -81,6 +81,7 @@ def grid_search(tabular=False,
         num_labels=NUM_LABELS,
         num_classes=NUM_CLASSES
     )
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model.to(device)
 
     # Freeze layers of vision encoder
