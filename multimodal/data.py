@@ -19,7 +19,7 @@ TABULAR_PATH = os.path.join(DATA_PATH, 'mimic-iv')
 IMAGES_PATH = os.path.join(DATA_PATH, 'mimic-cxr')
 PROCESSED_PATH = os.path.join(DATA_PATH, 'processed_data')
 
-METADATA_PATH = os.path.join(IMAGES_PATH, 'mimic-cxr-2.0.0-metadata.csv.gz')
+METADATA_PATH = os.path.join(IMAGES_PATH, 'mimic-cxr-2.0.0-metadata.csv')
 LABELS_PATH = os.path.join(IMAGES_PATH, 'mimic-cxr-2.0.0-chexpert.csv')
 
 TAB_PATH = os.path.join(PROCESSED_PATH, 'tab_data_total.csv')
@@ -49,19 +49,43 @@ def load_tabular_data():
     '''
     Load tabular data: admissions, patients, services, image metadata
     '''
-    admissions = pd.read_csv(os.path.join(TABULAR_PATH, 'admissions.csv.gz'))
-    patients = pd.read_csv(os.path.join(TABULAR_PATH, 'patients.csv.gz'))
-    services = pd.read_csv(os.path.join(TABULAR_PATH, 'services.csv.gz'))
-    metadata = pd.read_csv(IMAGES_PATH + 'mimic-cxr-2.0.0-metadata.csv')
+    admissions_path = os.path.join(TABULAR_PATH, 'admissions.csv.gz')
+    patients_path = os.path.join(TABULAR_PATH, 'patients.csv.gz')
+    services_path = os.path.join(TABULAR_PATH, 'services.csv.gz')
+    metadata_path = os.path.join(TABULAR_PATH, 'mimic-cxr-2.0.0-metadata.csv')
+
+    if not os.path.exists(admissions_path):
+        raise ValueError(f'Admissions file not found in {admissions_path}.')
+    if not os.path.exists(patients_path):
+        raise ValueError(f'Patients file not found in {patients_path}.')
+    if not os.path.exists(services_path):
+        raise ValueError(f'Services file not found in {services_path}.')
+    if not os.path.exists(metadata_path):
+        raise ValueError(f'Image metadata file not found in {metadata_path}.')
+    
+    admissions = pd.read_csv(admissions_path)
+    patients = pd.read_csv(patients_path)
+    services = pd.read_csv(services_path)
+    metadata = pd.read_csv(metadata_path)
     return admissions, patients, services, metadata
 
 def load_images_data():
     '''
     Load image data: labels, image files, image metadata
     '''
+    if not os.path.exists(LABELS_PATH):
+        raise ValueError(f'Labels file not found in {LABELS_PATH}.')
+    if not os.path.exists(IMAGES_PATH):
+        raise ValueError(f'Images folder not found in {IMAGES_PATH}.')
+    if not os.path.exists(METADATA_PATH):
+        raise ValueError(f'Image metadata file not found in {METADATA_PATH}.')
+    
     labels_data = pd.read_csv(LABELS_PATH)
-    image_files = list_images(os.path.join(IMAGES_PATH, 'files'))
     metadata = pd.read_csv(METADATA_PATH)
+    image_files = list_images(os.path.join(IMAGES_PATH, 'files'))
+    if image_files == []:
+        raise ValueError(f'No image files found in {IMAGES_PATH}.')
+    
     return labels_data, image_files, metadata
 
 
@@ -113,7 +137,6 @@ def filter_images(labels_data, image_files, info_jpg, tab_data):
     Filter the images and labels based on the tabular data.
     Used to optimize storage.
     '''
-
     # Tabular data
     tab_data['study_id'] = tab_data['study_id'].astype(int).astype(str)
     tab_data['subject_id'] = tab_data['subject_id'].astype(int).astype(str)
@@ -145,7 +168,7 @@ def filter_images(labels_data, image_files, info_jpg, tab_data):
 
 def preprocess_tabular():
     if os.path.exists(TAB_PATH):
-        print(f'Data already preprocessed, loading from {TAB_PATH}')
+        print(f'Tabular data already preprocessed. Loading from {TAB_PATH}.')
         return pd.read_csv(TAB_PATH)
 
     # PREPROCESS ADMISSIONS AND PATIENTS
@@ -324,7 +347,7 @@ class MultimodalDataset(Dataset):
         
         # Organize paths by subject_id and study_id
         self.organized_paths = self._organize_paths()
-        print(f'Number of samples: {len(self.organized_paths)}')
+        #print(f'Number of samples: {len(self.organized_paths)}')
 
         # Filter out pairs where both images are None
         self.organized_paths = {k: v for k, v in self.organized_paths.items() \
@@ -408,12 +431,12 @@ def load_data(image_size=256):
     tab_train, tab_val, tab_test, lab_train, lab_val, lab_test = split(tabular, labels)
     
     # Load image labels, files and metadata
-    labels_data, image_data, info_data = load_images_data()
+    labels_data, image_files, metadata = load_images_data()
 
     # Get intersection of tabular and image data
-    tab_data_train, image_dict_train = filter_images(labels_data, image_data, info_data, tab_train)
-    tab_data_val, image_dict_val = filter_images(labels_data, image_data, info_data, tab_val)
-    tab_data_test, image_dict_test = filter_images(labels_data, image_data, info_data, tab_test)
+    tab_data_train, image_dict_train = filter_images(labels_data, image_files, metadata, tab_train)
+    tab_data_val, image_dict_val = filter_images(labels_data, image_files, metadata, tab_val)
+    tab_data_test, image_dict_test = filter_images(labels_data, image_files, metadata, tab_test)
 
     # Create datasets
     train_dataset = MultimodalDataset(image_dict_train, tab_data_train, size=image_size)
@@ -435,3 +458,13 @@ def load_data(image_size=256):
         break
 
     return train_loader, val_loader, test_loader
+
+if __name__ == '__main__': 
+
+    # Preprocess data
+    tabular = preprocess_tabular()
+    labels = preprocess_labels()
+
+    # Split into train/val/test sets
+    tab_train, tab_val, tab_test, lab_train, lab_val, lab_test = split(tabular, labels)
+
