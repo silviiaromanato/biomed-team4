@@ -4,6 +4,8 @@ import numpy as np
 seed = 42
 np.random.seed(seed)
 
+from data import *
+
 MIMIC_PATH = '../data/mimic-iv/'
 PATH_ADMISSIONS = MIMIC_PATH + 'admissions.csv.gz'
 PATH_PATIENTS = MIMIC_PATH + 'patients.csv.gz'
@@ -18,6 +20,8 @@ PATH_DATA_TEST = '../data/processed_data/tab_data_test.csv'
 PATH_LABELS_TRAIN = '../data/processed_data/labels_train.csv'
 PATH_LABELS_VAL = '../data/processed_data/labels_val.csv'
 PATH_LABELS_TEST = '../data/processed_data/labels_test.csv'
+
+PATH_IMAGES = '../data/mimic-cxr/'
 
 def preprocess_data():
     # check if preprocessed data already exists
@@ -203,10 +207,6 @@ def split_data(data, train_size=0.75, val_size=0.1, test_size=0.15):
     return tab_data_train, tab_data_val, tab_data_test, labels_train, labels_val, labels_test
 
 
-
-
-
-
 def load_data():
     # Load admissions, patients, and icustays
     admissions = pd.read_csv(MIMIC_PATH+'admissions.csv.gz')
@@ -215,3 +215,36 @@ def load_data():
     metadata = pd.read_csv(PATH_METADATA)
     return admissions, patients, services, metadata
 
+def load_images_data():
+    labels_data = pd.read_csv(PATH_IMAGES + 'mimic-cxr-2.0.0-chexpert.csv')
+    image_files = list_images(PATH_IMAGES + 'files')
+    info_jpg = pd.read_csv(PATH_IMAGES + 'mimic-cxr-2.0.0-metadata.csv')
+    return labels_data, image_files, info_jpg
+
+def filter_images(labels_data, image_files, info_jpg, tab_data):
+
+    # Tabular data
+    tab_data['study_id'] = tab_data['study_id'].astype(int).astype(str)
+    tab_data['subject_id'] = tab_data['subject_id'].astype(int).astype(str)
+
+    # Image data
+    image_labels_mapping = create_image_labels_mapping(image_files, labels_data, info_jpg)
+    df_img = pd.DataFrame.from_dict(image_labels_mapping, orient='index').reset_index()
+    df_img['study_id'] = df_img['study_id'].astype(int).astype(str)
+    df_img['subject_id'] = df_img['subject_id'].astype(int).astype(str)
+
+    # Filter on study
+    common_data = set(tab_data['study_id']).intersection(set(df_img['study_id']))
+    tab_data = tab_data[tab_data['study_id'].isin(common_data)]
+    df_img = df_img[df_img['study_id'].isin(common_data)]
+
+    # Filter on subject
+    common_data = set(tab_data['subject_id']).intersection(set(df_img['subject_id']))
+    tab_data = tab_data[tab_data['subject_id'].isin(common_data)]
+    df_img = df_img[df_img['subject_id'].isin(common_data)]
+    print(f'Number of studies in tabular data: {len(tab_data)} and in image data: {len(df_img)}')
+
+    # Return the imae data to a dictionary
+    dict_img = df_img.set_index('index').T.to_dict()
+
+    return tab_data, dict_img

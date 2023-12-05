@@ -36,7 +36,6 @@ def list_images(base_path):
                 image_files.append(os.path.join(subdir, file))
     return image_files
 
-
 def create_image_labels_mapping(image_files, labels_data, info_data):
     """
     Create a mapping from image files to their corresponding labels and view positions.
@@ -79,7 +78,6 @@ def create_image_labels_mapping(image_files, labels_data, info_data):
 
     return image_labels_mapping
         
-
 class MedicalImagesTabularDataset(Dataset):
     def __init__(self, data_dict, tabular_data, size=224, transform_images=None, transform_tabular=None):
         self.data_dict = data_dict
@@ -170,7 +168,6 @@ class MedicalImagesTabularDataset(Dataset):
 
         return pa_image, lateral_image, label_tensor, tabular_tensor
     
-
 def train_val_test_split(dataset, val_size=0.2, test_size=0.2, 
                          batch_size=32, shuffle=True, num_workers=4, seed=0):
     '''
