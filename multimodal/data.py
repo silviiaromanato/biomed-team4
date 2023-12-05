@@ -5,11 +5,11 @@ Train/val/test splitting.
 '''
 
 import os
+import torch
 import numpy as np
 import pandas as pd
 from PIL import Image
 from torch.utils.data import Dataset, DataLoader
-import torch
 from torchvision import transforms
 
 # ---------------------------------------- GLOBAL VARIABLES ---------------------------------------- #
@@ -240,7 +240,7 @@ def preprocess_labels():
     labels = labels.fillna(0)      
     return labels
 
-def split(tabular, labels, val_size=0.1, test_size=0.15):
+def split(tabular, labels, val_size=0.1, test_size=0.15, seed=42):
     '''
     Split tabular data and labels into train, val, and test sets.
     '''
@@ -251,6 +251,7 @@ def split(tabular, labels, val_size=0.1, test_size=0.15):
 
         # Split the study_ids into train, val, and test sets
         study_ids = tabular['study_id'].unique()
+        np.random.seed(seed)
         np.random.shuffle(study_ids)
         num_study_ids = len(study_ids)
         num_val = int(num_study_ids * val_size)
@@ -398,10 +399,6 @@ def load_data(image_size=256):
     2 - Split into train/val/test sets
     3 - Create data loaders
     '''
-
-    # Set random seed
-    np.random.seed(42)
-    torch.manual_seed(42)
 
     # Load and pre-process tabular data and labels
     tabular = preprocess_tabular()
