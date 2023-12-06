@@ -18,7 +18,6 @@ from transformers import ViTImageProcessor
 DATA_PATH = '../data/'
 TABULAR_PATH = os.path.join(DATA_PATH, 'mimic-iv')
 IMAGES_PATH = os.path.join(DATA_PATH, 'mimic-cxr')
-IMG_FILES_PATH = os.path.join(IMAGES_PATH, 'files')
 PROCESSED_PATH = os.path.join(DATA_PATH, 'processed_data')
 
 METADATA_PATH = os.path.join(IMAGES_PATH, 'mimic-cxr-2.0.0-metadata.csv')
@@ -84,9 +83,9 @@ def load_images_data():
     
     labels_data = pd.read_csv(LABELS_PATH)
     metadata = pd.read_csv(METADATA_PATH)
-    image_files = list_images(IMG_FILES_PATH)
+    image_files = list_images(IMAGES_PATH)
     if image_files == []:
-        raise ValueError(f'No image files found in {IMG_FILES_PATH}.')
+        raise ValueError(f'No image files found in {IMAGES_PATH}.')
     
     return labels_data, image_files, metadata
 
