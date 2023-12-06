@@ -159,9 +159,9 @@ def join_multimodal(labels_data, image_files, info_jpg, tab_data):
     common_data = set(tab_data['subject_id']).intersection(set(df_img['subject_id']))
     tab_data = tab_data[tab_data['subject_id'].isin(common_data)]
     df_img = df_img[df_img['subject_id'].isin(common_data)]
-    print(f'Number of studies in tabular data: {len(tab_data)} and in image data: {len(df_img)}')
+    print(f'Number of studies:\tTabular: {len(tab_data)}\tImage: {len(df_img)}')
 
-    # Return the imae data to a dictionary
+    # Return the image data to a dictionary
     dict_img = df_img.set_index('index').T.to_dict()
 
     return tab_data, dict_img
@@ -170,9 +170,9 @@ def join_multimodal(labels_data, image_files, info_jpg, tab_data):
 
 def preprocess_tabular():
     if os.path.exists(TAB_PATH):
-        print(f'Loading: pre-processed tabular data from {TAB_PATH}.')
+        print(f'Loading:\tPre-processed tabular data from {TAB_PATH}.')
         return pd.read_csv(TAB_PATH)
-    print(f'Preprocessing tabular data, saving to {TAB_PATH}.')
+    print(f'Loading:\tPreprocessing tabular data, saving to {TAB_PATH}.')
 
     # PREPROCESS ADMISSIONS AND PATIENTS
     # Drop columns, merge admissions and patients, convert dates to datetime
@@ -277,7 +277,7 @@ def split(tabular, labels, val_size=0.1, test_size=0.15, seed=42):
              LABELS_TRAIN_PATH, LABELS_VAL_PATH, LABELS_TEST_PATH]
     
     if all([os.path.exists(path) for path in paths]):
-        print('Splitting: loading pre-processed train, val, and test sets.')
+        print('Splitting:\tLoading pre-processed train, val, and test sets.')
         tabular_train = pd.read_csv(TAB_TRAIN_PATH)
         tabular_val = pd.read_csv(TAB_VAL_PATH)
         tabular_test = pd.read_csv(TAB_TEST_PATH)
@@ -286,7 +286,7 @@ def split(tabular, labels, val_size=0.1, test_size=0.15, seed=42):
         labels_test = pd.read_csv(LABELS_TEST_PATH)
 
     else:
-        print('Splitting: tabular data and labels into train, val, and test sets.')
+        print('Splitting:\tTabular data and labels into train, val, and test sets.')
         # Split the study_ids into train, val, and test sets
         study_ids = tabular['study_id'].unique()
         np.random.seed(seed)
@@ -339,10 +339,16 @@ class MultimodalDataset(Dataset):
         self.size = 2500
 
         if vision == 'vit':
-            self.processor = ViTImageProcessor.from_pretrained('google/vit-base-patch16-224')
-            self.transform = lambda x: self.processor(x, return_tensors='pt').pixel_values.squeeze(0)
-
-        elif vision in ['resnet50', 'densenet121', None]:
+            self.transform = transforms.Compose([
+                transforms.CenterCrop((self.size, self.size)), # Not needed for ViT but kept for consistency
+                ViTImageProcessor.from_pretrained('google/vit-base-patch16-224', 
+                                                  do_normalize=True,
+                                                  image_mean=[0.485, 0.456, 0.406],
+                                                  image_std=[0.229, 0.224, 0.225],
+                                                  return_tensors='pt'),
+                lambda x: x.pixel_values[0]
+            ])
+        elif vision in ['resnet50', 'densenet121']:
             self.transform = transforms.Compose([
                 transforms.CenterCrop((self.size, self.size)),
                 transforms.ToTensor(),
@@ -350,7 +356,7 @@ class MultimodalDataset(Dataset):
                     mean=[0.485, 0.456, 0.406],    
                     std=[0.229, 0.224, 0.225])
                 ])
-        else:
+        elif vision is not None: 
             raise ValueError(f'Vision encoder {vision} not supported.')
         
         self.classes = ['Atelectasis', 'Cardiomegaly', 'Consolidation', 'Edema', 
@@ -389,8 +395,8 @@ class MultimodalDataset(Dataset):
             image = Image.open(path).convert('RGB')
         else:
             image = Image.new('RGB', (self.size, self.size))
-        if self.vision == 'vit':
-            image = self.processor(image, return_tensors='pt').pixel_values.squeeze(0)
+        #if self.vision == 'vit':
+            #image = self.processor(image, return_tensors='pt').pixel_values.squeeze(0)
         image = self.transform(image)
         return image
 
@@ -407,7 +413,9 @@ class MultimodalDataset(Dataset):
                                 (self.tabular['study_id'] == study_id)]
 
         tabular_row = tabular_row.drop(['subject_id', 'study_id'], axis=1).values       
-        tabular_tensor = torch.tensor(tabular_row, dtype=torch.float32)
+        tabular_tensor = torch.tensor(tabular_row, dtype=torch.float32).squeeze(0)
+        if self.vision is None:
+            return {'tabular': tabular_tensor}
 
         # Get the paths for the PA and Lateral images
         pa_path = self.organized_paths[subject_study_pair]['PA']
@@ -425,17 +433,12 @@ class MultimodalDataset(Dataset):
         labels = self.data_dict[labels_path]
         label_values = [labels[class_name] if not np.isnan(labels[class_name]) else 0 for class_name in self.classes]
         label_tensor = torch.tensor(label_values, dtype=torch.float32)
-        if self.vision is None:
-            inputs = {
-                'tabular': tabular_tensor
-            }
-        else:
-            inputs = {
-                'pa': pa_image,
-                'lateral': lateral_image,
-                'labels': label_tensor,
-                'tabular': tabular_tensor
-            }
+        inputs = {
+            'pa': pa_image,
+            'lateral': lateral_image,
+            'labels': label_tensor,
+            'tabular': tabular_tensor
+        }
         return inputs
 
 
@@ -460,7 +463,7 @@ def prepare_data():
     Split into train/val/test sets.
     Filter images based on tabular data.
     '''
-    print(f'Preparing:\n\tTabular data: {TABULAR_PATH}\n\tImage data: {IMAGES_PATH}')
+    print(f'PREPARING DATA')
     # Load and pre-process tabular data and labels
     tabular = preprocess_tabular()
     labels = preprocess_labels()
@@ -469,11 +472,11 @@ def prepare_data():
     tab_train, tab_val, tab_test, lab_train, lab_val, lab_test = split(tabular, labels)
     
     # Load image labels, files and metadata
-    print('Loading: image data (labels, files, metadata).')
+    print('Loading:\tImage data (labels, files, metadata).')
     labels_data, image_files, metadata = load_images_data()
 
     # Get intersection of tabular and image data
-    print('Joining: intersection of tabular and image data.')
+    print('Joining:\tIntersection of tabular and image data.')
     tab_data_train, image_data_train = join_multimodal(lab_train, image_files, metadata, tab_train)
     tab_data_val, image_data_val = join_multimodal(lab_val, image_files, metadata, tab_val)
     tab_data_test, image_data_test = join_multimodal(lab_test, image_files, metadata, tab_test)
