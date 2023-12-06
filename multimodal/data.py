@@ -443,9 +443,9 @@ def prepare_data():
     labels_data, image_files, metadata = load_images_data()
 
     # Get intersection of tabular and image data
-    tab_data_train, image_dict_train = filter_images(labels_data, image_files, metadata, tab_train)
-    tab_data_val, image_dict_val = filter_images(labels_data, image_files, metadata, tab_val)
-    tab_data_test, image_dict_test = filter_images(labels_data, image_files, metadata, tab_test)
+    tab_data_train, image_dict_train = filter_images(lab_train, image_files, metadata, tab_train)
+    tab_data_val, image_dict_val = filter_images(lab_val, image_files, metadata, tab_val)
+    tab_data_test, image_dict_test = filter_images(lab_test, image_files, metadata, tab_test)
 
     return tab_data_train, tab_data_val, tab_data_test, image_dict_train, image_dict_val, image_dict_test
 
