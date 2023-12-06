@@ -166,31 +166,6 @@ def join_multimodal(labels_data, image_files, info_jpg, tab_data):
     dict_img = df_img.set_index('index').T.to_dict()
 
     return tab_data, dict_img
-
-def filter_files(dict_img): 
-    '''
-    Filter the images and labels based on the tabular data.
-    Used to optimize storage.
-    '''
-    print('Filtering files present on tabular data. ')
-    image_files = set(list(dict_img.keys()))
-    removed = 0
-    for partition in os.listdir(IMG_FILES_PATH):
-        partition_path = os.path.join(IMG_FILES_PATH, partition)
-        for subject_id in os.listdir(partition_path):
-            subject_path = os.path.join(partition_path, subject_id)
-            for study_id in os.listdir(subject_path):
-                study_path = os.path.join(subject_path, study_id)
-                for file in os.listdir(study_path):
-                    file_path = os.path.join(study_path, file)
-                    if file_path not in image_files:
-                        os.remove(file_path)
-                        removed += 1
-                if not os.listdir(study_path):
-                    os.rmdir(study_path)
-            if not os.listdir(subject_path):
-                os.rmdir(subject_path)
-    print(f'Removed {removed} image files not in tabular data.')
     
 # ---------------------------------------- PREPROCESSING ---------------------------------------- #
 
@@ -516,12 +491,8 @@ if __name__ == '__main__':
     tab_data_train, tab_data_val, tab_data_test, image_dict_train, image_dict_val, image_dict_test = prepare_data()
 
     # Print the shapes of the dataframes
-    print('Tabular data train: ', tab_data_train.shape)
-    print('Tabular data val: ', tab_data_val.shape)
-    print('Tabular data test: ', tab_data_test.shape)
-    print('Image data train: ', len(image_dict_train))
-    print('Image data val: ', len(image_dict_val))
-    print('Image data test: ', len(image_dict_test))
+    print(f'Tabular data\nTrain: {tab_data_train.shape}\nVal: {tab_data_val.shape}\nTest: {tab_data_test.shape}')
+    print(f'Image data\nTrain: {len(image_dict_train)}\nVal: {len(image_dict_val)}\nTest: {len(image_dict_test)}')
 
     # Save the dataframes
     tab_data_train.to_csv(os.path.join(PROCESSED_PATH, 'tab_data_train.csv'), index=False)
@@ -534,12 +505,10 @@ if __name__ == '__main__':
     np.save(os.path.join(PROCESSED_PATH, 'image_dict_test.npy'), image_dict_test)
 
     # Delete not matched images
+    all_images = set(list(image_dict_train.keys()) + list(image_dict_val.keys()) + list(image_dict_test.keys()))
     _, image_files, _ = load_images_data()
     for image_file in image_files:
-        if image_file not in image_dict_train.keys():
+        if image_file not in all_images:
             os.remove(image_file)
-        if image_file not in image_dict_val.keys():
-            os.remove(image_file)
-        if image_file not in image_dict_test.keys():
-            os.remove(image_file)
+
 
