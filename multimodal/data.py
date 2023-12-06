@@ -18,6 +18,7 @@ from transformers import ViTImageProcessor
 DATA_PATH = '../data/'
 TABULAR_PATH = os.path.join(DATA_PATH, 'mimic-iv')
 IMAGES_PATH = os.path.join(DATA_PATH, 'mimic-cxr')
+IMG_FILES_PATH = os.path.join(IMAGES_PATH, 'files')
 PROCESSED_PATH = os.path.join(DATA_PATH, 'processed_data')
 
 METADATA_PATH = os.path.join(IMAGES_PATH, 'mimic-cxr-2.0.0-metadata.csv')
@@ -83,9 +84,9 @@ def load_images_data():
     
     labels_data = pd.read_csv(LABELS_PATH)
     metadata = pd.read_csv(METADATA_PATH)
-    image_files = list_images(os.path.join(IMAGES_PATH, 'files'))
+    image_files = list_images(IMG_FILES_PATH)
     if image_files == []:
-        raise ValueError(f'No image files found in {IMAGES_PATH}.')
+        raise ValueError(f'No image files found in {IMG_FILES_PATH}.')
     
     return labels_data, image_files, metadata
 
@@ -137,6 +138,10 @@ def filter_images(labels_data, image_files, info_jpg, tab_data):
     '''
     Filter the images and labels based on the tabular data.
     Used to optimize storage.
+
+    Returns: 
+        tab_data (DataFrame): tabular data
+        dict_img (dict): keys = image file paths and values = dicts with labels and ViewPosition
     '''
     # Tabular data
     tab_data['study_id'] = tab_data['study_id'].astype(int).astype(str)
@@ -475,10 +480,8 @@ def load_data(vision=None):
 
     # Test data loaders
     for pa_image, lateral_image, label_tensor, tabular_tensor in train_loader:
-        print(pa_image.shape)
-        print(lateral_image.shape)
-        print(label_tensor.shape)
-        print(tabular_tensor.shape)
+        print(f'Input shapes:\nPA image: {pa_image.shape}\nLateral image: {lateral_image.shape}'+\
+              f'\nLabel tensor: {label_tensor.shape}\nTabular tensor: {tabular_tensor.shape}')
         break
 
     return train_loader, val_loader, test_loader
