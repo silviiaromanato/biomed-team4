@@ -12,6 +12,16 @@ from PIL import Image
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
 from transformers import ViTImageProcessor
+from torchvision.transforms import (
+    CenterCrop,
+    Compose,
+    Normalize,
+    RandomHorizontalFlip,
+    RandomResizedCrop,
+    Resize,
+    ToTensor,
+)
+
 
 # ---------------------------------------- GLOBAL VARIABLES ---------------------------------------- #
 
@@ -33,6 +43,15 @@ LABELS_VAL_PATH = os.path.join(PROCESSED_PATH, 'labels_val.csv')
 LABELS_TEST_PATH = os.path.join(PROCESSED_PATH, 'labels_test.csv')
 
 # ---------------------------------------- HELPER FUNCTIONS ---------------------------------------- #
+
+def test_dataloader(loader): 
+    for batch in loader:
+        for key in batch.keys():
+            if type(batch[key]) == torch.Tensor:
+                print(f'{key}:\t{batch[key].shape}')
+            else:
+                print(f'{key}:\t{type(batch[key])}')
+        break
 
 def list_images(base_path):
     '''
@@ -326,6 +345,30 @@ def split(tabular, labels, val_size=0.1, test_size=0.15, seed=42):
 
 # ---------------------------------------- DATA LOADING ---------------------------------------- #
 
+def augment(train=True, size=2500, crop_size=2500): 
+    normalize = Normalize(
+        mean=[0.485, 0.456, 0.406],std=[0.229, 0.224, 0.225]
+    )
+    if train:
+        transforms = Compose(
+            [
+                RandomResizedCrop(crop_size),
+                RandomHorizontalFlip(),
+                ToTensor(),
+                normalize
+            ]
+        )
+    else:
+        transforms = Compose(
+            [
+                Resize(size),
+                CenterCrop(crop_size),
+                ToTensor(),
+                normalize
+            ]
+        )
+    return transforms
+
 
 class MultimodalDataset(Dataset):
     '''
@@ -341,7 +384,7 @@ class MultimodalDataset(Dataset):
         if vision == 'vit':
             self.transform = transforms.Compose([
                 transforms.CenterCrop((self.size, self.size)), # Not needed for ViT but kept for consistency
-                ViTImageProcessor.from_pretrained('google/vit-base-patch16-224', 
+                ViTImageProcessor.from_pretrained('google/vit-large-patch32-384', 
                                                   do_normalize=True,
                                                   image_mean=[0.485, 0.456, 0.406],
                                                   image_std=[0.229, 0.224, 0.225],
@@ -505,7 +548,7 @@ def load_data(tab_data, image_data, vision=None, batch_size=4):
     print(f'Created datasets:\tTrain: {len(train_dataset)}\tValidation: {len(val_dataset)}\tTest: {len(test_dataset)} samples.')
 
     # Create data loaders
-    loader_params = {'batch_size': batch_size, 'num_workers': 4, 'shuffle': True}
+    loader_params = {'batch_size': batch_size, 'num_workers': 0, 'shuffle': True}
     train_loader = DataLoader(train_dataset, **loader_params)
     val_loader = DataLoader(val_dataset, **loader_params)
     test_loader = DataLoader(test_dataset, **loader_params)

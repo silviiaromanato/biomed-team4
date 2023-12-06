@@ -15,6 +15,12 @@ from torchvision import models
 from torchvision.models import DenseNet121_Weights, ResNet50_Weights
 from transformers import ViTForImageClassification
 
+NUM_FEATURES = 87           # Number of tabular features
+IMAGE_EMBEDDING_DIM = 512   # All vision encoders produce 512-dimensional embeddings
+IMAGE_SIZE = 2500           # All images are resized to 2500 x 2500
+NUM_LABELS = 3              # Number of labels for each class
+NUM_CLASSES = 15            # Number of classes
+
 class FullyConnectedLayer(nn.Module):
     '''
     Single fully-connected Layer
@@ -91,10 +97,11 @@ class ClassifierHead(nn.Module):
         num_classes (int): Number of classes
         num_labels (int): Number of labels for each class
     '''
-    def __init__(self, num_labels=3, num_classes=15):
+    def __init__(self, dim_input, num_labels=3, num_classes=15):
         super(ClassifierHead, self).__init__()
         self.num_classes = num_classes
         self.num_labels = num_labels
+        self.dim_input = dim_input
         self.dim_output = num_classes * num_labels
         self.sigmoid = nn.Sigmoid()
         self.classifier = nn.Linear(self.dim_input, self.dim_output)
@@ -128,8 +135,10 @@ class DualVisionEncoder(nn.Module):
             self.model_lateral = models.densenet121(weights=DenseNet121_Weights.IMAGENET1K_V1)
             self.num_features = self.model_pa.classifier.in_features # 1024
         elif vision == 'vit': 
-            self.model_pa = ViTForImageClassification.from_pretrained('google/vit-base-patch16-224')
-            self.model_lateral = ViTForImageClassification.from_pretrained('google/vit-base-patch16-224')
+            self.model_pa = ViTForImageClassification.from_pretrained(
+                'google/vit-large-patch32-384', image_size=2500, patch_size=32, ignore_mismatched_sizes=True)
+            self.model_lateral = ViTForImageClassification.from_pretrained(
+                'google/vit-large-patch32-384', image_size=2500, patch_size=32, ignore_mismatched_sizes=True)
             self.num_features = self.model_pa.classifier.in_features # 768
         else: 
             raise ValueError(f'Vision encoder type {vision} not supported.')
@@ -137,6 +146,10 @@ class DualVisionEncoder(nn.Module):
         # Remove last classification layer (1000 classes in ImageNet)
         self.model_pa = nn.Sequential(*list(self.model_pa.children())[:-1])
         self.model_lateral = nn.Sequential(*list(self.model_lateral.children())[:-1])
+
+        # Project to 512-dimensional embedding
+        self.model_pa.add_module('embedding', nn.Linear(self.num_features, 512))
+        self.model_lateral.add_module('embedding', nn.Linear(self.num_features, 512))
 
     def forward(self, x_pa, x_lateral):
         features_pa = self.features_pa(x_pa)
@@ -167,7 +180,7 @@ class JointEncoder(nn.Module):
 
         self.tabular = tabular
         self.vision = vision
-
+        self.dim_input = 0
         if not tabular and not vision: 
             raise ValueError('Must specify tabular and/or vision encoder.')
         
@@ -175,11 +188,15 @@ class JointEncoder(nn.Module):
             raise ValueError(f'Vision encoder type {vision} not supported.')
         if vision:
             self.vision_encoder = DualVisionEncoder(vision)
+            self.dim_input += IMAGE_EMBEDDING_DIM * 2
 
         if tabular:
             self.tabular_encoder = FullyConnectedNetwork(**tabular_params)
-        
-        self.classifier = ClassifierHead(num_labels=num_labels, num_classes=num_classes)
+            self.dim_input += IMAGE_EMBEDDING_DIM
+
+        self.classifier = ClassifierHead(self.dim_input, 
+                                         num_labels=num_labels, 
+                                         num_classes=num_classes)
 
     def forward(self, x_pa=None, x_lateral=None, x_tab=None):
         '''
