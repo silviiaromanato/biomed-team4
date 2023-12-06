@@ -485,5 +485,33 @@ def load_data(vision=None):
 
 
 if __name__ == '__main__': 
-    prepare_data()
+    tab_data_train, tab_data_val, tab_data_test, image_dict_train, image_dict_val, image_dict_test = prepare_data()
+
+    # Print the shapes of the dataframes
+    print('Tabular data train: ', tab_data_train.shape)
+    print('Tabular data val: ', tab_data_val.shape)
+    print('Tabular data test: ', tab_data_test.shape)
+    print('Image data train: ', len(image_dict_train))
+    print('Image data val: ', len(image_dict_val))
+    print('Image data test: ', len(image_dict_test))
+
+    # Save the dataframes
+    tab_data_train.to_csv(os.path.join(PROCESSED_PATH, 'tab_data_train.csv'), index=False)
+    tab_data_val.to_csv(os.path.join(PROCESSED_PATH, 'tab_data_val.csv'), index=False)
+    tab_data_test.to_csv(os.path.join(PROCESSED_PATH, 'tab_data_test.csv'), index=False)
+
+    # Save the dictionaries
+    np.save(os.path.join(PROCESSED_PATH, 'image_dict_train.npy'), image_dict_train)
+    np.save(os.path.join(PROCESSED_PATH, 'image_dict_val.npy'), image_dict_val)
+    np.save(os.path.join(PROCESSED_PATH, 'image_dict_test.npy'), image_dict_test)
+
+    # Delete not matched images
+    _, image_files, _ = load_images_data()
+    for image_file in image_files:
+        if image_file not in image_dict_train.keys():
+            os.remove(image_file)
+        if image_file not in image_dict_val.keys():
+            os.remove(image_file)
+        if image_file not in image_dict_test.keys():
+            os.remove(image_file)
 
