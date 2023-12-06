@@ -344,7 +344,7 @@ class MultimodalDataset(Dataset):
                     mean=[0.485, 0.456, 0.406],    
                     std=[0.229, 0.224, 0.225])
                 ])
-        else:
+        elif vision is not None:
             raise ValueError(f'Vision encoder {vision} not supported.')
         
         self.classes = ['Atelectasis', 'Cardiomegaly', 'Consolidation', 'Edema', 
@@ -403,7 +403,7 @@ class MultimodalDataset(Dataset):
         tabular_row = tabular_row.drop(['subject_id', 'study_id'], axis=1).values       
         tabular_tensor = torch.tensor(tabular_row, dtype=torch.float32)
 
-        if not self.vision:
+        if self.vision is None:
             return tabular_tensor, None, None, None
 
         # Get the paths for the PA and Lateral images
