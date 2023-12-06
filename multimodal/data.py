@@ -171,7 +171,7 @@ def join_multimodal(labels_data, image_files, info_jpg, tab_data):
 
 def preprocess_tabular():
     if os.path.exists(TAB_PATH):
-        print(f'Loading pre-processed tabular data from {TAB_PATH}.')
+        print(f'Loading: pre-processed tabular data from {TAB_PATH}.')
         return pd.read_csv(TAB_PATH)
     print(f'Preprocessing tabular data, saving to {TAB_PATH}.')
 
@@ -261,11 +261,14 @@ def preprocess_labels():
     - Uncertain: -1 -> 1
     - Missing == Negative: NaN -> 0
     '''
+    if not os.path.exists(LABELS_PATH):
+        raise ValueError(f'Labels file not found in {LABELS_PATH}.')
     labels = pd.read_csv(LABELS_PATH)
     labels = labels.replace(1, 2)
     labels = labels.replace(-1, 1) 
     labels = labels.fillna(0)      
     return labels
+
 
 def split(tabular, labels, val_size=0.1, test_size=0.15, seed=42):
     '''
@@ -273,9 +276,18 @@ def split(tabular, labels, val_size=0.1, test_size=0.15, seed=42):
     '''
     paths = [TAB_TRAIN_PATH, TAB_VAL_PATH, TAB_TEST_PATH, 
              LABELS_TRAIN_PATH, LABELS_VAL_PATH, LABELS_TEST_PATH]
+    
+    if all([os.path.exists(path) for path in paths]):
+        print('Splitting: loading pre-processed train, val, and test sets.')
+        tabular_train = pd.read_csv(TAB_TRAIN_PATH)
+        tabular_val = pd.read_csv(TAB_VAL_PATH)
+        tabular_test = pd.read_csv(TAB_TEST_PATH)
+        labels_train = pd.read_csv(LABELS_TRAIN_PATH)
+        labels_val = pd.read_csv(LABELS_VAL_PATH)
+        labels_test = pd.read_csv(LABELS_TEST_PATH)
 
-    if not all([os.path.exists(path) for path in paths]):
-
+    else:
+        print('Splitting: tabular data and labels into train, val, and test sets.')
         # Split the study_ids into train, val, and test sets
         study_ids = tabular['study_id'].unique()
         np.random.seed(seed)
@@ -310,18 +322,11 @@ def split(tabular, labels, val_size=0.1, test_size=0.15, seed=42):
         print('Percent val: ', len(tabular_val) / total_len)
         print('Percent test: ', len(tabular_test) / total_len)
 
-    else:   
-        tabular_train = pd.read_csv(TAB_TRAIN_PATH)
-        tabular_val = pd.read_csv(TAB_VAL_PATH)
-        tabular_test = pd.read_csv(TAB_TEST_PATH)
-        labels_train = pd.read_csv(LABELS_TRAIN_PATH)
-        labels_val = pd.read_csv(LABELS_VAL_PATH)
-        labels_test = pd.read_csv(LABELS_TEST_PATH)
-
     return tabular_train, tabular_val, tabular_test, labels_train, labels_val, labels_test
 
 
 # ---------------------------------------- DATA LOADING ---------------------------------------- #
+
 
 class MultimodalDataset(Dataset):
     '''
@@ -332,21 +337,21 @@ class MultimodalDataset(Dataset):
         self.vision = vision
         self.data_dict = data_dict
         self.tabular = tabular
-        self.size = 224
+        self.size = 2500
 
         if vision == 'vit':
             self.processor = ViTImageProcessor.from_pretrained('google/vit-base-patch16-224')
             self.transform = lambda x: self.processor(x, return_tensors='pt').pixel_values.squeeze(0)
 
-        elif vision in ['resnet50', 'dense121']:
+        elif vision in ['resnet50', 'densenet121', None]:
             self.transform = transforms.Compose([
-                transforms.Resize((self.size, self.size)),  # Resize to 224x224
-                transforms.ToTensor(),                      # Convert images to PyTorch tensors
+                transforms.CenterCrop((self.size, self.size)),
+                transforms.ToTensor(),
                 transforms.Normalize(                       # Normalize with ImageNet mean and std
                     mean=[0.485, 0.456, 0.406],    
                     std=[0.229, 0.224, 0.225])
                 ])
-        elif vision is not None:
+        else:
             raise ValueError(f'Vision encoder {vision} not supported.')
         
         self.classes = ['Atelectasis', 'Cardiomegaly', 'Consolidation', 'Edema', 
@@ -400,32 +405,54 @@ class MultimodalDataset(Dataset):
         # Get tabular data
         subject_id, study_id = subject_study_pair
         tabular_row = self.tabular[(self.tabular['subject_id'] == subject_id) & 
-                                   (self.tabular['study_id'] == study_id)]
+                                (self.tabular['study_id'] == study_id)]
 
         tabular_row = tabular_row.drop(['subject_id', 'study_id'], axis=1).values       
         tabular_tensor = torch.tensor(tabular_row, dtype=torch.float32)
-
-        if self.vision is None:
-            return tabular_tensor, None, None, None
 
         # Get the paths for the PA and Lateral images
         pa_path = self.organized_paths[subject_study_pair]['PA']
         lateral_path = self.organized_paths[subject_study_pair]['LATERAL']
 
         # Load and process PA and Lateral images
-        pa_image = self._load_and_process_image(pa_path)
-        lateral_image = self._load_and_process_image(lateral_path)
+        pa_image = self._load_and_process_image(pa_path) if pa_path else torch.zeros((3, self.size, self.size), dtype=torch.float32)
+        lateral_image = self._load_and_process_image(lateral_path) if lateral_path else torch.zeros((3, self.size, self.size), dtype=torch.float32)
 
         # Use one of the available paths to get labels
         labels_path = pa_path if pa_path else lateral_path
         if not labels_path:
-            return None # Skip if both are missing
+            raise ValueError(f'No labels path found for {subject_study_pair}.')
 
         labels = self.data_dict[labels_path]
         label_values = [labels[class_name] if not np.isnan(labels[class_name]) else 0 for class_name in self.classes]
         label_tensor = torch.tensor(label_values, dtype=torch.float32)
+        if self.vision is None:
+            inputs = {
+                'tabular': tabular_tensor
+            }
+        else:
+            inputs = {
+                'pa': pa_image,
+                'lateral': lateral_image,
+                'labels': label_tensor,
+                'tabular': tabular_tensor
+            }
+        return inputs
 
-        return pa_image, lateral_image, label_tensor, tabular_tensor
+
+    def collate_fn(self, batch):
+        if self.vision is None:
+            inputs = {
+                'tabular': torch.stack([x['tabular'] for x in batch if x is not None])
+            }
+        else: 
+            inputs = {
+                'pa': torch.stack([x['pa'] for x in batch if x['pa'] is not None]),
+                'lateral': torch.stack([x['lateral'] for x in batch if x['lateral'] is not None]),
+                'labels': torch.stack([x['labels'] for x in batch if x['labels'] is not None]),
+                'tabular': torch.stack([x['tabular'] for x in batch if x['tabular'] is not None])
+            }
+        return inputs
 
 
 def prepare_data(): 
@@ -434,6 +461,7 @@ def prepare_data():
     Split into train/val/test sets.
     Filter images based on tabular data.
     '''
+    print(f'Preparing:\n\tTabular data: {TABULAR_PATH}\n\tImage data: {IMAGES_PATH}')
     # Load and pre-process tabular data and labels
     tabular = preprocess_tabular()
     labels = preprocess_labels()
@@ -442,57 +470,54 @@ def prepare_data():
     tab_train, tab_val, tab_test, lab_train, lab_val, lab_test = split(tabular, labels)
     
     # Load image labels, files and metadata
+    print('Loading: image data (labels, files, metadata).')
     labels_data, image_files, metadata = load_images_data()
 
     # Get intersection of tabular and image data
-    tab_data_train, image_dict_train = join_multimodal(lab_train, image_files, metadata, tab_train)
-    tab_data_val, image_dict_val = join_multimodal(lab_val, image_files, metadata, tab_val)
-    tab_data_test, image_dict_test = join_multimodal(lab_test, image_files, metadata, tab_test)
+    print('Joining: intersection of tabular and image data.')
+    tab_data_train, image_data_train = join_multimodal(lab_train, image_files, metadata, tab_train)
+    tab_data_val, image_data_val = join_multimodal(lab_val, image_files, metadata, tab_val)
+    tab_data_test, image_data_test = join_multimodal(lab_test, image_files, metadata, tab_test)
+    tab_data = {'train': tab_data_train, 'val': tab_data_val, 'test': tab_data_test}
+    image_data = {'train': image_data_train, 'val': image_data_val, 'test': image_data_test}
+    return tab_data, image_data
 
-    # Filter image files
-    all_images = set(list(image_dict_train.keys()) + list(image_dict_val.keys()) + list(image_dict_test.keys()))
-    filter_files(all_images)
-    return tab_data_train, tab_data_val, tab_data_test, image_dict_train, image_dict_val, image_dict_test
 
-
-def load_data(vision=None):
+def load_data(tab_data, image_data, vision=None, batch_size=4):
     '''
     Create data loaders. 
 
     Arguments: 
-        tabular (bool): Whether to use tabular data
-        vision (str): Type of vision encoder 'resnet50', 'dense121' or 'vit' (Default: None --> No images)
+        tab_data (dict): Dictionary with keys = 'train', 'val', 'test' and values = tabular data
+        image_data (dict): Dictionary with keys = 'train', 'val', 'test' and values = image data
+        vision (str): Type of vision encoder 'resnet50', 'densenet121' or 'vit' (Default: None --> No images)
     '''
-    # Load and pre-process tabular data and labels
-    tab_data_train, tab_data_val, tab_data_test, \
-        image_dict_train, image_dict_val, image_dict_test = prepare_data()
+    print(f'LOADING DATA (vision: {vision})')
+    print(f'Loaded image data:\tTrain: {len(image_data["train"])}\tValidation: {len(image_data["val"])}\tTest: {len(image_data["test"])} samples.')
+    print(f'Loaded tabular data: \tTrain: {len(tab_data["train"])}\tValidation: {len(tab_data["val"])}\tTest: {len(tab_data["test"])} samples.')
 
     # Create datasets
-    train_dataset = MultimodalDataset(vision, image_dict_train, tab_data_train)
-    val_dataset = MultimodalDataset(vision, image_dict_val, tab_data_val)
-    test_dataset = MultimodalDataset(vision, image_dict_test, tab_data_test)
+    train_dataset = MultimodalDataset(vision, image_data['train'], tab_data['train'])
+    val_dataset = MultimodalDataset(vision, image_data['val'], tab_data['val'])
+    test_dataset = MultimodalDataset(vision, image_data['test'], tab_data['test'])
+    print(f'Created datasets:\tTrain: {len(train_dataset)}\tValidation: {len(val_dataset)}\tTest: {len(test_dataset)} samples.')
 
     # Create data loaders
-    loader_params = {'batch_size': 32, 'num_workers': 4, 'shuffle': True}
+    loader_params = {'batch_size': batch_size, 'num_workers': 4, 'shuffle': True}
     train_loader = DataLoader(train_dataset, **loader_params)
     val_loader = DataLoader(val_dataset, **loader_params)
     test_loader = DataLoader(test_dataset, **loader_params)
-
-    # Test data loaders
-    for pa_image, lateral_image, label_tensor, tabular_tensor in train_loader:
-        print(f'Input shapes:\nPA image: {pa_image.shape}\nLateral image: {lateral_image.shape}'+\
-              f'\nLabel tensor: {label_tensor.shape}\nTabular tensor: {tabular_tensor.shape}')
-        break
-
+    print(f'Created data loaders:\tTrain: {len(train_loader)}\tValidation: {len(val_loader)}\tTest: {len(test_loader)}\tbatches.')
     return train_loader, val_loader, test_loader
 
-
 if __name__ == '__main__': 
-    tab_data_train, tab_data_val, tab_data_test, image_dict_train, image_dict_val, image_dict_test = prepare_data()
+    tab_data, image_data = prepare_data()
+    tab_data_train, tab_data_val, tab_data_test = tab_data['train'], tab_data['val'], tab_data['test']
+    image_data_train, image_data_val, image_data_test = image_data['train'], image_data['val'], image_data['test']
 
     # Print the shapes of the dataframes
     print(f'Tabular data\nTrain: {tab_data_train.shape}\nVal: {tab_data_val.shape}\nTest: {tab_data_test.shape}')
-    print(f'Image data\nTrain: {len(image_dict_train)}\nVal: {len(image_dict_val)}\nTest: {len(image_dict_test)}')
+    print(f'Image data\nTrain: {len(image_data_train)}\nVal: {len(image_data_val)}\nTest: {len(image_data_test)}')
 
     # Save the dataframes
     tab_data_train.to_csv(os.path.join(PROCESSED_PATH, 'tab_data_train.csv'), index=False)
@@ -500,12 +525,12 @@ if __name__ == '__main__':
     tab_data_test.to_csv(os.path.join(PROCESSED_PATH, 'tab_data_test.csv'), index=False)
 
     # Save the dictionaries
-    np.save(os.path.join(PROCESSED_PATH, 'image_dict_train.npy'), image_dict_train)
-    np.save(os.path.join(PROCESSED_PATH, 'image_dict_val.npy'), image_dict_val)
-    np.save(os.path.join(PROCESSED_PATH, 'image_dict_test.npy'), image_dict_test)
+    np.save(os.path.join(PROCESSED_PATH, 'image_data_train.npy'), image_data_train)
+    np.save(os.path.join(PROCESSED_PATH, 'image_data_val.npy'), image_data_val)
+    np.save(os.path.join(PROCESSED_PATH, 'image_data_test.npy'), image_data_test)
 
     # Delete not matched images
-    all_images = set(list(image_dict_train.keys()) + list(image_dict_val.keys()) + list(image_dict_test.keys()))
+    all_images = set(list(image_data_train.keys()) + list(image_data_val.keys()) + list(image_data_test.keys()))
     _, image_files, _ = load_images_data()
     for image_file in image_files:
         if image_file not in all_images:
