@@ -12,6 +12,7 @@ from PIL import Image
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
 from transformers import ViTImageProcessor
+
 from torchvision.transforms import (
     CenterCrop,
     Compose,
@@ -32,7 +33,7 @@ NORM_STD = [0.3006, 0.3006, 0.3006]     # MIMIC-CXR std (based on 2GB of images)
 
 # ---------------------------------------- GLOBAL VARIABLES ---------------------------------------- #
 
-DATA_PATH = 'data/'
+DATA_PATH = '../data/'
 TABULAR_PATH = os.path.join(DATA_PATH, 'mimic-iv')
 IMAGES_PATH = os.path.join(DATA_PATH, 'mimic-cxr')
 PROCESSED_PATH = os.path.join(DATA_PATH, 'processed_data')
@@ -151,9 +152,13 @@ def create_image_labels_mapping(image_files, labels_data, info_data):
         ]
 
         # Assuming there is only one match, get the labels and view position
+        if len(labels_row) > 1:
+            raise ValueError(f'More than one label row found for {image_path}.')
+        
         if not labels_row.empty and not view_info.empty:
             labels = labels_row.iloc[0].to_dict()
             labels['ViewPosition'] = view_info['ViewPosition'].values[0]
+            labels['dicom_id'] = dicom_id
             image_labels_mapping[image_path] = labels
 
     return image_labels_mapping
@@ -177,14 +182,19 @@ def join_multimodal(labels_data, image_files, info_jpg, tab_data):
     df_img['subject_id'] = df_img['subject_id'].astype(int).astype(str)
 
     # Filter on study
-    common_data = set(tab_data['study_id']).intersection(set(df_img['study_id']))
-    tab_data = tab_data[tab_data['study_id'].isin(common_data)]
-    df_img = df_img[df_img['study_id'].isin(common_data)]
+    #common_data = set(tab_data['study_id']).intersection(set(df_img['study_id']))
+    # tab_data = tab_data[tab_data['study_id'].isin(common_data)]
+    # df_img = df_img[df_img['study_id'].isin(common_data)]
+
+    # Filter on dicom_id
+    common_data = set(tab_data['dicom_id']).intersection(set(df_img['dicom_id']))
+    tab_data = tab_data[tab_data['dicom_id'].isin(common_data)]
+    df_img = df_img[df_img['dicom_id'].isin(common_data)]
 
     # Filter on subject
-    common_data = set(tab_data['subject_id']).intersection(set(df_img['subject_id']))
-    tab_data = tab_data[tab_data['subject_id'].isin(common_data)]
-    df_img = df_img[df_img['subject_id'].isin(common_data)]
+    # common_data = set(tab_data['subject_id']).intersection(set(df_img['subject_id']))
+    # tab_data = tab_data[tab_data['subject_id'].isin(common_data)]
+    # df_img = df_img[df_img['subject_id'].isin(common_data)]
     print(f'Number of samples:\tTabular: {len(tab_data)}\tImage: {len(df_img)}')
 
     # Return the image data to a dictionary
@@ -265,7 +275,7 @@ def preprocess_tabular():
     print('Number of unique studies: ', len(merged['study_id'].unique()))
     tms = tms[tms['ViewPosition']=='PA']
     tabular = tms.drop(
-        columns=['dicom_id', 'ViewPosition', 'StudyDateTime', 
+        columns=['ViewPosition', 'StudyDateTime', 
                  'hadm_id', 'admit_provider_id', 'anchor_year', 'admittime'])
 
     # ONE HOT ENCODING OF CATEGORICAL VARIABLES

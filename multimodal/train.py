@@ -58,7 +58,7 @@ def build_group(tabular=False,
               'vision': vision, 
               'tabular_params': tabular_params}
     wandb.init(group=group, config=config)
-
+    
 # ---------------------------------------- TRAINING FUNCTIONS ---------------------------------------- #
 
 
@@ -108,6 +108,8 @@ def train(model, train_loader, val_loader, test_loader,
     #criterion = nn.CrossEntropyLoss()
     #optimizer = optim.Adam(model.parameters(), lr=lr)
     #scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.1)
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model.to(device)
 
     training_args = TrainingArguments(
 
@@ -137,7 +139,7 @@ def train(model, train_loader, val_loader, test_loader,
         logging_first_step=True,
         logging_steps=100,
         logging_strategy='steps',
-        run_name=run_name,
+        run_name=run_name
     )
 
     # Train the model
@@ -147,7 +149,8 @@ def train(model, train_loader, val_loader, test_loader,
         train_dataloader=train_loader,
         eval_dataloader=val_loader,
         compute_metrics=compute_metrics,
-        callbacks=[EarlyStoppingCallback(early_stopping_patience=3)]
+        callbacks=[EarlyStoppingCallback(early_stopping_patience=3)],
+        #preprocess_logits_for_metrics=None, # MIGHT NEED TO CHANGE THIS
     )
     trainer.train()
 
@@ -198,8 +201,9 @@ def grid_search(tabular=False,
     train_loader, val_loader, test_loader = load_data(tab_data, image_data, vision=None)
 
     # Train model
-    eval_results = train(model, train_loader, val_loader, test_loader,
+    eval_results = train(model, train_loader, val_loader, test_loader, 
                          wandb.run.name, CHECKPOINTS_DIR, epochs=num_epochs, lr=lr, seed=seed)
+    return eval_results
     
 
 if __name__ == '__main__':
