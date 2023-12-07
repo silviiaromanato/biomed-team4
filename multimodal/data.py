@@ -180,6 +180,19 @@ def join_multimodal(labels_data, image_files, info_jpg, tab_data):
     df_img['study_id'] = df_img['study_id'].astype(int).astype(str)
     df_img['subject_id'] = df_img['subject_id'].astype(int).astype(str)
 
+    # Keep only PA and LATERAL images
+    df_img = df_img[df_img['ViewPosition'].isin(['PA', 'LATERAL'])]
+
+    # Group by study_id and subject_id and ViewPosition and keep the first row
+    df_img = df_img.groupby(['study_id', 'subject_id', 'ViewPosition']).first().reset_index()
+
+    # Function to check if both PA and Lateral images are present
+    def has_both_views(group):
+        return 'PA' in group['ViewPosition'].values and 'LATERAL' in group['ViewPosition'].values
+
+    # Filter the DataFrame
+    df_img = df_img.groupby(['study_id', 'subject_id']).filter(has_both_views)
+
     # Filter on study
     common_data = set(tab_data['study_id']).intersection(set(df_img['study_id']))
     tab_data = tab_data[tab_data['study_id'].isin(common_data)]
@@ -413,8 +426,7 @@ class MultimodalDataset(Dataset):
         #print(f'Number of samples: {len(self.organized_paths)}')
 
         # Filter out pairs where both images are None
-        self.organized_paths = {k: v for k, v in self.organized_paths.items() \
-                                if v['PA'] is not None and v['LATERAL'] is not None}
+        self.organized_paths = {k: v for k, v in self.organized_paths.items() if v['PA'] is not None and v['LATERAL'] is not None}
 
     def _organize_paths(self):
         organized = {}
@@ -461,13 +473,16 @@ class MultimodalDataset(Dataset):
 
         # Get the paths for the PA and Lateral images
         pa_path = self.organized_paths[subject_study_pair]['PA']
+        print(pa_path, len(self.organized_paths[subject_study_pair]))
         lateral_path = self.organized_paths[subject_study_pair]['LATERAL']
+        print(lateral_path, len(self.organized_paths[subject_study_pair]))
 
         # Load and process PA and Lateral images
-        pa_image = self._load_and_process_image(pa_path) \
-            if pa_path else torch.zeros((3, self.size, self.size), dtype=torch.float32)
-        lateral_image = self._load_and_process_image(lateral_path) \
-            if lateral_path else torch.zeros((3, self.size, self.size), dtype=torch.float32)
+        pa_image = self._load_and_process_image(pa_path)
+        lateral_image = self._load_and_process_image(lateral_path)
+        
+        if not pa_path or not lateral_path:
+            raise ValueError(f'Either PA or Lateral image is missing for {subject_study_pair}.')
 
         # Use one of the available paths to get labels
         labels_path = pa_path if pa_path else lateral_path
