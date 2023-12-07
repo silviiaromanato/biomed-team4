@@ -361,7 +361,7 @@ def transform_image(image_size, vision=None, augment=True):
     5. Normalize (with ImageNet mean and std)
     '''
     transforms = []
-    size = min(image_size) # Get minimum of image height and width
+    size = min(image_size) # Get minimum of image height and width to crop to square
 
     # Augmentation (flips, rotations)
     if augment:
@@ -371,7 +371,6 @@ def transform_image(image_size, vision=None, augment=True):
 
     transforms.append(CenterCrop((size, size)))
 
-    # ViT: 
     if vision == 'vit':
         processor = ViTImageProcessor.from_pretrained(
             'google/vit-large-patch32-384', 
@@ -397,26 +396,7 @@ class MultimodalDataset(Dataset):
         self.tabular = tabular
 
         if vision is not None: 
-            self.transform = transform_image(vision, augment=True)
-
-        if vision == 'vit':
-            self.transform = transforms.Compose([
-                transforms.CenterCrop((IMAGE_SIZE, IMAGE_SIZE)), # Not needed for ViT but kept for consistency
-                ViTImageProcessor.from_pretrained('google/vit-large-patch32-384', 
-                                                  do_normalize=True,
-                                                  image_mean=NORM_MEAN,
-                                                  image_std=NORM_STD,
-                                                  return_tensors='pt'),
-                lambda x: x.pixel_values[0]
-            ])
-        elif vision in ['resnet50', 'densenet121']:
-            self.transform = transforms.Compose([
-                transforms.CenterCrop((IMAGE_SIZE, IMAGE_SIZE)),
-                transforms.ToTensor(),
-                transforms.Normalize(mean=NORM_MEAN, std=NORM_STD)
-                ])
-        elif vision is not None: 
-            raise ValueError(f'Vision encoder {vision} not supported.')
+            self.transform = lambda img_size: transform_image(img_size, vision=vision, augment=augment)
         
         self.classes = ['Atelectasis', 'Cardiomegaly', 'Consolidation', 'Edema', 
                         'Enlarged Cardiomediastinum', 'Fracture', 'Lung Lesion', 
@@ -454,9 +434,7 @@ class MultimodalDataset(Dataset):
             image = Image.open(path).convert('RGB')
         else:
             image = Image.new('RGB', (self.size, self.size))
-        #if self.vision == 'vit':
-            #image = self.processor(image, return_tensors='pt').pixel_values.squeeze(0)
-        image = self.transform(image)
+        image = self.transform(image.size)(image)
         return image
 
     def __getitem__(self, idx):
@@ -571,7 +549,9 @@ def load_data(tab_data, image_data, vision=None, batch_size=4):
     print(f'Created data loaders:\tTrain: {len(train_loader)}\tValidation: {len(val_loader)}\tTest: {len(test_loader)}\tbatches.')
     return train_loader, val_loader, test_loader
 
+
 if __name__ == '__main__': 
+
     tab_data, image_data = prepare_data()
     tab_data_train, tab_data_val, tab_data_test = tab_data['train'], tab_data['val'], tab_data['test']
     image_data_train, image_data_val, image_data_test = image_data['train'], image_data['val'], image_data['test']
