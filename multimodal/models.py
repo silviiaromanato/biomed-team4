@@ -17,9 +17,8 @@ from transformers import ViTForImageClassification
 
 NUM_FEATURES = 87           # Number of tabular features
 IMAGE_EMBEDDING_DIM = 512   # All vision encoders produce 512-dimensional embeddings
-IMAGE_SIZE = 2500           # All images are resized to 2500 x 2500
 NUM_LABELS = 3              # Number of labels for each class
-NUM_CLASSES = 15            # Number of classes
+NUM_CLASSES = 14            # Number of classes
 
 class FullyConnectedLayer(nn.Module):
     '''

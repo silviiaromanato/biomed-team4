@@ -2,7 +2,7 @@
 
 program: multimodal/grid_search.py
 method: grid
-project: BioMedTeam4
+project: BioMed
 metric:
   goal: minimize
   name: val_loss

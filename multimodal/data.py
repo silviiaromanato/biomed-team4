@@ -17,10 +17,16 @@ from torchvision.transforms import (
     Compose,
     Normalize,
     RandomHorizontalFlip,
+    RandomRotation,
+    RandomVerticalFlip,
     RandomResizedCrop,
     Resize,
     ToTensor,
 )
+
+IMAGE_SIZE = 384        # All images are resized to 384 x 384
+NORM_MEAN = [0.4734, 0.4734, 0.4734]    # MIMIC-CXR mean (based on 2GB of images)
+NORM_STD = [0.3006, 0.3006, 0.3006]     # MIMIC-CXR std (based on 2GB of images)
 
 
 # ---------------------------------------- GLOBAL VARIABLES ---------------------------------------- #
@@ -178,7 +184,7 @@ def join_multimodal(labels_data, image_files, info_jpg, tab_data):
     common_data = set(tab_data['subject_id']).intersection(set(df_img['subject_id']))
     tab_data = tab_data[tab_data['subject_id'].isin(common_data)]
     df_img = df_img[df_img['subject_id'].isin(common_data)]
-    print(f'Number of studies:\tTabular: {len(tab_data)}\tImage: {len(df_img)}')
+    print(f'Number of samples:\tTabular: {len(tab_data)}\tImage: {len(df_img)}')
 
     # Return the image data to a dictionary
     dict_img = df_img.set_index('index').T.to_dict()
@@ -345,59 +351,69 @@ def split(tabular, labels, val_size=0.1, test_size=0.15, seed=42):
 
 # ---------------------------------------- DATA LOADING ---------------------------------------- #
 
-def augment(train=True, size=2500, crop_size=2500): 
-    normalize = Normalize(
-        mean=[0.485, 0.456, 0.406],std=[0.229, 0.224, 0.225]
-    )
-    if train:
-        transforms = Compose(
-            [
-                RandomResizedCrop(crop_size),
-                RandomHorizontalFlip(),
-                ToTensor(),
-                normalize
-            ]
-        )
-    else:
-        transforms = Compose(
-            [
-                Resize(size),
-                CenterCrop(crop_size),
-                ToTensor(),
-                normalize
-            ]
-        )
-    return transforms
+def transform_image(image_size, vision=None, augment=True): 
+    '''
+    Defines the image transformation pipeline. 
+    1. Augmentation (flips, rotations) (only for training)
+    2. Crop a square from the (non-square) image
+    3. Resize to IMAGE_SIZE x IMAGE_SIZE
+    4. Convert to tensor
+    5. Normalize (with ImageNet mean and std)
+    '''
+    transforms = []
+    size = min(image_size) # Get minimum of image height and width
 
+    # Augmentation (flips, rotations)
+    if augment:
+        transforms.append(RandomRotation(10))
+        transforms.append(RandomVerticalFlip())
+        transforms.append(RandomHorizontalFlip())
+
+    transforms.append(CenterCrop((size, size)))
+
+    # ViT: 
+    if vision == 'vit':
+        processor = ViTImageProcessor.from_pretrained(
+            'google/vit-large-patch32-384', 
+            do_normalize=False, 
+            image_mean=NORM_MEAN, 
+            image_std=NORM_STD, 
+            return_tensors='pt')
+        transforms.append(lambda x: processor(x).pixel_values[0].T)
+    else: 
+        transforms.append(Resize((IMAGE_SIZE, IMAGE_SIZE)))
+        transforms.append(ToTensor())
+        transforms.append(Normalize(mean=NORM_MEAN, std=NORM_STD))
+    return Compose(transforms)
 
 class MultimodalDataset(Dataset):
     '''
     Dataset class for MIMIC-CXR and MIMIC-IV.
     Handles both tabular data and images.
     '''
-    def __init__(self, vision, data_dict, tabular):
+    def __init__(self, vision, data_dict, tabular, augment=True):
         self.vision = vision
         self.data_dict = data_dict
         self.tabular = tabular
-        self.size = 2500
+
+        if vision is not None: 
+            self.transform = transform_image(vision, augment=True)
 
         if vision == 'vit':
             self.transform = transforms.Compose([
-                transforms.CenterCrop((self.size, self.size)), # Not needed for ViT but kept for consistency
+                transforms.CenterCrop((IMAGE_SIZE, IMAGE_SIZE)), # Not needed for ViT but kept for consistency
                 ViTImageProcessor.from_pretrained('google/vit-large-patch32-384', 
                                                   do_normalize=True,
-                                                  image_mean=[0.485, 0.456, 0.406],
-                                                  image_std=[0.229, 0.224, 0.225],
+                                                  image_mean=NORM_MEAN,
+                                                  image_std=NORM_STD,
                                                   return_tensors='pt'),
                 lambda x: x.pixel_values[0]
             ])
         elif vision in ['resnet50', 'densenet121']:
             self.transform = transforms.Compose([
-                transforms.CenterCrop((self.size, self.size)),
+                transforms.CenterCrop((IMAGE_SIZE, IMAGE_SIZE)),
                 transforms.ToTensor(),
-                transforms.Normalize(                       # Normalize with ImageNet mean and std
-                    mean=[0.485, 0.456, 0.406],    
-                    std=[0.229, 0.224, 0.225])
+                transforms.Normalize(mean=NORM_MEAN, std=NORM_STD)
                 ])
         elif vision is not None: 
             raise ValueError(f'Vision encoder {vision} not supported.')

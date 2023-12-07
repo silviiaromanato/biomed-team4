@@ -71,7 +71,6 @@ def test(model, test_data, device='cpu'):
 
 
 # PROBABLY DEPRECATED
-
 def train_model(model, num_epochs, train_dataloader, criterion, optimizer, device, verbose = False):
     model.to(device)
     for epoch in range(num_epochs):
