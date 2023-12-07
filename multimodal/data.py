@@ -19,12 +19,13 @@ from torchvision.transforms import (
     RandomHorizontalFlip,
     RandomRotation,
     RandomVerticalFlip,
-    RandomResizedCrop,
     Resize,
     ToTensor,
 )
 
-IMAGE_SIZE = 384        # All images are resized to 384 x 384
+NUM_LABELS = 3                          # Number of labels for each class
+NUM_CLASSES = 14                        # Number of classes
+IMAGE_SIZE = 384                        # All images are resized to 384 x 384
 NORM_MEAN = [0.4734, 0.4734, 0.4734]    # MIMIC-CXR mean (based on 2GB of images)
 NORM_STD = [0.3006, 0.3006, 0.3006]     # MIMIC-CXR std (based on 2GB of images)
 
@@ -469,7 +470,8 @@ class MultimodalDataset(Dataset):
 
         labels = self.data_dict[labels_path]
         label_values = [labels[class_name] if not np.isnan(labels[class_name]) else 0 for class_name in self.classes]
-        label_tensor = torch.tensor(label_values, dtype=torch.float32)
+        label_values = torch.tensor(label_values, dtype=torch.float32).unsqueeze(0)
+        label_tensor = torch.nn.functional.one_hot(label_values.to(torch.int64), num_classes=NUM_LABELS).squeeze(0)
         inputs = {
             'pa': pa_image,
             'lateral': lateral_image,
