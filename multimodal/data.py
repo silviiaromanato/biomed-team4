@@ -69,9 +69,9 @@ def load_tabular_data():
     '''
     Load tabular data: admissions, patients, services, image metadata
     '''
-    admissions_path = os.path.join(TABULAR_PATH, 'admissions.csv.gz')
-    patients_path = os.path.join(TABULAR_PATH, 'patients.csv.gz')
-    services_path = os.path.join(TABULAR_PATH, 'services.csv.gz')
+    admissions_path = os.path.join(TABULAR_PATH, 'ADMISSIONS.csv.gz')
+    patients_path = os.path.join(TABULAR_PATH, 'PATIENTS.csv.gz')
+    services_path = os.path.join(TABULAR_PATH, 'SERVICES.csv.gz')
     metadata_path = os.path.join(TABULAR_PATH, 'mimic-cxr-2.0.0-metadata.csv')
 
     if not os.path.exists(admissions_path):
