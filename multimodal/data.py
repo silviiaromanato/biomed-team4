@@ -158,7 +158,6 @@ def create_image_labels_mapping(image_files, labels_data, info_data):
         if not labels_row.empty and not view_info.empty:
             labels = labels_row.iloc[0].to_dict()
             labels['ViewPosition'] = view_info['ViewPosition'].values[0]
-            labels['dicom_id'] = dicom_id
             image_labels_mapping[image_path] = labels
 
     return image_labels_mapping
@@ -172,8 +171,8 @@ def join_multimodal(labels_data, image_files, info_jpg, tab_data):
         dict_img (dict): keys = image file paths and values = dicts with labels and ViewPosition
     '''
     # Tabular data
-    tab_data['study_id'] = tab_data['study_id'].astype(int).astype(str)
-    tab_data['subject_id'] = tab_data['subject_id'].astype(int).astype(str)
+    tab_data.loc[:, 'study_id'] = tab_data['study_id'].astype(int).astype(str)
+    tab_data.loc[:, 'subject_id'] = tab_data['subject_id'].astype(int).astype(str)
 
     # Image data
     image_labels_mapping = create_image_labels_mapping(image_files, labels_data, info_jpg)
@@ -182,19 +181,14 @@ def join_multimodal(labels_data, image_files, info_jpg, tab_data):
     df_img['subject_id'] = df_img['subject_id'].astype(int).astype(str)
 
     # Filter on study
-    #common_data = set(tab_data['study_id']).intersection(set(df_img['study_id']))
-    # tab_data = tab_data[tab_data['study_id'].isin(common_data)]
-    # df_img = df_img[df_img['study_id'].isin(common_data)]
-
-    # Filter on dicom_id
-    common_data = set(tab_data['dicom_id']).intersection(set(df_img['dicom_id']))
-    tab_data = tab_data[tab_data['dicom_id'].isin(common_data)]
-    df_img = df_img[df_img['dicom_id'].isin(common_data)]
+    common_data = set(tab_data['study_id']).intersection(set(df_img['study_id']))
+    tab_data = tab_data[tab_data['study_id'].isin(common_data)]
+    df_img = df_img[df_img['study_id'].isin(common_data)]
 
     # Filter on subject
-    # common_data = set(tab_data['subject_id']).intersection(set(df_img['subject_id']))
-    # tab_data = tab_data[tab_data['subject_id'].isin(common_data)]
-    # df_img = df_img[df_img['subject_id'].isin(common_data)]
+    common_data = set(tab_data['subject_id']).intersection(set(df_img['subject_id']))
+    tab_data = tab_data[tab_data['subject_id'].isin(common_data)]
+    df_img = df_img[df_img['subject_id'].isin(common_data)]
     print(f'Number of samples:\tTabular: {len(tab_data)}\tImage: {len(df_img)}')
 
     # Return the image data to a dictionary
@@ -275,7 +269,7 @@ def preprocess_tabular():
     print('Number of unique studies: ', len(merged['study_id'].unique()))
     tms = tms[tms['ViewPosition']=='PA']
     tabular = tms.drop(
-        columns=['ViewPosition', 'StudyDateTime', 
+        columns=['dicom_id', 'ViewPosition', 'StudyDateTime', 
                  'hadm_id', 'admit_provider_id', 'anchor_year', 'admittime'])
 
     # ONE HOT ENCODING OF CATEGORICAL VARIABLES
@@ -460,7 +454,8 @@ class MultimodalDataset(Dataset):
         tabular_row = self.tabular[(self.tabular['subject_id'] == subject_id) & 
                                 (self.tabular['study_id'] == study_id)]
 
-        tabular_row = tabular_row.drop(['subject_id', 'study_id'], axis=1).values       
+        tabular_row = tabular_row.drop(['subject_id', 'study_id'], axis=1).values
+        print(tabular_row) 
         tabular_tensor = torch.tensor(tabular_row, dtype=torch.float32).squeeze(0)
         if self.vision is None:
             return {'tabular': tabular_tensor}

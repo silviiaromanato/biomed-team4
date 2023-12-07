@@ -58,7 +58,7 @@ def build_group(tabular=False,
               'vision': vision, 
               'tabular_params': tabular_params}
     wandb.init(group=group, config=config)
-    
+
 # ---------------------------------------- TRAINING FUNCTIONS ---------------------------------------- #
 
 
@@ -89,7 +89,7 @@ def compute_metrics(pred, labels):
 
     
 def train(model, train_loader, val_loader, test_loader,
-          run_name, output_dir, epochs=3, lr=2e-5, seed=0):
+          output_dir, epochs=3, lr=2e-5, seed=0):
     '''
     Trains a Joint Encoder model. 
     W&B logging is enabled by default.
@@ -139,7 +139,7 @@ def train(model, train_loader, val_loader, test_loader,
         logging_first_step=True,
         logging_steps=100,
         logging_strategy='steps',
-        run_name=run_name
+        run_name=wandb.run.name
     )
 
     # Train the model
@@ -202,7 +202,7 @@ def grid_search(tabular=False,
 
     # Train model
     eval_results = train(model, train_loader, val_loader, test_loader, 
-                         wandb.run.name, CHECKPOINTS_DIR, epochs=num_epochs, lr=lr, seed=seed)
+                         CHECKPOINTS_DIR, epochs=num_epochs, lr=lr, seed=seed)
     return eval_results
     
 
