@@ -536,9 +536,9 @@ def load_data(tab_data, image_data, vision=None, batch_size=4):
     print(f'Loaded tabular data: \tTrain: {len(tab_data["train"])}\tValidation: {len(tab_data["val"])}\tTest: {len(tab_data["test"])} samples.')
 
     # Create datasets
-    train_dataset = MultimodalDataset(vision, image_data['train'], tab_data['train'])
-    val_dataset = MultimodalDataset(vision, image_data['val'], tab_data['val'])
-    test_dataset = MultimodalDataset(vision, image_data['test'], tab_data['test'])
+    train_dataset = MultimodalDataset(vision, image_data['train'], tab_data['train'], augment=True)
+    val_dataset = MultimodalDataset(vision, image_data['val'], tab_data['val'], augment=False)
+    test_dataset = MultimodalDataset(vision, image_data['test'], tab_data['test'], augment=False)
     print(f'Created datasets:\tTrain: {len(train_dataset)}\tValidation: {len(val_dataset)}\tTest: {len(test_dataset)} samples.')
 
     # Create data loaders
