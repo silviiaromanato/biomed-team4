@@ -32,7 +32,7 @@ NORM_STD = [0.3006, 0.3006, 0.3006]     # MIMIC-CXR std (based on 2GB of images)
 
 # ---------------------------------------- GLOBAL VARIABLES ---------------------------------------- #
 
-DATA_PATH = '../data/'
+DATA_PATH = 'data/'
 TABULAR_PATH = os.path.join(DATA_PATH, 'mimic-iv')
 IMAGES_PATH = os.path.join(DATA_PATH, 'mimic-cxr')
 PROCESSED_PATH = os.path.join(DATA_PATH, 'processed_data')
@@ -460,8 +460,10 @@ class MultimodalDataset(Dataset):
         lateral_path = self.organized_paths[subject_study_pair]['LATERAL']
 
         # Load and process PA and Lateral images
-        pa_image = self._load_and_process_image(pa_path) if pa_path else torch.zeros((3, self.size, self.size), dtype=torch.float32)
-        lateral_image = self._load_and_process_image(lateral_path) if lateral_path else torch.zeros((3, self.size, self.size), dtype=torch.float32)
+        pa_image = self._load_and_process_image(pa_path) \
+            if pa_path else torch.zeros((3, self.size, self.size), dtype=torch.float32)
+        lateral_image = self._load_and_process_image(lateral_path) \
+            if lateral_path else torch.zeros((3, self.size, self.size), dtype=torch.float32)
 
         # Use one of the available paths to get labels
         labels_path = pa_path if pa_path else lateral_path
@@ -472,12 +474,7 @@ class MultimodalDataset(Dataset):
         label_values = [labels[class_name] if not np.isnan(labels[class_name]) else 0 for class_name in self.classes]
         label_values = torch.tensor(label_values, dtype=torch.float32).unsqueeze(0)
         label_tensor = torch.nn.functional.one_hot(label_values.to(torch.int64), num_classes=NUM_LABELS).squeeze(0)
-        inputs = {
-            'pa': pa_image,
-            'lateral': lateral_image,
-            'labels': label_tensor,
-            'tabular': tabular_tensor
-        }
+        inputs = {'pa': pa_image, 'lateral': lateral_image, 'labels': label_tensor, 'tabular': tabular_tensor}
         return inputs
 
 

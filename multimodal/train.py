@@ -6,6 +6,7 @@ TODO: Add validation set, scheduler and log results to W&B.
 
 from data import *
 from sklearn.metrics import confusion_matrix, roc_curve, auc, precision_recall_curve, average_precision_score, f1_score, accuracy_score, precision_score, recall_score
+from transformers import TrainingArguments, Trainer
 
 
 def train(model, criterion, optimizer, scheduler, train_data, val_data, num_epochs, device='cpu', verbose=False):
