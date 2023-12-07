@@ -455,7 +455,6 @@ class MultimodalDataset(Dataset):
                                 (self.tabular['study_id'] == study_id)]
 
         tabular_row = tabular_row.drop(['subject_id', 'study_id'], axis=1).values
-        print(tabular_row) 
         tabular_tensor = torch.tensor(tabular_row, dtype=torch.float32).squeeze(0)
         if self.vision is None:
             return {'tabular': tabular_tensor}
@@ -526,10 +525,9 @@ def prepare_data():
     return tab_data, image_data
 
 
-def load_data(tab_data, image_data, vision=None, batch_size=4):
+def load_data(tab_data, image_data, vision=None):
     '''
-    Create data loaders. 
-
+    Create datasets for each split.
     Arguments: 
         tab_data (dict): Dictionary with keys = 'train', 'val', 'test' and values = tabular data
         image_data (dict): Dictionary with keys = 'train', 'val', 'test' and values = image data
@@ -538,20 +536,11 @@ def load_data(tab_data, image_data, vision=None, batch_size=4):
     print(f'LOADING DATA (vision: {vision})')
     print(f'Loaded image data:\tTrain: {len(image_data["train"])}\tValidation: {len(image_data["val"])}\tTest: {len(image_data["test"])} samples.')
     print(f'Loaded tabular data: \tTrain: {len(tab_data["train"])}\tValidation: {len(tab_data["val"])}\tTest: {len(tab_data["test"])} samples.')
-
-    # Create datasets
-    train_dataset = MultimodalDataset(vision, image_data['train'], tab_data['train'], augment=True)
-    val_dataset = MultimodalDataset(vision, image_data['val'], tab_data['val'], augment=False)
-    test_dataset = MultimodalDataset(vision, image_data['test'], tab_data['test'], augment=False)
-    print(f'Created datasets:\tTrain: {len(train_dataset)}\tValidation: {len(val_dataset)}\tTest: {len(test_dataset)} samples.')
-
-    # Create data loaders
-    loader_params = {'batch_size': batch_size, 'num_workers': 0, 'shuffle': True}
-    train_loader = DataLoader(train_dataset, **loader_params)
-    val_loader = DataLoader(val_dataset, **loader_params)
-    test_loader = DataLoader(test_dataset, **loader_params)
-    print(f'Created data loaders:\tTrain: {len(train_loader)}\tValidation: {len(val_loader)}\tTest: {len(test_loader)}\tbatches.')
-    return train_loader, val_loader, test_loader
+    train_data = MultimodalDataset(vision, image_data['train'], tab_data['train'], augment=True)
+    val_data = MultimodalDataset(vision, image_data['val'], tab_data['val'], augment=False)
+    test_data = MultimodalDataset(vision, image_data['test'], tab_data['test'], augment=False)
+    print(f'Created datasets:\tTrain: {len(train_data)}\tValidation: {len(val_data)}\tTest: {len(test_data)} samples.')
+    return train_data, val_data, test_data
 
 
 if __name__ == '__main__': 

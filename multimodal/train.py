@@ -19,6 +19,8 @@ from data import *
 
 # ---------------------------------------- GLOBAL VARIABLES ---------------------------------------- #
 
+WANDB_PROJECT_NAME = 'BioMed'
+
 # Path to data and results directories
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 GRID_DIR = os.path.join(BASE_DIR, 'results')
@@ -88,7 +90,42 @@ def compute_metrics(pred, labels):
     }
 
     
-def train(model, train_loader, val_loader, test_loader,
+class MultimodalTrainer(Trainer):
+    '''
+    Trainer class for joint image-tabular encoders. 
+    '''
+    def __init__(self, 
+                 model, 
+                 args, 
+                 train_dataset, 
+                 eval_dataset, 
+                 compute_metrics, 
+                 callbacks=None, 
+                 optimizers=None, 
+                 **kwargs):
+        super().__init__(model, args, train_dataset, eval_dataset, compute_metrics, callbacks, optimizers, **kwargs)
+
+    def get_train_dataloader(self):
+        '''
+        Returns the training dataloader.
+        '''
+        return self.train_dataset
+    
+
+    def compute_loss(self, model, inputs, return_outputs=False):
+        '''
+        Computes loss for joint image-tabular encoders. 
+        '''
+        labels = inputs.pop('labels')
+        outputs = model(**inputs)
+        logits = outputs.logits
+        loss_fct = nn.BCEWithLogitsLoss()
+        loss = loss_fct(logits, labels)
+        return (loss, outputs) if return_outputs else loss
+    
+
+
+def train(model, train_data, val_data, test_data,
           output_dir, epochs=3, lr=2e-5, seed=0):
     '''
     Trains a Joint Encoder model. 
@@ -96,7 +133,7 @@ def train(model, train_loader, val_loader, test_loader,
 
     Arguments: 
         model (JointEncoder): model to train
-        train_loader, val_loader, test_loader: Data loaders
+        train_data, val_data, test_data: Datasets
         run_name (str): Name of W&B run
         output_dir (str): Output directory for model checkpoints
         epochs (int): Number of training epochs
@@ -139,15 +176,15 @@ def train(model, train_loader, val_loader, test_loader,
         logging_first_step=True,
         logging_steps=100,
         logging_strategy='steps',
-        run_name=wandb.run.name
+        run_name='test'
     )
 
     # Train the model
     trainer = Trainer(
         model=model,
         args=training_args,
-        train_dataloader=train_loader,
-        eval_dataloader=val_loader,
+        train_dataset=train_data,
+        eval_dataset=val_data,
         compute_metrics=compute_metrics,
         callbacks=[EarlyStoppingCallback(early_stopping_patience=3)],
         #preprocess_logits_for_metrics=None, # MIGHT NEED TO CHANGE THIS
@@ -155,7 +192,7 @@ def train(model, train_loader, val_loader, test_loader,
     trainer.train()
 
     # Evaluate the model
-    eval_results = trainer.evaluate(test_loader)
+    eval_results = trainer.evaluate(eval_dataset=test_data)
     return eval_results
 
 def grid_search(tabular=False, 
@@ -198,10 +235,10 @@ def grid_search(tabular=False,
 
     # Load data
     tab_data, image_data = prepare_data()
-    train_loader, val_loader, test_loader = load_data(tab_data, image_data, vision=None)
+    train_data, val_data, test_data = load_data(tab_data, image_data, vision=None)
 
     # Train model
-    eval_results = train(model, train_loader, val_loader, test_loader, 
+    eval_results = train(model, train_data, val_data, test_data, 
                          CHECKPOINTS_DIR, epochs=num_epochs, lr=lr, seed=seed)
     return eval_results
     
