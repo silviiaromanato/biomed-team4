@@ -52,15 +52,6 @@ LABELS_TEST_PATH = os.path.join(PROCESSED_PATH, 'labels_test.csv')
 
 # ---------------------------------------- HELPER FUNCTIONS ---------------------------------------- #
 
-def test_dataloader(loader): 
-    for batch in loader:
-        for key in batch.keys():
-            if type(batch[key]) == torch.Tensor:
-                print(f'{key}:\t{batch[key].shape}')
-            else:
-                print(f'{key}:\t{type(batch[key])}')
-        break
-
 def list_images(base_path):
     '''
     Recursively lists all image files starting from the base path.
@@ -468,49 +459,49 @@ class MultimodalDataset(Dataset):
 
         tabular_row = tabular_row.drop(['subject_id', 'study_id'], axis=1).values
         tabular_tensor = torch.tensor(tabular_row, dtype=torch.float32).squeeze(0)
-        if self.vision is None:
-            return {'tabular': tabular_tensor}
-
+        
         # Get the paths for the PA and Lateral images
         pa_path = self.organized_paths[subject_study_pair]['PA']
         print(pa_path, len(self.organized_paths[subject_study_pair]))
         lateral_path = self.organized_paths[subject_study_pair]['LATERAL']
         print(lateral_path, len(self.organized_paths[subject_study_pair]))
 
-        # Load and process PA and Lateral images
-        pa_image = self._load_and_process_image(pa_path)
-        lateral_image = self._load_and_process_image(lateral_path)
-        
-        if not pa_path or not lateral_path:
-            raise ValueError(f'Either PA or Lateral image is missing for {subject_study_pair}.')
-
-        # Use one of the available paths to get labels
+        # Get labels from the image data
         labels_path = pa_path if pa_path else lateral_path
         if not labels_path:
             raise ValueError(f'No labels path found for {subject_study_pair}.')
-
         labels = self.data_dict[labels_path]
         label_values = [labels[class_name] if not np.isnan(labels[class_name]) else 0 for class_name in self.classes]
         label_values = torch.tensor(label_values, dtype=torch.float32).unsqueeze(0)
         label_tensor = torch.nn.functional.one_hot(label_values.to(torch.int64), num_classes=NUM_LABELS).squeeze(0)
-        inputs = {'pa': pa_image, 'lateral': lateral_image, 'labels': label_tensor, 'tabular': tabular_tensor}
+        
+        inputs = {'x_tab': tabular_tensor, 'label': label_tensor}
+        
+        # Load and process PA and Lateral images
+        if self.vision is not None:
+            pa_image = self._load_and_process_image(pa_path) \
+                if pa_path else torch.zeros((3, self.size, self.size), dtype=torch.float32)
+            lateral_image = self._load_and_process_image(lateral_path) \
+                if lateral_path else torch.zeros((3, self.size, self.size), dtype=torch.float32)
+            inputs['x_pa'] = pa_image
+            inputs['x_lat'] = lateral_image
         return inputs
-
 
     def collate_fn(self, batch):
-        if self.vision is None:
-            inputs = {
-                'tabular': torch.stack([x['tabular'] for x in batch if x is not None])
-            }
-        else: 
-            inputs = {
-                'pa': torch.stack([x['pa'] for x in batch if x['pa'] is not None]),
-                'lateral': torch.stack([x['lateral'] for x in batch if x['lateral'] is not None]),
-                'labels': torch.stack([x['labels'] for x in batch if x['labels'] is not None]),
-                'tabular': torch.stack([x['tabular'] for x in batch if x['tabular'] is not None])
-            }
-        return inputs
+        inputs = {}
+        if 'x_tab' in batch[0]:
+            inputs['x_tab'] = torch.stack([x['x_tab'] for x in batch if 'x_tab' in x])
+        
+        if 'label' in batch[0]:
+            inputs['label'] = torch.stack([x['label'] for x in batch if 'label' in x])
 
+        if self.vision is not None:
+            if 'x_pa' in batch[0]:
+                inputs['x_pa'] = torch.stack([x['x_pa'] for x in batch if 'x_pa' in x])
+
+            if 'x_lat' in batch[0]:
+                inputs['x_lat'] = torch.stack([x['x_lat'] for x in batch if 'x_lat' in x])
+        return inputs
 
 def prepare_data(): 
     '''

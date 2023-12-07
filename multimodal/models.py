@@ -98,7 +98,7 @@ class ClassifierHead(nn.Module):
         num_classes (int): Number of classes
         num_labels (int): Number of labels for each class
     '''
-    def __init__(self, dim_input, num_labels=3, num_classes=15):
+    def __init__(self, dim_input, num_labels=3, num_classes=14):
         super(ClassifierHead, self).__init__()
         self.num_classes = num_classes
         self.num_labels = num_labels
@@ -152,9 +152,9 @@ class DualVisionEncoder(nn.Module):
         self.model_pa.add_module('embedding', nn.Linear(self.num_features, 512))
         self.model_lateral.add_module('embedding', nn.Linear(self.num_features, 512))
 
-    def forward(self, x_pa, x_lateral):
+    def forward(self, x_pa, x_lat):
         features_pa = self.features_pa(x_pa)
-        features_lateral = self.features_lateral(x_lateral)
+        features_lateral = self.features_lateral(x_lat)
         combined_features = torch.cat((features_pa, features_lateral), dim=1)
         return combined_features
     
@@ -175,7 +175,7 @@ class JointEncoder(nn.Module):
                  tabular_params = None,
                  vision = None,
                  num_labels=3,
-                 num_classes=15  
+                 num_classes=14
                  ):
         super(JointEncoder, self).__init__()
 
@@ -199,18 +199,25 @@ class JointEncoder(nn.Module):
                                          num_labels=num_labels, 
                                          num_classes=num_classes)
 
-    def forward(self, x_pa=None, x_lateral=None, x_tab=None):
+    def forward(self, x_pa=None, x_lat=None, x_tab=None, **kwargs):
         '''
         Args:
             x_pa (tensor): PA image
-            x_lateral (tensor): Lateral image
+            x_lat (tensor): Lateral image
             x_tab (tensor): Tabular features
         '''
+        print('Forward:')
+        print('\tx_pa: ', None if x_pa is None else x_pa.shape)
+        print('\tx_lat: ', None if x_lat is None else x_lat.shape)
+        print('\tx_tab: ', None if x_tab is None else x_tab.shape)
+        for key, value in kwargs.items():
+            print(f'\t{key}: ', None if value is None else value.shape)
+            
         # Generate embeddings (image and/or tabular)
         if self.vision:
-            if x_pa is None or x_lateral is None:
+            if x_pa is None or x_lat is None:
                 raise ValueError('Vision encoder is specified but no images are provided.')
-            vision_embedding = self.vision_encoder(x_pa, x_lateral)
+            vision_embedding = self.vision_encoder(x_pa, x_lat)
         if self.tabular:
             if x_tab is None:
                 raise ValueError('Tabular encoder is specified but no tabular data is provided.')
@@ -226,4 +233,7 @@ class JointEncoder(nn.Module):
         
         # Classify embeddings
         output = self.classifier(embedding)
+
+        outputs = {}
+        outputs['logits'] = output
         return output

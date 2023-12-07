@@ -29,7 +29,7 @@ DATA_DIR = os.path.join(BASE_DIR, 'data')
 
 # Constants
 NUM_LABELS = 3 # Neutral, Positive, Negative
-NUM_CLASSES = 15 # Radiology diagnoses
+NUM_CLASSES = 14 # Radiology diagnoses
 TABULAR_DIM = 88 # Number of tabular features
 
 # ---------------------------------------- W&B FUNCTIONS ---------------------------------------- #
@@ -64,65 +64,47 @@ def build_group(tabular=False,
 # ---------------------------------------- TRAINING FUNCTIONS ---------------------------------------- #
 
 
-def compute_metrics(pred, labels):
+def compute_metrics(prediction): 
     ''' 
     Compares the diagnosis matrix to the ground truth. 
     Both prediction and labels are [batch_size, num_classes, num_labels] tensors.
     Computes accuracy, precision, recall, F1 score, AUC, and average precision.
     '''
-    pred_flat = pred.flatten()
-    labels_flat = labels.flatten()
-    pred_flat = pred_flat.detach().cpu().numpy()
-    labels_flat = labels_flat.detach().cpu().numpy()
-    accuracy = accuracy_score(labels_flat, pred_flat.round())
-    precision = precision_score(labels_flat, pred_flat.round(), average='macro')
-    recall = recall_score(labels_flat, pred_flat.round(), average='macro')
-    f1 = f1_score(labels_flat, pred_flat.round(), average='macro')
-    auc = roc_auc_score(labels_flat, pred_flat)
-    ap = average_precision_score(labels_flat, pred_flat)
+    print('Computing metrics...')
+    print('Prediction: ', prediction)
+    labels = prediction.label_ids.flatten().detach().cpu().numpy()
+    pred = prediction.predictions.flatten().detach().cpu().numpy()
     return {
-        'accuracy': accuracy,
-        'precision': precision,
-        'recall': recall,
-        'f1': f1,
-        'auc': auc,
-        'ap': ap
+        'accuracy': accuracy_score(labels, pred.round()),
+        'precision': precision_score(labels, pred.round(), average='macro'),
+        'recall': recall_score(labels, pred.round(), average='macro'),
+        'f1': f1_score(labels, pred.round(), average='macro'),
+        'auc': roc_auc_score(labels, pred),
+        'ap': average_precision_score(labels, pred)
     }
 
-    
 class MultimodalTrainer(Trainer):
     '''
     Trainer class for joint image-tabular encoders. 
     '''
-    def __init__(self, 
-                 model, 
-                 args, 
-                 train_dataset, 
-                 eval_dataset, 
-                 compute_metrics, 
-                 callbacks=None, 
-                 optimizers=None, 
-                 **kwargs):
-        super().__init__(model, args, train_dataset, eval_dataset, compute_metrics, callbacks, optimizers, **kwargs)
-
-    def get_train_dataloader(self):
-        '''
-        Returns the training dataloader.
-        '''
-        return self.train_dataset
-    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def compute_loss(self, model, inputs, return_outputs=False):
         '''
         Computes loss for joint image-tabular encoders. 
+        Diagnosis matrix computed by the model is compared to the ground truth.
         '''
-        labels = inputs.pop('labels')
-        outputs = model(**inputs)
-        logits = outputs.logits
+        # Move inputs to GPU
+        inputs = self._prepare_inputs(inputs)
+        inputs = {k: v.to(self.args.device) for k, v in inputs.items()}
+
+        # Predict diagnosis and compute loss
+        labels = inputs.pop('label').float()
+        diagnosis = model(**inputs)
         loss_fct = nn.BCEWithLogitsLoss()
-        loss = loss_fct(logits, labels)
-        return (loss, outputs) if return_outputs else loss
-    
+        loss = loss_fct(diagnosis, labels)
+        return (loss, diagnosis) if return_outputs else loss
 
 
 def train(model, train_data, val_data, test_data,
@@ -140,13 +122,10 @@ def train(model, train_data, val_data, test_data,
         lr (float): Learning rate
         seed (int): Random seed
     '''
-    
-    # Define loss function, optimizer and scheduler
-    #criterion = nn.CrossEntropyLoss()
-    #optimizer = optim.Adam(model.parameters(), lr=lr)
-    #scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.1)
+
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model.to(device)
+    print(f'Using device: {device}')
 
     training_args = TrainingArguments(
 
@@ -154,18 +133,18 @@ def train(model, train_data, val_data, test_data,
         num_train_epochs=epochs,
         learning_rate=lr,
         weight_decay=0.01,
-        per_device_train_batch_size=16,
-        per_device_eval_batch_size=16,
+        per_device_train_batch_size=2,
+        per_device_eval_batch_size=2,
         warmup_steps=500,
+        dataloader_num_workers=0, # MIGHT NEED TO CHANGE THIS
         seed=seed,
-        dataloader_num_workers=4,
 
         # Evaluation & checkpointing
         output_dir=output_dir,
-        evaluation_strategy="steps",
-        eval_steps=500,
-        save_total_limit=3,
-        save_steps=500,
+        evaluation_strategy="epoch",
+        eval_accumulation_steps=None,
+        save_strategy="epoch",
+        save_total_limit=1,
         load_best_model_at_end=True,
         metric_for_best_model="eval_loss",
         greater_is_better=False,
@@ -174,20 +153,19 @@ def train(model, train_data, val_data, test_data,
         report_to='wandb',
         logging_dir='./logs',
         logging_first_step=True,
-        logging_steps=100,
-        logging_strategy='steps',
-        run_name='test'
+        logging_steps=1,
+        logging_strategy='epoch',
+        run_name='test',
+        use_mps_device=True # MIGHT NEED TO CHANGE THIS
     )
-
     # Train the model
-    trainer = Trainer(
+    trainer = MultimodalTrainer(
         model=model,
         args=training_args,
         train_dataset=train_data,
         eval_dataset=val_data,
         compute_metrics=compute_metrics,
-        callbacks=[EarlyStoppingCallback(early_stopping_patience=3)],
-        #preprocess_logits_for_metrics=None, # MIGHT NEED TO CHANGE THIS
+        data_collator=train_data.collate_fn
     )
     trainer.train()
 
@@ -202,7 +180,6 @@ def grid_search(tabular=False,
                 batch_norm=True,
                 lr=0.001, 
                 num_epochs=10,
-                device='cpu',
                 seed=0):
     '''
     Grid search for radiology diagnosis using joint image-tabular encoders. 
@@ -222,8 +199,6 @@ def grid_search(tabular=False,
         num_labels=NUM_LABELS,
         num_classes=NUM_CLASSES
     )
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model.to(device)
 
     # Freeze layers of vision encoder
     #if vision:
@@ -238,8 +213,7 @@ def grid_search(tabular=False,
     train_data, val_data, test_data = load_data(tab_data, image_data, vision=None)
 
     # Train model
-    eval_results = train(model, train_data, val_data, test_data, 
-                         CHECKPOINTS_DIR, epochs=num_epochs, lr=lr, seed=seed)
+    eval_results = train(model, train_data, val_data, test_data, CHECKPOINTS_DIR, epochs=num_epochs, lr=lr, seed=seed)
     return eval_results
     
 
