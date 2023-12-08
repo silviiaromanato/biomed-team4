@@ -512,9 +512,9 @@ def prepare_data():
     pickle_img_path = os.path.join(PROCESSED_PATH, 'image_data.pickle')
 
     if os.path.exists(pickle_tab_path) and os.path.exists(pickle_img_path):
-        with open('tab_data.pickle', 'rb') as handle:
+        with open(pickle_tab_path, 'rb') as handle:
             tab_data = pickle.load(handle)
-        with open('image_data.pickle', 'rb') as handle:
+        with open(pickle_img_path, 'rb') as handle:
             image_data = pickle.load(handle)
         return tab_data, image_data
     

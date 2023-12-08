@@ -201,12 +201,14 @@ class JointEncoder(nn.Module):
         
         if vision and vision not in ['resnet50', 'densenet121', 'vit']:
             raise ValueError(f'Vision encoder type {vision} not supported.')
-        
+        print('Model initialization')
         if vision:
+            print(f'\tVision encoder {vision}')
             self.vision_encoder = DualVisionEncoder(vision)
             self.dim_input += IMAGE_EMBEDDING_DIM * 2
 
         if tabular:
+            print(f'\tTabular encoder with parameters: {tabular_params}')
             self.tabular_encoder = FullyConnectedNetwork(**tabular_params)
             self.dim_input += TABULAR_EMBEDDING_DIM
 

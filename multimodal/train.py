@@ -55,21 +55,21 @@ def build_group(tabular=False,
         raise ValueError('Error in build_group: tabular and/or vision must be specified.')  
 
     run_name = 'Tabular-' if tabular else ''
-    run_name += f'{vision}' if vision else ''
+    run_name += f'{vision}-' if vision else ''
     if tabular:
-        run_name += f'_in{tabular_params["dim_input"]}'
-        run_name += f'_hid{str(tabular_params["hidden_dims"])}'
-        run_name += f'_p{tabular_params["dropout_prob"]}'
+        dims = '-'.join([str(x) for x in tabular_params["hidden_dims"]])
+        run_name += f'{dims}'
+        run_name += f'-p{tabular_params["dropout_prob"]}'
     
     config = {'tabular': tabular, 
               'vision': vision, 
               'tabular_params': tabular_params}
     # Log to organization project
-
+    print(f'W&B initialization: run {run_name}')
     wandb.init(group=run_name, 
                config=config, 
                project='biomed-team4', 
-               #entity='antoinebonnet'
+               entity='antoinebonnet'
                )
     return run_name
 
@@ -181,8 +181,7 @@ def grid_search(tabular=False,
         'dropout_prob': dropout_prob,
         'batch_norm': batch_norm
     }
-    if tabular: 
-        print(f'Initializing tabular encoder with parameters: {tabular_params}')
+
     model = JointEncoder(
         tabular=tabular, 
         tabular_params=tabular_params,
@@ -198,7 +197,6 @@ def grid_search(tabular=False,
 
     # Build W&B group
     run_name = build_group(tabular=tabular, vision=vision, tabular_params=tabular_params)
-    print(f'Initializing W&B run {run_name}')
 
     # Load data
     tab_data, image_data = prepare_data()
