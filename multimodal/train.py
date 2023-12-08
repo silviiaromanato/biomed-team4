@@ -24,7 +24,7 @@ CLASSES = [
     'Lung Opacity', 'No Finding', 'Pleural Effusion', 
     'Pleural Other', 'Pneumonia', 'Pneumothorax', 'Support Devices'
     ]
-
+os.environ['WANDB_SILENT'] = 'true'
 # ---------------------------------------- GLOBAL VARIABLES ---------------------------------------- #
 
 # Path to data and results directories
@@ -66,7 +66,11 @@ def build_group(tabular=False,
               'tabular_params': tabular_params}
     # Log to organization project
 
-    wandb.init(group=run_name, config=config, project='biomed-team4', entity='biomed-team4')
+    wandb.init(group=run_name, 
+               config=config, 
+               project='biomed-team4', 
+               #entity='antoinebonnet'
+               )
     return run_name
 
 # ---------------------------------------- TRAINING FUNCTIONS ---------------------------------------- #
@@ -209,7 +213,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--tabular', action='store_true', default=False)
     parser.add_argument('--vision', type=str, default=None)
-    parser.add_argument('--hidden_dims', nargs='+', type=int, default=None)
+    parser.add_argument('--hidden_dims', type=str, default=[256, 512])
     parser.add_argument('--dropout_prob', type=float, default=0.0)
     parser.add_argument('--batch_norm', action='store_true', default=False)
     parser.add_argument('--lr', type=float, default=0.001)
@@ -217,6 +221,9 @@ if __name__ == '__main__':
     parser.add_argument('--device', type=str, default='cpu')
     parser.add_argument('--seed', type=int, default=0)
     args = parser.parse_args()
+
+    if args.hidden_dims and type(args.hidden_dims) == str:
+        args.hidden_dims = [int(x) for x in args.hidden_dims.split('-')]
 
     #kwargs = autoparse(grid_search, verbose=False)
     grid_search(**vars(args))

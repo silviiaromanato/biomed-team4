@@ -1,10 +1,10 @@
 # Grid Search: ResNet only
-program: multimodal/grid_search.py
+program: multimodal/train.py
 method: grid
-project: BioMed
+project: biomed-team4
 metric:
   goal: minimize
-  name: val_loss
+  name: eval_loss
 command:
  - ${env}
  - python3
@@ -14,8 +14,12 @@ parameters:
   tabular: 
     value: 0
   vision: 
-    value: 'resnet'
-  device: 
-    value: 'cuda:0'
-  seed:
-    values: [1, 2, 3]
+    value: 'resnet50' 
+  hidden_dims: 
+    value: '256-512' # Tune on tabular only
+  dropout_prob: 
+    value: 0.2
+  lr: 
+    values: [0.0001, 0.00001]
+  num_epochs: 
+    value: 50

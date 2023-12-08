@@ -131,17 +131,19 @@ class DualVisionEncoder(nn.Module):
             self.model_pa = models.resnet50(weights=ResNet50_Weights.DEFAULT)
             self.model_lateral = models.resnet50(weights=ResNet50_Weights.DEFAULT)
             self.num_features = self.model_pa.fc.in_features # 2048
-            ''' DenseNet produces 1024-dimensional feature vectors. '''
+
         elif vision == 'densenet121':
             self.model_pa = models.densenet121(weights=DenseNet121_Weights.IMAGENET1K_V1)
             self.model_lateral = models.densenet121(weights=DenseNet121_Weights.IMAGENET1K_V1)
             self.num_features = self.model_pa.classifier.in_features # 1024
+
         elif vision == 'vit': 
             self.model_pa = ViTForImageClassification.from_pretrained(
                 'google/vit-large-patch32-384', image_size=2500, patch_size=32, ignore_mismatched_sizes=True)
             self.model_lateral = ViTForImageClassification.from_pretrained(
                 'google/vit-large-patch32-384', image_size=2500, patch_size=32, ignore_mismatched_sizes=True)
             self.num_features = self.model_pa.classifier.in_features # 768
+            
         else: 
             raise ValueError(f'Vision encoder type {vision} not supported.')
 

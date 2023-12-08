@@ -13,11 +13,10 @@ command:
 parameters:
   tabular: 
     value: 1 # == True
-  #vision: value: 'densenet121' # 'resnet50', 'densenet121' or 'vit'
   hidden_dims: 
-    value: [256, 512]
+    values: ['256-512', '128-256-512', '256-512-1024']
   dropout_prob: 
-    value: 0.0
+    value: 0.2
   lr: 
     values: [0.001, 0.0001, 0.00001]
   num_epochs: 
