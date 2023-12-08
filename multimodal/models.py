@@ -126,6 +126,7 @@ class DualVisionEncoder(nn.Module):
     def __init__(self, vision : str):
         super().__init__()
 
+        self.vision = vision
         # Load two pre-trained visual encoders
         if vision == 'resnet50':
             self.model_pa = models.resnet50(weights=ResNet50_Weights.DEFAULT)
@@ -143,20 +144,23 @@ class DualVisionEncoder(nn.Module):
 
         elif vision == 'vit': 
             self.model_pa = ViTForImageClassification.from_pretrained(
-                'google/vit-large-patch32-384', image_size=2500, patch_size=32, ignore_mismatched_sizes=True)
+                'google/vit-large-patch32-384', image_size=384, patch_size=32, ignore_mismatched_sizes=True)
             self.model_lateral = ViTForImageClassification.from_pretrained(
-                'google/vit-large-patch32-384', image_size=2500, patch_size=32, ignore_mismatched_sizes=True)
-            self.num_features = self.model_pa.classifier.in_features # 768
+                'google/vit-large-patch32-384', image_size=384, patch_size=32, ignore_mismatched_sizes=True)
+            self.num_features = self.model_pa.classifier.in_features # 1024
             self.model_pa.classifier = nn.Linear(self.num_features, IMAGE_EMBEDDING_DIM)
             self.model_lateral.classifier = nn.Linear(self.num_features, IMAGE_EMBEDDING_DIM)
-            
         else: 
             raise ValueError(f'Vision encoder type {vision} not supported.')
 
     def forward(self, x_pa, x_lat):
-        features_pa = self.model_pa(x_pa)
-        features_lateral = self.model_lateral(x_lat)
-        combined_features = torch.cat((features_pa, features_lateral), dim=1)
+        if self.vision in ['resnet50', 'densenet121']:
+            features_pa = self.model_pa(x_pa)
+            features_lat = self.model_lateral(x_lat)
+        elif self.vision == 'vit':
+            features_pa = self.model_pa(x_pa).logits
+            features_lat = self.model_lateral(x_lat).logits
+        combined_features = torch.cat((features_pa, features_lat), dim=1)
         return combined_features
     
 

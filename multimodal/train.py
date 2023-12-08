@@ -69,7 +69,7 @@ def build_group(tabular=False,
     wandb.init(group=run_name, 
                config=config, 
                project='biomed-team4', 
-               entity='antoinebonnet'
+               entity='silvy-romanato'
                )
     return run_name
 

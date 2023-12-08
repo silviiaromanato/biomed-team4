@@ -1,0 +1,279 @@
+2023-12-08 17:48:40,212 INFO    StreamThr :44202 [internal.py:wandb_internal():86] W&B internal server running at pid: 44202, started at: 2023-12-08 17:48:40.211337
+2023-12-08 17:48:40,213 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: status
+2023-12-08 17:48:40,227 INFO    WriterThread:44202 [datastore.py:open_for_write():85] open: /Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/wandb/run-20231208_174840-nifq7s63/run-nifq7s63.wandb
+2023-12-08 17:48:40,227 DEBUG   SenderThread:44202 [sender.py:send():382] send: header
+2023-12-08 17:48:40,377 DEBUG   SenderThread:44202 [sender.py:send():382] send: run
+2023-12-08 17:48:40,785 INFO    SenderThread:44202 [dir_watcher.py:__init__():211] watching files in: /Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/wandb/run-20231208_174840-nifq7s63/files
+2023-12-08 17:48:40,785 INFO    SenderThread:44202 [sender.py:_start_run_threads():1136] run started: nifq7s63 with start time 1702054120.209541
+2023-12-08 17:48:40,794 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: check_version
+2023-12-08 17:48:40,794 DEBUG   SenderThread:44202 [sender.py:send_request():409] send_request: check_version
+2023-12-08 17:48:40,885 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: run_start
+2023-12-08 17:48:40,886 DEBUG   HandlerThread:44202 [system_info.py:__init__():32] System info init
+2023-12-08 17:48:40,886 DEBUG   HandlerThread:44202 [system_info.py:__init__():47] System info init done
+2023-12-08 17:48:40,886 INFO    HandlerThread:44202 [system_monitor.py:start():194] Starting system monitor
+2023-12-08 17:48:40,886 INFO    SystemMonitor:44202 [system_monitor.py:_start():158] Starting system asset monitoring threads
+2023-12-08 17:48:40,886 INFO    HandlerThread:44202 [system_monitor.py:probe():214] Collecting system info
+2023-12-08 17:48:40,887 DEBUG   HandlerThread:44202 [system_info.py:probe():196] Probing system
+2023-12-08 17:48:40,887 INFO    SystemMonitor:44202 [interfaces.py:start():190] Started cpu monitoring
+2023-12-08 17:48:40,889 INFO    SystemMonitor:44202 [interfaces.py:start():190] Started disk monitoring
+2023-12-08 17:48:40,889 INFO    SystemMonitor:44202 [interfaces.py:start():190] Started memory monitoring
+2023-12-08 17:48:40,890 INFO    SystemMonitor:44202 [interfaces.py:start():190] Started network monitoring
+2023-12-08 17:48:40,905 DEBUG   HandlerThread:44202 [system_info.py:_probe_git():181] Probing git
+2023-12-08 17:48:40,969 DEBUG   HandlerThread:44202 [system_info.py:_probe_git():189] Probing git done
+2023-12-08 17:48:40,970 DEBUG   HandlerThread:44202 [system_info.py:probe():244] Probing system done
+2023-12-08 17:48:40,970 DEBUG   HandlerThread:44202 [system_monitor.py:probe():223] {'os': 'macOS-10.16-x86_64-i386-64bit', 'python': '3.8.18', 'heartbeatAt': '2023-12-08T16:48:40.887412', 'startedAt': '2023-12-08T16:48:40.199310', 'docker': None, 'cuda': None, 'args': (), 'state': 'running', 'program': '<python with no main file>', 'codePathLocal': None, 'git': {'remote': 'https://github.com/silviiaromanato/biomed-team4.git', 'commit': '831774e21581fd90bf90840f5937afc5941557e5'}, 'email': '80218776+silvipilvi@users.noreply.github.com', 'root': '/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4', 'host': 'tsf-492-wpa-7-048.epfl.ch', 'username': 'silviaromanato', 'executable': '/Users/silviaromanato/.conda/envs/lastenv/bin/python', 'cpu_count': 12, 'cpu_count_logical': 12, 'cpu_freq': {'current': 2400, 'min': 2400, 'max': 2400}, 'cpu_freq_per_core': [{'current': 2400, 'min': 2400, 'max': 2400}], 'disk': {'/': {'total': 926.3517189025879, 'used': 250.5190315246582}}, 'memory': {'total': 18.0}}
+2023-12-08 17:48:40,970 INFO    HandlerThread:44202 [system_monitor.py:probe():224] Finished collecting system info
+2023-12-08 17:48:40,970 INFO    HandlerThread:44202 [system_monitor.py:probe():227] Publishing system info
+2023-12-08 17:48:40,970 DEBUG   HandlerThread:44202 [system_info.py:_save_pip():52] Saving list of pip packages installed into the current environment
+2023-12-08 17:48:40,971 DEBUG   HandlerThread:44202 [system_info.py:_save_pip():68] Saving pip packages done
+2023-12-08 17:48:40,971 DEBUG   HandlerThread:44202 [system_info.py:_save_conda():75] Saving list of conda packages installed into the current environment
+2023-12-08 17:48:41,791 INFO    Thread-12 :44202 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/wandb/run-20231208_174840-nifq7s63/files/conda-environment.yaml
+2023-12-08 17:48:41,791 INFO    Thread-12 :44202 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/wandb/run-20231208_174840-nifq7s63/files/requirements.txt
+2023-12-08 17:48:42,454 DEBUG   HandlerThread:44202 [system_info.py:_save_conda():87] Saving conda packages done
+2023-12-08 17:48:42,456 INFO    HandlerThread:44202 [system_monitor.py:probe():229] Finished publishing system info
+2023-12-08 17:48:42,458 DEBUG   SenderThread:44202 [sender.py:send():382] send: files
+2023-12-08 17:48:42,458 INFO    SenderThread:44202 [sender.py:_save_file():1392] saving file wandb-metadata.json with policy now
+2023-12-08 17:48:42,462 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: internal_messages
+2023-12-08 17:48:42,462 DEBUG   SenderThread:44202 [sender.py:send():382] send: telemetry
+2023-12-08 17:48:42,463 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: stop_status
+2023-12-08 17:48:42,464 DEBUG   SenderThread:44202 [sender.py:send_request():409] send_request: stop_status
+2023-12-08 17:48:42,795 INFO    Thread-12 :44202 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/wandb/run-20231208_174840-nifq7s63/files/conda-environment.yaml
+2023-12-08 17:48:42,795 INFO    Thread-12 :44202 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/wandb/run-20231208_174840-nifq7s63/files/output.log
+2023-12-08 17:48:42,795 INFO    Thread-12 :44202 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/wandb/run-20231208_174840-nifq7s63/files/wandb-metadata.json
+2023-12-08 17:48:43,023 INFO    wandb-upload_0:44202 [upload_job.py:push():131] Uploaded file /var/folders/kh/fr43342j0b998y80lvy2k2qh0000gn/T/tmp82l743blwandb/y9ko6nzl-wandb-metadata.json
+2023-12-08 17:48:43,276 DEBUG   SenderThread:44202 [sender.py:send():382] send: config
+2023-12-08 17:48:43,276 DEBUG   SenderThread:44202 [sender.py:send():382] send: metric
+2023-12-08 17:48:43,277 DEBUG   SenderThread:44202 [sender.py:send():382] send: telemetry
+2023-12-08 17:48:43,277 DEBUG   SenderThread:44202 [sender.py:send():382] send: metric
+2023-12-08 17:48:43,277 WARNING SenderThread:44202 [sender.py:send_metric():1343] Seen metric with glob (shouldn't happen)
+2023-12-08 17:48:43,277 DEBUG   SenderThread:44202 [sender.py:send():382] send: telemetry
+2023-12-08 17:48:44,805 INFO    Thread-12 :44202 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/wandb/run-20231208_174840-nifq7s63/files/output.log
+2023-12-08 17:48:45,283 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 17:48:50,296 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 17:48:52,138 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: pause
+2023-12-08 17:48:52,139 INFO    HandlerThread:44202 [handler.py:handle_request_pause():705] stopping system metrics thread
+2023-12-08 17:48:52,139 INFO    HandlerThread:44202 [system_monitor.py:finish():203] Stopping system monitor
+2023-12-08 17:48:52,139 DEBUG   SystemMonitor:44202 [system_monitor.py:_start():172] Starting system metrics aggregation loop
+2023-12-08 17:48:52,140 DEBUG   SystemMonitor:44202 [system_monitor.py:_start():179] Finished system metrics aggregation loop
+2023-12-08 17:48:52,140 INFO    HandlerThread:44202 [interfaces.py:finish():202] Joined cpu monitor
+2023-12-08 17:48:52,140 DEBUG   SystemMonitor:44202 [system_monitor.py:_start():183] Publishing last batch of metrics
+2023-12-08 17:48:52,140 INFO    HandlerThread:44202 [interfaces.py:finish():202] Joined disk monitor
+2023-12-08 17:48:52,142 INFO    HandlerThread:44202 [interfaces.py:finish():202] Joined memory monitor
+2023-12-08 17:48:52,142 INFO    HandlerThread:44202 [interfaces.py:finish():202] Joined network monitor
+2023-12-08 17:48:52,143 DEBUG   SenderThread:44202 [sender.py:send():382] send: stats
+2023-12-08 17:48:52,837 INFO    Thread-12 :44202 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/wandb/run-20231208_174840-nifq7s63/files/output.log
+2023-12-08 17:48:56,163 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 17:48:57,467 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: internal_messages
+2023-12-08 17:48:57,468 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: stop_status
+2023-12-08 17:48:57,469 DEBUG   SenderThread:44202 [sender.py:send_request():409] send_request: stop_status
+2023-12-08 17:49:01,809 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 17:49:06,830 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 17:49:11,861 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 17:49:12,472 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: stop_status
+2023-12-08 17:49:12,473 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: internal_messages
+2023-12-08 17:49:12,474 DEBUG   SenderThread:44202 [sender.py:send_request():409] send_request: stop_status
+2023-12-08 17:49:12,945 INFO    Thread-12 :44202 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/wandb/run-20231208_174840-nifq7s63/files/config.yaml
+2023-12-08 17:49:17,725 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 17:49:22,743 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 17:49:27,478 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: internal_messages
+2023-12-08 17:49:27,478 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: stop_status
+2023-12-08 17:49:27,479 DEBUG   SenderThread:44202 [sender.py:send_request():409] send_request: stop_status
+2023-12-08 17:49:28,699 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 17:49:33,722 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 17:49:38,748 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 17:49:42,479 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: internal_messages
+2023-12-08 17:49:42,481 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: stop_status
+2023-12-08 17:49:42,481 DEBUG   SenderThread:44202 [sender.py:send_request():409] send_request: stop_status
+2023-12-08 17:49:43,750 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 17:49:48,768 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 17:49:53,785 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 17:49:57,484 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: stop_status
+2023-12-08 17:49:57,485 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: internal_messages
+2023-12-08 17:49:57,487 DEBUG   SenderThread:44202 [sender.py:send_request():409] send_request: stop_status
+2023-12-08 17:49:59,668 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 17:50:04,690 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 17:50:09,711 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 17:50:12,486 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: stop_status
+2023-12-08 17:50:12,487 DEBUG   SenderThread:44202 [sender.py:send_request():409] send_request: stop_status
+2023-12-08 17:50:12,490 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: internal_messages
+2023-12-08 17:50:14,758 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 17:50:19,781 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 17:50:24,805 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 17:50:27,489 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: stop_status
+2023-12-08 17:50:27,490 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: internal_messages
+2023-12-08 17:50:27,491 DEBUG   SenderThread:44202 [sender.py:send_request():409] send_request: stop_status
+2023-12-08 17:50:30,662 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 17:50:35,686 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 17:50:40,707 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 17:50:42,495 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: stop_status
+2023-12-08 17:50:42,496 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: internal_messages
+2023-12-08 17:50:42,497 DEBUG   SenderThread:44202 [sender.py:send_request():409] send_request: stop_status
+2023-12-08 17:50:46,682 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 17:50:51,698 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 17:50:56,722 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 17:50:57,497 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: stop_status
+2023-12-08 17:50:57,498 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: internal_messages
+2023-12-08 17:50:57,498 DEBUG   SenderThread:44202 [sender.py:send_request():409] send_request: stop_status
+2023-12-08 17:51:01,868 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 17:51:06,889 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 17:51:11,911 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 17:51:12,504 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: internal_messages
+2023-12-08 17:51:12,505 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: stop_status
+2023-12-08 17:51:12,506 DEBUG   SenderThread:44202 [sender.py:send_request():409] send_request: stop_status
+2023-12-08 17:51:17,734 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 17:51:22,757 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 17:51:27,505 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: stop_status
+2023-12-08 17:51:27,506 DEBUG   SenderThread:44202 [sender.py:send_request():409] send_request: stop_status
+2023-12-08 17:51:27,507 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: internal_messages
+2023-12-08 17:51:28,223 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 17:51:33,245 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 17:51:37,852 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: resume
+2023-12-08 17:51:37,852 INFO    HandlerThread:44202 [handler.py:handle_request_resume():696] starting system metrics thread
+2023-12-08 17:51:37,853 INFO    HandlerThread:44202 [system_monitor.py:start():194] Starting system monitor
+2023-12-08 17:51:37,853 INFO    SystemMonitor:44202 [system_monitor.py:_start():158] Starting system asset monitoring threads
+2023-12-08 17:51:37,854 INFO    SystemMonitor:44202 [interfaces.py:start():190] Started cpu monitoring
+2023-12-08 17:51:37,854 INFO    SystemMonitor:44202 [interfaces.py:start():190] Started disk monitoring
+2023-12-08 17:51:37,856 INFO    SystemMonitor:44202 [interfaces.py:start():190] Started memory monitoring
+2023-12-08 17:51:37,857 INFO    SystemMonitor:44202 [interfaces.py:start():190] Started network monitoring
+2023-12-08 17:51:38,842 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 17:51:38,859 DEBUG   SenderThread:44202 [sender.py:send():382] send: telemetry
+2023-12-08 17:51:38,880 DEBUG   SenderThread:44202 [sender.py:send():382] send: exit
+2023-12-08 17:51:38,880 INFO    SenderThread:44202 [sender.py:send_exit():589] handling exit code: 0
+2023-12-08 17:51:38,881 INFO    SenderThread:44202 [sender.py:send_exit():591] handling runtime: 12
+2023-12-08 17:51:38,881 INFO    SenderThread:44202 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2023-12-08 17:51:38,882 INFO    SenderThread:44202 [sender.py:send_exit():597] send defer
+2023-12-08 17:51:38,882 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: defer
+2023-12-08 17:51:38,882 INFO    HandlerThread:44202 [handler.py:handle_request_defer():172] handle defer: 0
+2023-12-08 17:51:38,882 DEBUG   SenderThread:44202 [sender.py:send_request():409] send_request: defer
+2023-12-08 17:51:38,882 INFO    SenderThread:44202 [sender.py:send_request_defer():613] handle sender defer: 0
+2023-12-08 17:51:38,882 INFO    SenderThread:44202 [sender.py:transition_state():617] send defer: 1
+2023-12-08 17:51:38,883 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: defer
+2023-12-08 17:51:38,883 INFO    HandlerThread:44202 [handler.py:handle_request_defer():172] handle defer: 1
+2023-12-08 17:51:38,883 DEBUG   SenderThread:44202 [sender.py:send_request():409] send_request: defer
+2023-12-08 17:51:38,883 INFO    SenderThread:44202 [sender.py:send_request_defer():613] handle sender defer: 1
+2023-12-08 17:51:38,883 INFO    SenderThread:44202 [sender.py:transition_state():617] send defer: 2
+2023-12-08 17:51:38,884 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: defer
+2023-12-08 17:51:38,884 INFO    HandlerThread:44202 [handler.py:handle_request_defer():172] handle defer: 2
+2023-12-08 17:51:38,884 INFO    HandlerThread:44202 [system_monitor.py:finish():203] Stopping system monitor
+2023-12-08 17:51:38,884 INFO    HandlerThread:44202 [interfaces.py:finish():202] Joined cpu monitor
+2023-12-08 17:51:38,884 DEBUG   SystemMonitor:44202 [system_monitor.py:_start():172] Starting system metrics aggregation loop
+2023-12-08 17:51:38,884 INFO    HandlerThread:44202 [interfaces.py:finish():202] Joined disk monitor
+2023-12-08 17:51:38,884 DEBUG   SystemMonitor:44202 [system_monitor.py:_start():179] Finished system metrics aggregation loop
+2023-12-08 17:51:38,884 INFO    HandlerThread:44202 [interfaces.py:finish():202] Joined memory monitor
+2023-12-08 17:51:38,884 DEBUG   SystemMonitor:44202 [system_monitor.py:_start():183] Publishing last batch of metrics
+2023-12-08 17:51:38,885 INFO    HandlerThread:44202 [interfaces.py:finish():202] Joined network monitor
+2023-12-08 17:51:38,886 DEBUG   SenderThread:44202 [sender.py:send_request():409] send_request: defer
+2023-12-08 17:51:38,886 INFO    SenderThread:44202 [sender.py:send_request_defer():613] handle sender defer: 2
+2023-12-08 17:51:38,886 INFO    SenderThread:44202 [sender.py:transition_state():617] send defer: 3
+2023-12-08 17:51:38,886 DEBUG   SenderThread:44202 [sender.py:send():382] send: stats
+2023-12-08 17:51:38,886 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: defer
+2023-12-08 17:51:38,886 INFO    HandlerThread:44202 [handler.py:handle_request_defer():172] handle defer: 3
+2023-12-08 17:51:38,886 DEBUG   SenderThread:44202 [sender.py:send_request():409] send_request: defer
+2023-12-08 17:51:38,886 INFO    SenderThread:44202 [sender.py:send_request_defer():613] handle sender defer: 3
+2023-12-08 17:51:38,886 INFO    SenderThread:44202 [sender.py:transition_state():617] send defer: 4
+2023-12-08 17:51:38,886 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: defer
+2023-12-08 17:51:38,886 INFO    HandlerThread:44202 [handler.py:handle_request_defer():172] handle defer: 4
+2023-12-08 17:51:38,887 DEBUG   SenderThread:44202 [sender.py:send_request():409] send_request: defer
+2023-12-08 17:51:38,887 INFO    SenderThread:44202 [sender.py:send_request_defer():613] handle sender defer: 4
+2023-12-08 17:51:38,887 INFO    SenderThread:44202 [sender.py:transition_state():617] send defer: 5
+2023-12-08 17:51:38,887 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: defer
+2023-12-08 17:51:38,887 INFO    HandlerThread:44202 [handler.py:handle_request_defer():172] handle defer: 5
+2023-12-08 17:51:38,887 DEBUG   SenderThread:44202 [sender.py:send():382] send: summary
+2023-12-08 17:51:38,887 INFO    SenderThread:44202 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2023-12-08 17:51:38,887 DEBUG   SenderThread:44202 [sender.py:send_request():409] send_request: defer
+2023-12-08 17:51:38,887 INFO    SenderThread:44202 [sender.py:send_request_defer():613] handle sender defer: 5
+2023-12-08 17:51:38,887 INFO    SenderThread:44202 [sender.py:transition_state():617] send defer: 6
+2023-12-08 17:51:38,888 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: defer
+2023-12-08 17:51:38,888 INFO    HandlerThread:44202 [handler.py:handle_request_defer():172] handle defer: 6
+2023-12-08 17:51:38,888 DEBUG   SenderThread:44202 [sender.py:send_request():409] send_request: defer
+2023-12-08 17:51:38,888 INFO    SenderThread:44202 [sender.py:send_request_defer():613] handle sender defer: 6
+2023-12-08 17:51:38,891 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 17:51:39,095 INFO    SenderThread:44202 [sender.py:transition_state():617] send defer: 7
+2023-12-08 17:51:39,095 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: defer
+2023-12-08 17:51:39,095 INFO    HandlerThread:44202 [handler.py:handle_request_defer():172] handle defer: 7
+2023-12-08 17:51:39,096 DEBUG   SenderThread:44202 [sender.py:send_request():409] send_request: defer
+2023-12-08 17:51:39,096 INFO    SenderThread:44202 [sender.py:send_request_defer():613] handle sender defer: 7
+2023-12-08 17:51:39,693 INFO    Thread-12 :44202 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/wandb/run-20231208_174840-nifq7s63/files/output.log
+2023-12-08 17:51:39,694 INFO    Thread-12 :44202 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/wandb/run-20231208_174840-nifq7s63/files/config.yaml
+2023-12-08 17:51:39,695 INFO    Thread-12 :44202 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/wandb/run-20231208_174840-nifq7s63/files/wandb-summary.json
+2023-12-08 17:51:39,887 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: poll_exit
+2023-12-08 17:51:41,699 INFO    Thread-12 :44202 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/wandb/run-20231208_174840-nifq7s63/files/output.log
+2023-12-08 17:51:43,072 INFO    SenderThread:44202 [sender.py:transition_state():617] send defer: 8
+2023-12-08 17:51:43,073 DEBUG   SenderThread:44202 [sender.py:send_request():409] send_request: poll_exit
+2023-12-08 17:51:43,073 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: defer
+2023-12-08 17:51:43,074 INFO    HandlerThread:44202 [handler.py:handle_request_defer():172] handle defer: 8
+2023-12-08 17:51:43,075 DEBUG   SenderThread:44202 [sender.py:send_request():409] send_request: defer
+2023-12-08 17:51:43,076 INFO    SenderThread:44202 [sender.py:send_request_defer():613] handle sender defer: 8
+2023-12-08 17:51:43,076 INFO    SenderThread:44202 [job_builder.py:build():298] Attempting to build job artifact
+2023-12-08 17:51:43,078 INFO    SenderThread:44202 [job_builder.py:_get_source_type():428] is repo sourced job
+2023-12-08 17:51:43,078 INFO    SenderThread:44202 [job_builder.py:_get_program_relpath():446] run is notebook based run
+2023-12-08 17:51:43,079 INFO    SenderThread:44202 [sender.py:transition_state():617] send defer: 9
+2023-12-08 17:51:43,079 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: defer
+2023-12-08 17:51:43,079 INFO    HandlerThread:44202 [handler.py:handle_request_defer():172] handle defer: 9
+2023-12-08 17:51:43,080 DEBUG   SenderThread:44202 [sender.py:send_request():409] send_request: defer
+2023-12-08 17:51:43,080 INFO    SenderThread:44202 [sender.py:send_request_defer():613] handle sender defer: 9
+2023-12-08 17:51:43,080 INFO    SenderThread:44202 [dir_watcher.py:finish():358] shutting down directory watcher
+2023-12-08 17:51:43,711 INFO    SenderThread:44202 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/wandb/run-20231208_174840-nifq7s63/files/output.log
+2023-12-08 17:51:43,711 INFO    SenderThread:44202 [dir_watcher.py:finish():388] scan: /Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/wandb/run-20231208_174840-nifq7s63/files
+2023-12-08 17:51:43,712 INFO    SenderThread:44202 [dir_watcher.py:finish():402] scan save: /Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/wandb/run-20231208_174840-nifq7s63/files/requirements.txt requirements.txt
+2023-12-08 17:51:43,713 INFO    SenderThread:44202 [dir_watcher.py:finish():402] scan save: /Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/wandb/run-20231208_174840-nifq7s63/files/output.log output.log
+2023-12-08 17:51:43,713 INFO    SenderThread:44202 [dir_watcher.py:finish():402] scan save: /Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/wandb/run-20231208_174840-nifq7s63/files/config.yaml config.yaml
+2023-12-08 17:51:43,718 INFO    SenderThread:44202 [dir_watcher.py:finish():402] scan save: /Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/wandb/run-20231208_174840-nifq7s63/files/wandb-summary.json wandb-summary.json
+2023-12-08 17:51:43,722 INFO    SenderThread:44202 [dir_watcher.py:finish():402] scan save: /Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/wandb/run-20231208_174840-nifq7s63/files/conda-environment.yaml conda-environment.yaml
+2023-12-08 17:51:43,722 INFO    SenderThread:44202 [dir_watcher.py:finish():402] scan save: /Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/wandb/run-20231208_174840-nifq7s63/files/wandb-metadata.json wandb-metadata.json
+2023-12-08 17:51:43,723 INFO    SenderThread:44202 [sender.py:transition_state():617] send defer: 10
+2023-12-08 17:51:43,725 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: defer
+2023-12-08 17:51:43,727 INFO    HandlerThread:44202 [handler.py:handle_request_defer():172] handle defer: 10
+2023-12-08 17:51:43,728 DEBUG   SenderThread:44202 [sender.py:send_request():409] send_request: defer
+2023-12-08 17:51:43,728 INFO    SenderThread:44202 [sender.py:send_request_defer():613] handle sender defer: 10
+2023-12-08 17:51:43,729 INFO    SenderThread:44202 [file_pusher.py:finish():175] shutting down file pusher
+2023-12-08 17:51:43,903 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: poll_exit
+2023-12-08 17:51:43,903 DEBUG   SenderThread:44202 [sender.py:send_request():409] send_request: poll_exit
+2023-12-08 17:51:43,904 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 17:51:44,136 INFO    wandb-upload_1:44202 [upload_job.py:push():131] Uploaded file /Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/wandb/run-20231208_174840-nifq7s63/files/output.log
+2023-12-08 17:51:44,166 INFO    wandb-upload_0:44202 [upload_job.py:push():131] Uploaded file /Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/wandb/run-20231208_174840-nifq7s63/files/requirements.txt
+2023-12-08 17:51:44,187 INFO    wandb-upload_3:44202 [upload_job.py:push():131] Uploaded file /Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/wandb/run-20231208_174840-nifq7s63/files/wandb-summary.json
+2023-12-08 17:51:44,188 INFO    wandb-upload_4:44202 [upload_job.py:push():131] Uploaded file /Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/wandb/run-20231208_174840-nifq7s63/files/conda-environment.yaml
+2023-12-08 17:51:44,196 INFO    wandb-upload_2:44202 [upload_job.py:push():131] Uploaded file /Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/wandb/run-20231208_174840-nifq7s63/files/config.yaml
+2023-12-08 17:51:44,398 INFO    Thread-11 :44202 [sender.py:transition_state():617] send defer: 11
+2023-12-08 17:51:44,398 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: defer
+2023-12-08 17:51:44,398 INFO    HandlerThread:44202 [handler.py:handle_request_defer():172] handle defer: 11
+2023-12-08 17:51:44,399 DEBUG   SenderThread:44202 [sender.py:send_request():409] send_request: defer
+2023-12-08 17:51:44,399 INFO    SenderThread:44202 [sender.py:send_request_defer():613] handle sender defer: 11
+2023-12-08 17:51:44,399 INFO    SenderThread:44202 [file_pusher.py:join():181] waiting for file pusher
+2023-12-08 17:51:44,399 INFO    SenderThread:44202 [sender.py:transition_state():617] send defer: 12
+2023-12-08 17:51:44,399 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: defer
+2023-12-08 17:51:44,399 INFO    HandlerThread:44202 [handler.py:handle_request_defer():172] handle defer: 12
+2023-12-08 17:51:44,399 DEBUG   SenderThread:44202 [sender.py:send_request():409] send_request: defer
+2023-12-08 17:51:44,399 INFO    SenderThread:44202 [sender.py:send_request_defer():613] handle sender defer: 12
+2023-12-08 17:51:44,399 INFO    SenderThread:44202 [file_stream.py:finish():595] file stream finish called
+2023-12-08 17:51:44,909 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: poll_exit
+2023-12-08 17:51:44,968 INFO    SenderThread:44202 [file_stream.py:finish():599] file stream finish is done
+2023-12-08 17:51:44,969 INFO    SenderThread:44202 [sender.py:transition_state():617] send defer: 13
+2023-12-08 17:51:44,969 DEBUG   SenderThread:44202 [sender.py:send_request():409] send_request: poll_exit
+2023-12-08 17:51:44,969 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: defer
+2023-12-08 17:51:44,969 INFO    HandlerThread:44202 [handler.py:handle_request_defer():172] handle defer: 13
+2023-12-08 17:51:44,969 DEBUG   SenderThread:44202 [sender.py:send_request():409] send_request: defer
+2023-12-08 17:51:44,969 INFO    SenderThread:44202 [sender.py:send_request_defer():613] handle sender defer: 13
+2023-12-08 17:51:44,969 INFO    SenderThread:44202 [sender.py:transition_state():617] send defer: 14
+2023-12-08 17:51:44,970 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: defer
+2023-12-08 17:51:44,970 INFO    HandlerThread:44202 [handler.py:handle_request_defer():172] handle defer: 14
+2023-12-08 17:51:44,970 DEBUG   SenderThread:44202 [sender.py:send():382] send: final
+2023-12-08 17:51:44,970 DEBUG   SenderThread:44202 [sender.py:send():382] send: footer
+2023-12-08 17:51:44,970 DEBUG   SenderThread:44202 [sender.py:send_request():409] send_request: defer
+2023-12-08 17:51:44,970 INFO    SenderThread:44202 [sender.py:send_request_defer():613] handle sender defer: 14
+2023-12-08 17:51:44,971 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: poll_exit
+2023-12-08 17:51:44,971 DEBUG   SenderThread:44202 [sender.py:send_request():409] send_request: poll_exit
+2023-12-08 17:51:44,973 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: internal_messages
+2023-12-08 17:51:44,974 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: server_info
+2023-12-08 17:51:44,974 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: get_summary
+2023-12-08 17:51:44,975 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: sampled_history
+2023-12-08 17:51:44,975 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: job_info
+2023-12-08 17:51:44,975 DEBUG   SenderThread:44202 [sender.py:send_request():409] send_request: server_info
+2023-12-08 17:51:45,118 DEBUG   SenderThread:44202 [sender.py:send_request():409] send_request: job_info
+2023-12-08 17:51:45,120 DEBUG   HandlerThread:44202 [handler.py:handle_request():146] handle_request: shutdown
+2023-12-08 17:51:45,120 INFO    HandlerThread:44202 [handler.py:finish():866] shutting down handler
+2023-12-08 17:51:45,976 INFO    WriterThread:44202 [datastore.py:close():294] close: /Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/wandb/run-20231208_174840-nifq7s63/run-nifq7s63.wandb
+2023-12-08 17:51:46,123 INFO    SenderThread:44202 [sender.py:finish():1548] shutting down sender
+2023-12-08 17:51:46,123 INFO    SenderThread:44202 [file_pusher.py:finish():175] shutting down file pusher
+2023-12-08 17:51:46,124 INFO    SenderThread:44202 [file_pusher.py:join():181] waiting for file pusher

@@ -1,0 +1,17 @@
+LOADING DATA (vision: vit)
+Loaded image data:	Train: 520	Validation: 62	Test: 74 samples.
+Loaded tabular data: 	Train: 260	Validation: 31	Test: 37 samples.
+Created datasets:	Train: 260	Validation: 31	Test: 37 samples.
+Moving model to device: cpu
+/Users/silviaromanato/.conda/envs/lastenv/lib/python3.8/site-packages/transformers/training_args.py:1843: UserWarning: `use_mps_device` is deprecated and will be removed in version 5.0 of 🤗 Transformers. `mps` device will be used by default if available similar to the way `cuda` device is used.Therefore, no action from user is required.
+  warnings.warn(
+After forward, the shape of features_pa is:  torch.Size([8, 512])
+After forward, the shape of features_lat is:  torch.Size([8, 512])
+Vision embedding shape: torch.Size([8, 1024])
+Tabular embedding shape: torch.Size([8, 512])
+Combined embedding shape: torch.Size([8, 1536])
+{'loss': 12.3701, 'learning_rate': 9.96969696969697e-05, 'epoch': 0.03}
+After forward, the shape of features_pa is:  torch.Size([8, 512])
+After forward, the shape of features_lat is:  torch.Size([8, 512])
+Vision embedding shape: torch.Size([8, 1024])
+Tabular embedding shape: torch.Size([8, 512])

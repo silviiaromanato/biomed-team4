@@ -388,7 +388,7 @@ def transform_image(image_size, vision=None, augment=True):
             image_mean=NORM_MEAN, 
             image_std=NORM_STD, 
             return_tensors='pt')
-        transforms.append(lambda x: processor(x).pixel_values[0].T)
+        transforms.append(lambda x: processor(x).pixel_values[0])
     else: 
         transforms.append(Resize((IMAGE_SIZE, IMAGE_SIZE)))
         transforms.append(ToTensor())
@@ -482,6 +482,11 @@ class MultimodalDataset(Dataset):
                 if pa_path else torch.zeros((3, self.size, self.size), dtype=torch.float32)
             lateral_image = self._load_and_process_image(lateral_path) \
                 if lateral_path else torch.zeros((3, self.size, self.size), dtype=torch.float32)
+            # If the x_pa are not tensors, convert them 
+            if not isinstance(pa_image, torch.Tensor):
+                pa_image = torch.tensor(pa_image)
+            if not isinstance(lateral_image, torch.Tensor):
+                lateral_image = torch.tensor(lateral_image)
             inputs['x_pa'] = pa_image
             inputs['x_lat'] = lateral_image
         return inputs
