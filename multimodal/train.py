@@ -200,7 +200,7 @@ def grid_search(tabular=False,
 
     # Load data
     tab_data, image_data = prepare_data()
-    train_data, val_data, test_data = load_data(tab_data, image_data, vision=None)
+    train_data, val_data, test_data = load_data(tab_data, image_data, vision=vision)
 
     # Train model
     eval_results = train(model, train_data, val_data, test_data, run_name, CHECKPOINTS_DIR, epochs=num_epochs, lr=lr, seed=seed)

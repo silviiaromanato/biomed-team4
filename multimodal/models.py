@@ -156,8 +156,8 @@ class DualVisionEncoder(nn.Module):
         self.model_lateral.add_module('embedding', nn.Linear(self.num_features, IMAGE_EMBEDDING_DIM))
 
     def forward(self, x_pa, x_lat):
-        features_pa = self.features_pa(x_pa)
-        features_lateral = self.features_lateral(x_lat)
+        features_pa = self.model_pa(x_pa)
+        features_lateral = self.model_lateral(x_lat)
         combined_features = torch.cat((features_pa, features_lateral), dim=1)
         return combined_features
     
@@ -203,7 +203,7 @@ class JointEncoder(nn.Module):
             raise ValueError(f'Vision encoder type {vision} not supported.')
         print('Model initialization')
         if vision:
-            print(f'\tVision encoder {vision}')
+            print(f'\tVision encoder: {vision}')
             self.vision_encoder = DualVisionEncoder(vision)
             self.dim_input += IMAGE_EMBEDDING_DIM * 2
 
@@ -245,10 +245,7 @@ class JointEncoder(nn.Module):
         logits = self.classifier(embedding)
 
         # Return prediction, logits (and loss if labels are provided)
-        outputs = {
-            'logits': logits, 
-            'prediction': diagnosis(logits)
-            }
+        outputs = {'logits': logits, 'prediction': diagnosis(logits)}
         if labels is not None:
             loss_fct = nn.CrossEntropyLoss()
             outputs['loss'] = loss_fct(logits, labels)
