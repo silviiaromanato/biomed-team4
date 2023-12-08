@@ -12,6 +12,7 @@ from PIL import Image
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
 from transformers import ViTImageProcessor
+import pickle
 
 from torchvision.transforms import (
     CenterCrop,
@@ -507,6 +508,16 @@ def prepare_data():
     Split into train/val/test sets.
     Filter images based on tabular data.
     '''
+    pickle_tab_path = os.path.join(PROCESSED_PATH, 'tab_data.pickle')
+    pickle_img_path = os.path.join(PROCESSED_PATH, 'image_data.pickle')
+
+    if os.path.exists(pickle_tab_path) and os.path.exists(pickle_img_path):
+        with open('tab_data.pickle', 'rb') as handle:
+            tab_data = pickle.load(handle)
+        with open('image_data.pickle', 'rb') as handle:
+            image_data = pickle.load(handle)
+        return tab_data, image_data
+    
     print(f'PREPARING DATA')
     # Load and pre-process tabular data and labels
     tabular = preprocess_tabular()
@@ -526,6 +537,12 @@ def prepare_data():
     tab_data_test, image_data_test = join_multimodal(lab_test, image_files, metadata, tab_test)
     tab_data = {'train': tab_data_train, 'val': tab_data_val, 'test': tab_data_test}
     image_data = {'train': image_data_train, 'val': image_data_val, 'test': image_data_test}
+
+    with open(pickle_tab_path, 'wb') as handle:
+        pickle.dump(tab_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    with open(pickle_img_path, 'wb') as handle:
+        pickle.dump(image_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        
     return tab_data, image_data
 
 

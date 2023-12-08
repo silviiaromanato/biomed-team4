@@ -20,7 +20,8 @@ from sklearn.metrics import roc_auc_score, average_precision_score, f1_score, ac
 
 
 NUM_FEATURES = 87           # Number of tabular features
-IMAGE_EMBEDDING_DIM = 512   # All vision encoders produce 512-dimensional embeddings
+IMAGE_EMBEDDING_DIM = 512   # Vision encoders produce 512-dimensional embeddings
+TABULAR_EMBEDDING_DIM = 512 # Tabular encoder produces 512-dimensional embeddings
 
 class FullyConnectedLayer(nn.Module):
     '''
@@ -74,7 +75,7 @@ class FullyConnectedNetwork(nn.Module):
 
         self.dim_input = dim_input
         self.hidden_dims = hidden_dims
-        self.dims = [dim_input] + hidden_dims
+        self.dims = [dim_input] + hidden_dims + [TABULAR_EMBEDDING_DIM]
         self.dropout_prob = dropout_prob
         self.batch_norm = batch_norm
         self.sigmoid = nn.Sigmoid()
@@ -98,7 +99,7 @@ class ClassifierHead(nn.Module):
         num_classes (int): Number of classes
         num_labels (int): Number of labels for each class
     '''
-    def __init__(self, dim_input, num_labels=3, num_classes=14):
+    def __init__(self, dim_input, num_labels=NUM_LABELS, num_classes=NUM_CLASSES):
         super(ClassifierHead, self).__init__()
         self.num_classes = num_classes
         self.num_labels = num_labels
@@ -149,8 +150,8 @@ class DualVisionEncoder(nn.Module):
         self.model_lateral = nn.Sequential(*list(self.model_lateral.children())[:-1])
 
         # Project to 512-dimensional embedding
-        self.model_pa.add_module('embedding', nn.Linear(self.num_features, 512))
-        self.model_lateral.add_module('embedding', nn.Linear(self.num_features, 512))
+        self.model_pa.add_module('embedding', nn.Linear(self.num_features, IMAGE_EMBEDDING_DIM))
+        self.model_lateral.add_module('embedding', nn.Linear(self.num_features, IMAGE_EMBEDDING_DIM))
 
     def forward(self, x_pa, x_lat):
         features_pa = self.features_pa(x_pa)
@@ -198,13 +199,14 @@ class JointEncoder(nn.Module):
         
         if vision and vision not in ['resnet50', 'densenet121', 'vit']:
             raise ValueError(f'Vision encoder type {vision} not supported.')
+        
         if vision:
             self.vision_encoder = DualVisionEncoder(vision)
             self.dim_input += IMAGE_EMBEDDING_DIM * 2
 
         if tabular:
             self.tabular_encoder = FullyConnectedNetwork(**tabular_params)
-            self.dim_input += IMAGE_EMBEDDING_DIM
+            self.dim_input += TABULAR_EMBEDDING_DIM
 
         self.classifier = ClassifierHead(self.dim_input, 
                                          num_labels=num_labels, 

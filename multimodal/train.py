@@ -27,8 +27,6 @@ CLASSES = [
 
 # ---------------------------------------- GLOBAL VARIABLES ---------------------------------------- #
 
-WANDB_PROJECT_NAME = 'BioMed'
-
 # Path to data and results directories
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 GRID_DIR = os.path.join(BASE_DIR, 'results')
@@ -38,7 +36,6 @@ DATA_DIR = os.path.join(BASE_DIR, 'data')
 # Constants
 NUM_LABELS = 3 # Neutral, Positive, Negative
 NUM_CLASSES = 14 # Radiology diagnoses
-TABULAR_DIM = 88 # Number of tabular features
 
 # ---------------------------------------- W&B FUNCTIONS ---------------------------------------- #
 
@@ -57,17 +54,20 @@ def build_group(tabular=False,
     if tabular is None and vision is None: 
         raise ValueError('Error in build_group: tabular and/or vision must be specified.')  
 
-    group = 'Tabular-' if tabular else ''
-    group += f'{vision}' if vision else ''
+    run_name = 'Tabular-' if tabular else ''
+    run_name += f'{vision}' if vision else ''
     if tabular:
-        group += f'_in{tabular_params["dim_input"]}'
-        group += f'_hid{str(tabular_params["hidden_dims"])}'
-        group += f'_p{tabular_params["dropout_prob"]}'
+        run_name += f'_in{tabular_params["dim_input"]}'
+        run_name += f'_hid{str(tabular_params["hidden_dims"])}'
+        run_name += f'_p{tabular_params["dropout_prob"]}'
     
     config = {'tabular': tabular, 
               'vision': vision, 
               'tabular_params': tabular_params}
-    wandb.init(group=group, config=config)
+    # Log to organization project
+
+    wandb.init(group=run_name, config=config, project='biomed-team4', entity='biomed-team4')
+    return run_name
 
 # ---------------------------------------- TRAINING FUNCTIONS ---------------------------------------- #
 
@@ -92,7 +92,7 @@ def compute_metrics(eval_preds):
 
 
 def train(model, train_data, val_data, test_data,
-          output_dir, epochs=3, lr=2e-5, seed=0):
+          run_name, output_dir, epochs=10, lr=1e-5, seed=0):
     '''
     Trains a Joint Encoder model. 
     W&B logging is enabled by default.
@@ -138,7 +138,7 @@ def train(model, train_data, val_data, test_data,
         logging_first_step=True,
         logging_steps=1,
         logging_strategy='epoch',
-        run_name='test',
+        run_name=run_name,
         use_mps_device=True # MIGHT NEED TO CHANGE THIS
     )
     # Train the model
@@ -172,11 +172,13 @@ def grid_search(tabular=False,
 
     # Create model
     tabular_params = {
-        'dim_input': TABULAR_DIM,
+        'dim_input': NUM_FEATURES,
         'hidden_dims': hidden_dims,
         'dropout_prob': dropout_prob,
         'batch_norm': batch_norm
     }
+    if tabular: 
+        print(f'Initializing tabular encoder with parameters: {tabular_params}')
     model = JointEncoder(
         tabular=tabular, 
         tabular_params=tabular_params,
@@ -191,14 +193,15 @@ def grid_search(tabular=False,
     #        param.requires_grad = False
 
     # Build W&B group
-    build_group(tabular=tabular, vision=vision, tabular_params=tabular_params)
+    run_name = build_group(tabular=tabular, vision=vision, tabular_params=tabular_params)
+    print(f'Initializing W&B run {run_name}')
 
     # Load data
     tab_data, image_data = prepare_data()
     train_data, val_data, test_data = load_data(tab_data, image_data, vision=None)
 
     # Train model
-    eval_results = train(model, train_data, val_data, test_data, CHECKPOINTS_DIR, epochs=num_epochs, lr=lr, seed=seed)
+    eval_results = train(model, train_data, val_data, test_data, run_name, CHECKPOINTS_DIR, epochs=num_epochs, lr=lr, seed=seed)
     return eval_results
     
 
