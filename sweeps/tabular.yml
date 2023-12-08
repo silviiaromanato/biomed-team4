@@ -1,10 +1,10 @@
 # Grid Search: Tabular only
-program: multimodal/grid_search.py
+program: multimodal/train.py
 method: grid
-project: BioMed
+project: biomed-team4
 metric:
   goal: minimize
-  name: val_loss
+  name: eval_loss
 command:
  - ${env}
  - python3
@@ -12,8 +12,13 @@ command:
  - ${args}
 parameters:
   tabular: 
-    value: 1
-  device: 
-    value: 'cuda:0'
-  seed:
-    values: [1, 2, 3]
+    value: 1 # == True
+  #vision: value: 'densenet121' # 'resnet50', 'densenet121' or 'vit'
+  hidden_dims: 
+    value: [256, 512]
+  dropout_prob: 
+    value: 0.0
+  lr: 
+    values: [0.001, 0.0001, 0.00001]
+  num_epochs: 
+    value: 50
