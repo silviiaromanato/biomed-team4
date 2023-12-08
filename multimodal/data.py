@@ -473,7 +473,7 @@ class MultimodalDataset(Dataset):
         label_values = torch.tensor(label_values, dtype=torch.float32).unsqueeze(0)
         label_tensor = torch.nn.functional.one_hot(label_values.to(torch.int64), num_classes=NUM_LABELS).squeeze(0)
         
-        inputs = {'x_tab': tabular_tensor, 'label': label_tensor}
+        inputs = {'x_tab': tabular_tensor, 'labels': label_tensor}
         
         # Load and process PA and Lateral images
         if self.vision is not None:
@@ -490,8 +490,8 @@ class MultimodalDataset(Dataset):
         if 'x_tab' in batch[0]:
             inputs['x_tab'] = torch.stack([x['x_tab'] for x in batch if 'x_tab' in x])
         
-        if 'label' in batch[0]:
-            inputs['label'] = torch.stack([x['label'] for x in batch if 'label' in x])
+        if 'labels' in batch[0]:
+            inputs['labels'] = torch.stack([x['labels'] for x in batch if 'labels' in x])
 
         if self.vision is not None:
             if 'x_pa' in batch[0]:

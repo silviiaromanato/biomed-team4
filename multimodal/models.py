@@ -78,7 +78,6 @@ class FullyConnectedNetwork(nn.Module):
         self.dropout_prob = dropout_prob
         self.batch_norm = batch_norm
         self.sigmoid = nn.Sigmoid()
-
         self.layers = nn.ModuleList()
         for i in range(len(self.dims)-1):
             self.layers.append(FullyConnectedLayer(self.dims[i], self.dims[i+1], dropout_prob, batch_norm))
@@ -86,6 +85,7 @@ class FullyConnectedNetwork(nn.Module):
     def forward(self, x):
         for layer in self.layers:
             x = layer(x)
+        x = self.sigmoid(x)
         return x
     
 class ClassifierHead(nn.Module):
@@ -104,13 +104,13 @@ class ClassifierHead(nn.Module):
         self.num_labels = num_labels
         self.dim_input = dim_input
         self.dim_output = num_classes * num_labels
-        self.sigmoid = nn.Sigmoid()
+        self.softmax = nn.Softmax(dim=-1)
         self.classifier = nn.Linear(self.dim_input, self.dim_output)
 
     def forward(self, x):
         x = self.classifier(x)
         x = x.view(-1, self.num_classes, self.num_labels)
-        x = self.sigmoid(x)
+        x = self.softmax(x)
         return x
 
     
@@ -158,6 +158,18 @@ class DualVisionEncoder(nn.Module):
         combined_features = torch.cat((features_pa, features_lateral), dim=1)
         return combined_features
     
+
+def diagnosis(logits): 
+    '''
+    Given a logits tensor of size (batch_size, num_classes, num_labels),
+    returns a diagnosis matrix of size (batch_size, num_classes, num_labels)
+    where each entry is 1 if it is the argmax of labels for that class, and 0 otherwise.
+    '''
+    diagnosis = torch.zeros_like(logits)
+    for i in range(logits.shape[0]):
+        for j in range(logits.shape[1]):
+            diagnosis[i, j, logits[i, j].argmax()] = 1
+    return diagnosis
 class JointEncoder(nn.Module):
     '''
     Joint Encoder: Encodes image and tabular data separately, 
@@ -199,7 +211,7 @@ class JointEncoder(nn.Module):
                                          num_labels=num_labels, 
                                          num_classes=num_classes)
 
-    def forward(self, x_pa=None, x_lat=None, x_tab=None, **kwargs):
+    def forward(self, x_pa=None, x_lat=None, x_tab=None, labels=None):
         '''
         Args:
             x_pa (tensor): PA image
@@ -210,9 +222,8 @@ class JointEncoder(nn.Module):
         print('\tx_pa: ', None if x_pa is None else x_pa.shape)
         print('\tx_lat: ', None if x_lat is None else x_lat.shape)
         print('\tx_tab: ', None if x_tab is None else x_tab.shape)
-        for key, value in kwargs.items():
-            print(f'\t{key}: ', None if value is None else value.shape)
-            
+        print('\tlabels: ', None if labels is None else labels.shape)
+
         # Generate embeddings (image and/or tabular)
         if self.vision:
             if x_pa is None or x_lat is None:
@@ -232,8 +243,16 @@ class JointEncoder(nn.Module):
             embedding = tabular_embedding
         
         # Classify embeddings
-        output = self.classifier(embedding)
+        logits = self.classifier(embedding)
+        prediction = diagnosis(logits)
+        outputs = {'logits': logits, 'prediction': prediction}
+        if labels is not None:
+            criterion = nn.CrossEntropyLoss()
+            outputs['loss'] = criterion(logits, labels)
 
-        outputs = {}
-        outputs['logits'] = output
-        return output
+        print('\tOutputs: ')
+        for k, v in outputs.items():
+            print('\t\t', k, v.shape)
+        return outputs
+
+

@@ -64,24 +64,33 @@ def build_group(tabular=False,
 # ---------------------------------------- TRAINING FUNCTIONS ---------------------------------------- #
 
 
-def compute_metrics(prediction): 
+def compute_metrics(eval_preds): 
     ''' 
     Compares the diagnosis matrix to the ground truth. 
     Both prediction and labels are [batch_size, num_classes, num_labels] tensors.
     Computes accuracy, precision, recall, F1 score, AUC, and average precision.
     '''
     print('Computing metrics...')
-    print('Prediction: ', prediction)
-    labels = prediction.label_ids.flatten().detach().cpu().numpy()
-    pred = prediction.predictions.flatten().detach().cpu().numpy()
+    preds, labels = eval_preds
+    print('Prediction: ')
+    print('\tPredictions.predictions: ', preds.shape)
+    print('\tPredictions.labels: ', labels.shape)
+
+    # take argmax to get predictions
+    preds = torch.argmax(preds, dim=-1)
+    labels = torch.argmax(labels, dim=-1)
+    print('Prediction (argmax)')
+    print('\tPredictions.predictions: ', preds.shape)
+    print('\tPredictions.labels: ', labels.shape)
+
+
     return {
-        'loss': prediction.loss,
-        'accuracy': accuracy_score(labels, pred.round()),
-        'precision': precision_score(labels, pred.round(), average='macro'),
-        'recall': recall_score(labels, pred.round(), average='macro'),
-        'f1': f1_score(labels, pred.round(), average='macro'),
-        'auc': roc_auc_score(labels, pred),
-        'ap': average_precision_score(labels, pred),
+        'accuracy': accuracy_score(labels, preds),
+        'precision': precision_score(labels, preds, average='macro'),
+        'recall': recall_score(labels, preds, average='macro'),
+        'f1': f1_score(labels, preds, average='macro'),
+        'auc': roc_auc_score(labels, preds),
+        'ap': average_precision_score(labels, preds),
     }
 
 class MultimodalTrainer(Trainer):
@@ -96,16 +105,24 @@ class MultimodalTrainer(Trainer):
         Computes loss for joint image-tabular encoders. 
         Diagnosis matrix computed by the model is compared to the ground truth.
         '''
+        print('Computing loss...')
+        print('Inputs: ')
+        for k, v in inputs.items():
+            print(f'\t{k}: {v.shape}')
+            
         # Move inputs to GPU
-        inputs = self._prepare_inputs(inputs)
-        inputs = {k: v.to(self.args.device) for k, v in inputs.items()}
+        #inputs = self._prepare_inputs(inputs)
+        #inputs = {k: v.to(self.args.device) for k, v in inputs.items()}
 
         # Predict diagnosis and compute loss
-        labels = inputs.pop('label').float()
-        diagnosis = model(**inputs)
-        loss_fct = nn.BCEWithLogitsLoss()
-        loss = loss_fct(diagnosis, labels)
-        return (loss, diagnosis) if return_outputs else loss
+        labels = inputs.pop('labels').float()
+        output = model(**inputs)
+        pred = output['prediction']
+        logits = output['logits']
+        loss_fct = nn.CrossEntropyLoss()
+        loss = loss_fct(logits, labels)
+        return (loss, pred) if return_outputs else loss
+
 
 
 def train(model, train_data, val_data, test_data,
