@@ -165,11 +165,10 @@ def diagnosis(logits):
     returns a diagnosis matrix of size (batch_size, num_classes, num_labels)
     where each entry is 1 if it is the argmax of labels for that class, and 0 otherwise.
     '''
-    diagnosis = torch.zeros_like(logits)
-    for i in range(logits.shape[0]):
-        for j in range(logits.shape[1]):
-            diagnosis[i, j, logits[i, j].argmax()] = 1
+    diagnosis = torch.argmax(logits, dim=-1)
+    diagnosis = F.one_hot(diagnosis, num_classes=logits.shape[-1])
     return diagnosis
+
 class JointEncoder(nn.Module):
     '''
     Joint Encoder: Encodes image and tabular data separately, 
@@ -218,12 +217,6 @@ class JointEncoder(nn.Module):
             x_lat (tensor): Lateral image
             x_tab (tensor): Tabular features
         '''
-        print('Forward:')
-        print('\tx_pa: ', None if x_pa is None else x_pa.shape)
-        print('\tx_lat: ', None if x_lat is None else x_lat.shape)
-        print('\tx_tab: ', None if x_tab is None else x_tab.shape)
-        print('\tlabels: ', None if labels is None else labels.shape)
-
         # Generate embeddings (image and/or tabular)
         if self.vision:
             if x_pa is None or x_lat is None:
@@ -244,15 +237,15 @@ class JointEncoder(nn.Module):
         
         # Classify embeddings
         logits = self.classifier(embedding)
-        prediction = diagnosis(logits)
-        outputs = {'logits': logits, 'prediction': prediction}
-        if labels is not None:
-            criterion = nn.CrossEntropyLoss()
-            outputs['loss'] = criterion(logits, labels)
 
-        print('\tOutputs: ')
-        for k, v in outputs.items():
-            print('\t\t', k, v.shape)
+        # Return prediction, logits (and loss if labels are provided)
+        outputs = {
+            'logits': logits, 
+            'prediction': diagnosis(logits)
+            }
+        if labels is not None:
+            loss_fct = nn.CrossEntropyLoss()
+            outputs['loss'] = loss_fct(logits, labels)
         return outputs
 
 

@@ -10,12 +10,20 @@ import wandb
 #from autoparse import autoparse
 import torch.optim as optim
 import argparse
-from sklearn.metrics import roc_auc_score, average_precision_score, f1_score, accuracy_score, precision_score, recall_score
+from sklearn.metrics import average_precision_score, f1_score, accuracy_score, precision_score, recall_score
 from transformers import TrainingArguments, Trainer
+from transformers.trainer_utils import PredictionOutput 
 
 from train import *
 from models import *
 from data import *
+
+CLASSES = [
+    'Atelectasis', 'Cardiomegaly', 'Consolidation', 'Edema', 
+    'Enlarged Cardiomediastinum', 'Fracture', 'Lung Lesion', 
+    'Lung Opacity', 'No Finding', 'Pleural Effusion', 
+    'Pleural Other', 'Pneumonia', 'Pneumothorax', 'Support Devices'
+    ]
 
 # ---------------------------------------- GLOBAL VARIABLES ---------------------------------------- #
 
@@ -70,59 +78,17 @@ def compute_metrics(eval_preds):
     Both prediction and labels are [batch_size, num_classes, num_labels] tensors.
     Computes accuracy, precision, recall, F1 score, AUC, and average precision.
     '''
-    print('Computing metrics...')
-    preds, labels = eval_preds
-    print('Prediction: ')
-    print('\tPredictions.predictions: ', preds.shape)
-    print('\tPredictions.labels: ', labels.shape)
-
-    # take argmax to get predictions
-    preds = torch.argmax(preds, dim=-1)
-    labels = torch.argmax(labels, dim=-1)
-    print('Prediction (argmax)')
-    print('\tPredictions.predictions: ', preds.shape)
-    print('\tPredictions.labels: ', labels.shape)
-
-
-    return {
-        'accuracy': accuracy_score(labels, preds),
-        'precision': precision_score(labels, preds, average='macro'),
-        'recall': recall_score(labels, preds, average='macro'),
-        'f1': f1_score(labels, preds, average='macro'),
-        'auc': roc_auc_score(labels, preds),
-        'ap': average_precision_score(labels, preds),
-    }
-
-class MultimodalTrainer(Trainer):
-    '''
-    Trainer class for joint image-tabular encoders. 
-    '''
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def compute_loss(self, model, inputs, return_outputs=False):
-        '''
-        Computes loss for joint image-tabular encoders. 
-        Diagnosis matrix computed by the model is compared to the ground truth.
-        '''
-        print('Computing loss...')
-        print('Inputs: ')
-        for k, v in inputs.items():
-            print(f'\t{k}: {v.shape}')
-            
-        # Move inputs to GPU
-        #inputs = self._prepare_inputs(inputs)
-        #inputs = {k: v.to(self.args.device) for k, v in inputs.items()}
-
-        # Predict diagnosis and compute loss
-        labels = inputs.pop('labels').float()
-        output = model(**inputs)
-        pred = output['prediction']
-        logits = output['logits']
-        loss_fct = nn.CrossEntropyLoss()
-        loss = loss_fct(logits, labels)
-        return (loss, pred) if return_outputs else loss
-
+    preds = eval_preds.predictions
+    if isinstance(preds, tuple):
+        preds = preds[0]
+    labels = eval_preds.label_ids
+    preds = torch.argmax(torch.tensor(preds), dim=-1)
+    labels = torch.argmax(torch.tensor(labels), dim=-1)
+    accuracies = {}
+    for i, disease in enumerate(CLASSES):
+        accuracies[disease] = accuracy_score(labels[:, i], preds[:, i])
+    accuracies['Average'] = sum(accuracies.values()) / len(accuracies)
+    return accuracies
 
 
 def train(model, train_data, val_data, test_data,
@@ -143,7 +109,7 @@ def train(model, train_data, val_data, test_data,
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model.to(device)
-    print(f'Using device: {device}')
+    print(f'Moving model to device: {device}')
 
     training_args = TrainingArguments(
 
@@ -152,7 +118,7 @@ def train(model, train_data, val_data, test_data,
         learning_rate=lr,
         weight_decay=0.01,
         per_device_train_batch_size=4,
-        per_device_eval_batch_size=4,
+        per_device_eval_batch_size=1,
         warmup_steps=500,
         dataloader_num_workers=0, # MIGHT NEED TO CHANGE THIS
         seed=seed,
@@ -160,7 +126,6 @@ def train(model, train_data, val_data, test_data,
         # Evaluation & checkpointing
         output_dir=output_dir,
         evaluation_strategy="epoch",
-        eval_accumulation_steps=None,
         save_strategy="epoch",
         save_total_limit=1,
         load_best_model_at_end=True,
@@ -177,15 +142,17 @@ def train(model, train_data, val_data, test_data,
         use_mps_device=True # MIGHT NEED TO CHANGE THIS
     )
     # Train the model
-    trainer = MultimodalTrainer(
+    trainer = Trainer(
         model=model,
         args=training_args,
         train_dataset=train_data,
         eval_dataset=val_data,
         compute_metrics=compute_metrics,
-        data_collator=train_data.collate_fn
+        data_collator=train_data.collate_fn,
     )
-    trainer.train()
+    trainer.train(
+        ignore_keys_for_eval=['logits']
+    )
 
     # Evaluate the model
     eval_results = trainer.evaluate(eval_dataset=test_data)

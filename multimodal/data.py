@@ -471,7 +471,7 @@ class MultimodalDataset(Dataset):
         labels = self.data_dict[labels_path]
         label_values = [labels[class_name] if not np.isnan(labels[class_name]) else 0 for class_name in self.classes]
         label_values = torch.tensor(label_values, dtype=torch.float32).unsqueeze(0)
-        label_tensor = torch.nn.functional.one_hot(label_values.to(torch.int64), num_classes=NUM_LABELS).squeeze(0)
+        label_tensor = torch.nn.functional.one_hot(label_values.to(torch.int64), num_classes=NUM_LABELS).squeeze(0).float()
         
         inputs = {'x_tab': tabular_tensor, 'labels': label_tensor}
         
