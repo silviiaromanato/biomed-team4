@@ -75,12 +75,13 @@ def compute_metrics(prediction):
     labels = prediction.label_ids.flatten().detach().cpu().numpy()
     pred = prediction.predictions.flatten().detach().cpu().numpy()
     return {
+        'loss': prediction.loss,
         'accuracy': accuracy_score(labels, pred.round()),
         'precision': precision_score(labels, pred.round(), average='macro'),
         'recall': recall_score(labels, pred.round(), average='macro'),
         'f1': f1_score(labels, pred.round(), average='macro'),
         'auc': roc_auc_score(labels, pred),
-        'ap': average_precision_score(labels, pred)
+        'ap': average_precision_score(labels, pred),
     }
 
 class MultimodalTrainer(Trainer):
@@ -133,8 +134,8 @@ def train(model, train_data, val_data, test_data,
         num_train_epochs=epochs,
         learning_rate=lr,
         weight_decay=0.01,
-        per_device_train_batch_size=2,
-        per_device_eval_batch_size=2,
+        per_device_train_batch_size=4,
+        per_device_eval_batch_size=4,
         warmup_steps=500,
         dataloader_num_workers=0, # MIGHT NEED TO CHANGE THIS
         seed=seed,
@@ -146,7 +147,7 @@ def train(model, train_data, val_data, test_data,
         save_strategy="epoch",
         save_total_limit=1,
         load_best_model_at_end=True,
-        metric_for_best_model="eval_loss",
+        metric_for_best_model="loss",
         greater_is_better=False,
 
         # W&B logging

@@ -462,9 +462,7 @@ class MultimodalDataset(Dataset):
         
         # Get the paths for the PA and Lateral images
         pa_path = self.organized_paths[subject_study_pair]['PA']
-        print(pa_path, len(self.organized_paths[subject_study_pair]))
         lateral_path = self.organized_paths[subject_study_pair]['LATERAL']
-        print(lateral_path, len(self.organized_paths[subject_study_pair]))
 
         # Get labels from the image data
         labels_path = pa_path if pa_path else lateral_path
