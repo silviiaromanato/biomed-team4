@@ -1,0 +1,20 @@
+LOADING DATA (vision: densenet121)
+Loaded image data:	Train: 520	Validation: 62	Test: 74 samples.
+Loaded tabular data: 	Train: 260	Validation: 31	Test: 37 samples.
+Created datasets:	Train: 260	Validation: 31	Test: 37 samples.
+Moving model to device: cpu
+/Users/silviaromanato/.conda/envs/lastenv/lib/python3.8/site-packages/transformers/training_args.py:1843: UserWarning: `use_mps_device` is deprecated and will be removed in version 5.0 of 🤗 Transformers. `mps` device will be used by default if available similar to the way `cuda` device is used.Therefore, no action from user is required.
+  warnings.warn(
+{'loss': 12.3345, 'learning_rate': 9.96969696969697e-05, 'epoch': 0.03}
+{'loss': 12.1504, 'learning_rate': 9e-05, 'epoch': 1.0}
+{'eval_loss': 12.123772621154785, 'eval_Atelectasis': 0.7741935483870968, 'eval_Cardiomegaly': 0.9354838709677419, 'eval_Consolidation': 0.967741935483871, 'eval_Edema': 0.8064516129032258, 'eval_Enlarged Cardiomediastinum': 0.967741935483871, 'eval_Fracture': 1.0, 'eval_Lung Lesion': 1.0, 'eval_Lung Opacity': 0.9032258064516129, 'eval_No Finding': 0.5161290322580645, 'eval_Pleural Effusion': 0.4838709677419355, 'eval_Pleural Other': 1.0, 'eval_Pneumonia': 0.06451612903225806, 'eval_Pneumothorax': 1.0, 'eval_Support Devices': 0.967741935483871, 'eval_Average': 0.8133640552995391, 'eval_runtime': 7.9536, 'eval_samples_per_second': 3.898, 'eval_steps_per_second': 0.503, 'epoch': 1.0}
+Model initialization
+	Vision encoder: vit
+Some weights of ViTForImageClassification were not initialized from the model checkpoint at google/vit-large-patch32-384 and are newly initialized because the shapes did not match:
+- vit.embeddings.position_embeddings: found shape torch.Size([1, 145, 1024]) in the checkpoint and torch.Size([1, 6085, 1024]) in the model instantiated
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+	Tabular encoder with parameters: {'dim_input': 87, 'hidden_dims': [256, 512], 'dropout_prob': 0.0, 'batch_norm': True}
+W&B initialization: run Tabular-vit-256-512-p0.0
+Some weights of ViTForImageClassification were not initialized from the model checkpoint at google/vit-large-patch32-384 and are newly initialized because the shapes did not match:
+- vit.embeddings.position_embeddings: found shape torch.Size([1, 145, 1024]) in the checkpoint and torch.Size([1, 6085, 1024]) in the model instantiated
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.

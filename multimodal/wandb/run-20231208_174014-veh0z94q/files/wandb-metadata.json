@@ -1,0 +1,44 @@
+{
+    "os": "macOS-10.16-x86_64-i386-64bit",
+    "python": "3.8.18",
+    "heartbeatAt": "2023-12-08T16:40:15.167240",
+    "startedAt": "2023-12-08T16:40:14.381280",
+    "docker": null,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "<python with no main file>",
+    "codePathLocal": null,
+    "git": {
+        "remote": "https://github.com/silviiaromanato/biomed-team4.git",
+        "commit": "831774e21581fd90bf90840f5937afc5941557e5"
+    },
+    "email": "80218776+silvipilvi@users.noreply.github.com",
+    "root": "/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4",
+    "host": "tsf-492-wpa-7-048.epfl.ch",
+    "username": "silviaromanato",
+    "executable": "/Users/silviaromanato/.conda/envs/lastenv/bin/python",
+    "cpu_count": 12,
+    "cpu_count_logical": 12,
+    "cpu_freq": {
+        "current": 2400,
+        "min": 2400,
+        "max": 2400
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 2400,
+            "min": 2400,
+            "max": 2400
+        }
+    ],
+    "disk": {
+        "/": {
+            "total": 926.3517189025879,
+            "used": 251.49994277954102
+        }
+    },
+    "memory": {
+        "total": 18.0
+    }
+}

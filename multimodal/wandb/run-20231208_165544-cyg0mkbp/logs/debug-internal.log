@@ -1,0 +1,75 @@
+2023-12-08 16:55:44,382 INFO    StreamThr :38854 [internal.py:wandb_internal():86] W&B internal server running at pid: 38854, started at: 2023-12-08 16:55:44.381903
+2023-12-08 16:55:44,383 DEBUG   HandlerThread:38854 [handler.py:handle_request():146] handle_request: status
+2023-12-08 16:55:44,391 INFO    WriterThread:38854 [datastore.py:open_for_write():85] open: /Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/wandb/run-20231208_165544-cyg0mkbp/run-cyg0mkbp.wandb
+2023-12-08 16:55:44,392 DEBUG   SenderThread:38854 [sender.py:send():382] send: header
+2023-12-08 16:55:44,541 DEBUG   SenderThread:38854 [sender.py:send():382] send: run
+2023-12-08 16:55:45,058 ERROR   SenderThread:38854 [internal_api.py:execute():373] 404 response executing GraphQL.
+2023-12-08 16:55:45,059 ERROR   SenderThread:38854 [internal_api.py:execute():374] {"errors":[{"message":"project not found","path":["upsertBucket"]}],"data":{"upsertBucket":null}}
+2023-12-08 16:55:45,059 ERROR   SenderThread:38854 [sender.py:send_run():987] It appears that you do not have permission to access the requested resource. Please reach out to the project owner to grant you access. If you have the correct permissions, verify that there are no issues with your networking setup.(Error 404: Not Found)
+Traceback (most recent call last):
+  File "/Users/silviaromanato/.conda/envs/lastenv/lib/python3.8/site-packages/wandb/sdk/lib/retry.py", line 131, in __call__
+    result = self._call_fn(*args, **kwargs)
+  File "/Users/silviaromanato/.conda/envs/lastenv/lib/python3.8/site-packages/wandb/sdk/internal/internal_api.py", line 369, in execute
+    return self.client.execute(*args, **kwargs)  # type: ignore
+  File "/Users/silviaromanato/.conda/envs/lastenv/lib/python3.8/site-packages/wandb/vendor/gql-0.2.0/wandb_gql/client.py", line 52, in execute
+    result = self._get_result(document, *args, **kwargs)
+  File "/Users/silviaromanato/.conda/envs/lastenv/lib/python3.8/site-packages/wandb/vendor/gql-0.2.0/wandb_gql/client.py", line 60, in _get_result
+    return self.transport.execute(document, *args, **kwargs)
+  File "/Users/silviaromanato/.conda/envs/lastenv/lib/python3.8/site-packages/wandb/sdk/lib/gql_request.py", line 59, in execute
+    request.raise_for_status()
+  File "/Users/silviaromanato/.conda/envs/lastenv/lib/python3.8/site-packages/requests/models.py", line 1021, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 404 Client Error: Not Found for url: https://api.wandb.ai/graphql
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/silviaromanato/.conda/envs/lastenv/lib/python3.8/site-packages/wandb/sdk/internal/sender.py", line 985, in send_run
+    self._init_run(run, config_value_dict)
+  File "/Users/silviaromanato/.conda/envs/lastenv/lib/python3.8/site-packages/wandb/sdk/internal/sender.py", line 1027, in _init_run
+    server_run, inserted, server_messages = self._api.upsert_run(
+  File "/Users/silviaromanato/.conda/envs/lastenv/lib/python3.8/site-packages/wandb/apis/normalize.py", line 73, in wrapper
+    raise err
+  File "/Users/silviaromanato/.conda/envs/lastenv/lib/python3.8/site-packages/wandb/apis/normalize.py", line 41, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/silviaromanato/.conda/envs/lastenv/lib/python3.8/site-packages/wandb/sdk/internal/internal_api.py", line 2212, in upsert_run
+    response = self.gql(
+  File "/Users/silviaromanato/.conda/envs/lastenv/lib/python3.8/site-packages/wandb/sdk/internal/internal_api.py", line 341, in gql
+    ret = self._retry_gql(
+  File "/Users/silviaromanato/.conda/envs/lastenv/lib/python3.8/site-packages/wandb/sdk/lib/retry.py", line 147, in __call__
+    retry_timedelta_triggered = check_retry_fn(e)
+  File "/Users/silviaromanato/.conda/envs/lastenv/lib/python3.8/site-packages/wandb/util.py", line 965, in check_retry_fn
+    return fallback_retry_fn(e)
+  File "/Users/silviaromanato/.conda/envs/lastenv/lib/python3.8/site-packages/wandb/util.py", line 907, in no_retry_auth
+    raise CommError(
+wandb.errors.CommError: It appears that you do not have permission to access the requested resource. Please reach out to the project owner to grant you access. If you have the correct permissions, verify that there are no issues with your networking setup.(Error 404: Not Found)
+2023-12-08 16:55:50,087 DEBUG   HandlerThread:38854 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 16:55:55,103 DEBUG   HandlerThread:38854 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 16:56:00,115 DEBUG   HandlerThread:38854 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 16:56:05,136 DEBUG   HandlerThread:38854 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 16:56:10,161 DEBUG   HandlerThread:38854 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 16:56:15,175 DEBUG   HandlerThread:38854 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 16:56:20,193 DEBUG   HandlerThread:38854 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 16:56:25,214 DEBUG   HandlerThread:38854 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 16:56:30,238 DEBUG   HandlerThread:38854 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 16:56:35,260 DEBUG   HandlerThread:38854 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 16:56:40,277 DEBUG   HandlerThread:38854 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 16:56:45,293 DEBUG   HandlerThread:38854 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 16:56:50,315 DEBUG   HandlerThread:38854 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 16:56:55,330 DEBUG   HandlerThread:38854 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 16:57:00,349 DEBUG   HandlerThread:38854 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 16:57:05,370 DEBUG   HandlerThread:38854 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 16:57:10,396 DEBUG   HandlerThread:38854 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 16:57:15,416 DEBUG   HandlerThread:38854 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 16:57:20,436 DEBUG   HandlerThread:38854 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 16:57:25,460 DEBUG   HandlerThread:38854 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 16:57:30,480 DEBUG   HandlerThread:38854 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 16:57:35,496 DEBUG   HandlerThread:38854 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 16:57:40,517 DEBUG   HandlerThread:38854 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 16:57:45,535 DEBUG   HandlerThread:38854 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 16:57:50,554 DEBUG   HandlerThread:38854 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 16:57:55,573 DEBUG   HandlerThread:38854 [handler.py:handle_request():146] handle_request: status_report
+2023-12-08 16:57:59,335 DEBUG   HandlerThread:38854 [handler.py:handle_request():146] handle_request: shutdown
+2023-12-08 16:57:59,335 INFO    HandlerThread:38854 [handler.py:finish():866] shutting down handler
+2023-12-08 16:57:59,587 INFO    SenderThread:38854 [sender.py:finish():1548] shutting down sender
+2023-12-08 16:57:59,587 INFO    WriterThread:38854 [datastore.py:close():294] close: /Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/wandb/run-20231208_165544-cyg0mkbp/run-cyg0mkbp.wandb

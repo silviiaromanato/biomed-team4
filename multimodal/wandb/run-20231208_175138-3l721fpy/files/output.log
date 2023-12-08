@@ -1,0 +1,247 @@
+LOADING DATA (vision: resnet50)
+Loaded image data:	Train: 520	Validation: 62	Test: 74 samples.
+Loaded tabular data: 	Train: 260	Validation: 31	Test: 37 samples.
+Created datasets:	Train: 260	Validation: 31	Test: 37 samples.
+Moving model to device: cpu
+/Users/silviaromanato/.conda/envs/lastenv/lib/python3.8/site-packages/transformers/training_args.py:1843: UserWarning: `use_mps_device` is deprecated and will be removed in version 5.0 of 🤗 Transformers. `mps` device will be used by default if available similar to the way `cuda` device is used.Therefore, no action from user is required.
+  warnings.warn(
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+Vision embedding shape: torch.Size([8, 1024])
+Tabular embedding shape: torch.Size([8, 512])
+Combined embedding shape: torch.Size([8, 1536])
+{'loss': 12.3204, 'learning_rate': 9.96969696969697e-05, 'epoch': 0.03}
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+Vision embedding shape: torch.Size([8, 1024])
+Tabular embedding shape: torch.Size([8, 512])
+Combined embedding shape: torch.Size([8, 1536])
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+Vision embedding shape: torch.Size([8, 1024])
+Tabular embedding shape: torch.Size([8, 512])
+Combined embedding shape: torch.Size([8, 1536])
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+Vision embedding shape: torch.Size([8, 1024])
+Tabular embedding shape: torch.Size([8, 512])
+Combined embedding shape: torch.Size([8, 1536])
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+Vision embedding shape: torch.Size([8, 1024])
+Tabular embedding shape: torch.Size([8, 512])
+Combined embedding shape: torch.Size([8, 1536])
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:486: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_pa'] = torch.tensor(pa_image)
+/Users/silviaromanato/Desktop/EPFL/MA3/DeepLearning/biomed-team4/multimodal/data.py:487: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  inputs['x_lat'] = torch.tensor(lateral_image)
+Model initialization
+	Vision encoder: resnet50
+	Tabular encoder with parameters: {'dim_input': 87, 'hidden_dims': [256, 512], 'dropout_prob': 0.0, 'batch_norm': True}
+W&B initialization: run Tabular-resnet50-256-512-p0.0
