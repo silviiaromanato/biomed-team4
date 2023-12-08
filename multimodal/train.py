@@ -120,10 +120,10 @@ def train(model, train_data, val_data, test_data,
         # Training
         num_train_epochs=epochs,
         learning_rate=lr,
-        weight_decay=0.01,
-        per_device_train_batch_size=4,
-        per_device_eval_batch_size=1,
-        warmup_steps=500,
+        #weight_decay=0.01,
+        per_device_train_batch_size=8,
+        per_device_eval_batch_size=8,
+        #warmup_steps=500,
         dataloader_num_workers=0, # MIGHT NEED TO CHANGE THIS
         seed=seed,
 

@@ -131,11 +131,15 @@ class DualVisionEncoder(nn.Module):
             self.model_pa = models.resnet50(weights=ResNet50_Weights.DEFAULT)
             self.model_lateral = models.resnet50(weights=ResNet50_Weights.DEFAULT)
             self.num_features = self.model_pa.fc.in_features # 2048
+            self.model_pa.fc = nn.Linear(self.num_features, IMAGE_EMBEDDING_DIM)
+            self.model_lateral.fc = nn.Linear(self.num_features, IMAGE_EMBEDDING_DIM)
 
         elif vision == 'densenet121':
             self.model_pa = models.densenet121(weights=DenseNet121_Weights.IMAGENET1K_V1)
             self.model_lateral = models.densenet121(weights=DenseNet121_Weights.IMAGENET1K_V1)
             self.num_features = self.model_pa.classifier.in_features # 1024
+            self.model_pa.classifier = nn.Linear(self.num_features, IMAGE_EMBEDDING_DIM)
+            self.model_lateral.classifier = nn.Linear(self.num_features, IMAGE_EMBEDDING_DIM)
 
         elif vision == 'vit': 
             self.model_pa = ViTForImageClassification.from_pretrained(
@@ -143,17 +147,11 @@ class DualVisionEncoder(nn.Module):
             self.model_lateral = ViTForImageClassification.from_pretrained(
                 'google/vit-large-patch32-384', image_size=2500, patch_size=32, ignore_mismatched_sizes=True)
             self.num_features = self.model_pa.classifier.in_features # 768
+            self.model_pa.classifier = nn.Linear(self.num_features, IMAGE_EMBEDDING_DIM)
+            self.model_lateral.classifier = nn.Linear(self.num_features, IMAGE_EMBEDDING_DIM)
             
         else: 
             raise ValueError(f'Vision encoder type {vision} not supported.')
-
-        # Remove last classification layer (1000 classes in ImageNet)
-        self.model_pa = nn.Sequential(*list(self.model_pa.children())[:-1])
-        self.model_lateral = nn.Sequential(*list(self.model_lateral.children())[:-1])
-
-        # Project to 512-dimensional embedding
-        self.model_pa.add_module('embedding', nn.Linear(self.num_features, IMAGE_EMBEDDING_DIM))
-        self.model_lateral.add_module('embedding', nn.Linear(self.num_features, IMAGE_EMBEDDING_DIM))
 
     def forward(self, x_pa, x_lat):
         features_pa = self.model_pa(x_pa)
