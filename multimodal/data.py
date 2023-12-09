@@ -72,7 +72,7 @@ def load_tabular_data():
     admissions_path = os.path.join(TABULAR_PATH, 'admissions.csv.gz')
     patients_path = os.path.join(TABULAR_PATH, 'patients.csv.gz')
     services_path = os.path.join(TABULAR_PATH, 'services.csv.gz')
-    metadata_path = os.path.join(TABULAR_PATH, 'mimic-cxr-2.0.0-metadata.csv')
+    metadata_path = os.path.join(TABULAR_PATH, 'mimic-cxr-2.0.0-metadata.csv.gz')
 
     if not os.path.exists(admissions_path):
         raise ValueError(f'Admissions file not found in {admissions_path}.')
