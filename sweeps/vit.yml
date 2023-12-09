@@ -11,8 +11,6 @@ command:
  - ${program}
  - ${args}
 parameters:
-  tabular: 
-    value: 0
   vision: 
     value: 'vit' 
   hidden_dims: 
