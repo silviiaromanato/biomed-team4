@@ -115,6 +115,7 @@ def train(model, train_data, val_data, test_data,
     model.to(device)
     print(f'Moving model to device: {device}')
 
+    print('Training:\tInitializing training arguments')
     training_args = TrainingArguments(
 
         # Training
@@ -145,7 +146,8 @@ def train(model, train_data, val_data, test_data,
         run_name=run_name,
         #use_mps_device=True # MIGHT NEED TO CHANGE THIS
     )
-    # Train the model
+
+    print('Training:\tInitializing trainer')
     trainer = Trainer(
         model=model,
         args=training_args,
@@ -154,11 +156,13 @@ def train(model, train_data, val_data, test_data,
         compute_metrics=compute_metrics,
         data_collator=train_data.collate_fn,
     )
+    
+    print('Training:\tStarting training')
     trainer.train(
         ignore_keys_for_eval=['logits']
     )
 
-    # Evaluate the model
+    print('Evaluation:\tEvaluating model on test set')
     eval_results = trainer.evaluate(eval_dataset=test_data)
     return eval_results
 
