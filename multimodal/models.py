@@ -159,7 +159,7 @@ class DualVisionEncoder(nn.Module):
             raise ValueError(f'Vision encoder type {vision} not supported.')
 
     def forward(self, x_pa, x_lat):
-        print(f'DualVisionEncoder.forward() with vision {self.vision}, x_pa.shape={x_pa.shape}, x_lat.shape={x_lat.shape}')
+        # print(f'DualVisionEncoder.forward() with vision {self.vision}, x_pa.shape={x_pa.shape}, x_lat.shape={x_lat.shape}')
         if self.vision in ['resnet50', 'densenet121']:
             features_pa = self.model_pa(x_pa) # x_pa was chacked and is a on cuda!
             features_lat = self.model_lateral(x_lat)
@@ -211,16 +211,16 @@ class JointEncoder(nn.Module):
             raise ValueError(f'Vision encoder type {vision} not supported.')
         print('Model initialization')
         if vision:
-            print(f'\tVision encoder: {vision}')
+            # print(f'\tVision encoder: {vision}')
             self.vision_encoder = DualVisionEncoder(vision)
             self.dim_input += IMAGE_EMBEDDING_DIM * 2
 
         if tabular:
-            print(f'\tTabular encoder with parameters: {tabular_params}')
+            # print(f'\tTabular encoder with parameters: {tabular_params}')
             self.tabular_encoder = FullyConnectedNetwork(**tabular_params)
             self.dim_input += TABULAR_EMBEDDING_DIM
 
-        print(f'\tClassifier head with num_labels={num_labels} and num_classes={num_classes}')
+        # print(f'\tClassifier head with num_labels={num_labels} and num_classes={num_classes}')
         self.classifier = ClassifierHead(self.dim_input, 
                                          num_labels=num_labels, 
                                          num_classes=num_classes)
