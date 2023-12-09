@@ -161,7 +161,9 @@ class DualVisionEncoder(nn.Module):
     def forward(self, x_pa, x_lat):
         print(f'DualVisionEncoder.forward() with vision {self.vision}, x_pa.shape={x_pa.shape}, x_lat.shape={x_lat.shape}')
         if self.vision in ['resnet50', 'densenet121']:
+            print('The input of the images x_pa is:', x_pa)
             features_pa = self.model_pa(x_pa)
+            print('The output of the images x_pa is:', features_pa)
             features_lat = self.model_lateral(x_lat)
         elif self.vision == 'vit':
             features_pa = self.model_pa(x_pa).logits
