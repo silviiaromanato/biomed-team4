@@ -1,0 +1,25 @@
+# Grid Search: Vision Transformer only
+program: multimodal/train.py
+method: grid
+project: biomed-team4
+metric:
+  goal: minimize
+  name: eval_loss
+command:
+ - ${env}
+ - python3
+ - ${program}
+ - ${args}
+parameters:
+  tabular: 
+    value: 0
+  vision: 
+    value: 'vit' 
+  hidden_dims: 
+    value: '256-512' # Tune on tabular only
+  dropout_prob: 
+    value: 0.2
+  lr: 
+    values: [0.0001, 0.00001]
+  num_epochs: 
+    value: 50

@@ -1,0 +1,23 @@
+# Grid Search: Tabular only
+program: multimodal/train.py
+method: grid
+project: biomed-team4
+metric:
+  goal: minimize
+  name: eval_loss
+command:
+ - ${env}
+ - python3
+ - ${program}
+ - ${args}
+parameters:
+  tabular: 
+    value: 1 # == True
+  hidden_dims: 
+    values: ['256-512', '128-256-512', '256-512-1024']
+  dropout_prob: 
+    value: 0.2
+  lr: 
+    values: [0.001, 0.0001, 0.00001]
+  num_epochs: 
+    value: 50
