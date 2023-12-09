@@ -12,7 +12,7 @@ command:
  - ${args}
 parameters:
   tabular: 
-    value: 0
+    value: False
   vision: 
     value: 'resnet50' 
   hidden_dims: 
