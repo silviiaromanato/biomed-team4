@@ -156,7 +156,7 @@ def create_image_labels_mapping(image_files, labels_data, info_data):
     return image_labels_mapping
         
 
-def join_multimodal(labels_data, image_files, info_jpg, tab_data):
+def join_multimodal(image_labels_mapping, tab_data):
     '''
     Join the tabular data with the image data.
     Returns: 
@@ -171,7 +171,6 @@ def join_multimodal(labels_data, image_files, info_jpg, tab_data):
 
     # Image data
     print('Image data')
-    image_labels_mapping = create_image_labels_mapping(image_files, labels_data, info_jpg)
     df_img = pd.DataFrame.from_dict(image_labels_mapping, orient='index').reset_index()
     df_img['study_id'] = df_img['study_id'].astype(int).astype(str)
     df_img['subject_id'] = df_img['subject_id'].astype(int).astype(str)
@@ -552,13 +551,12 @@ def prepare_data():
     labels_data, image_files, metadata = load_images_data()
 
     # Get intersection of tabular and image data
+    print('\tCreating image labels mapping.')
+    image_labels_mapping = create_image_labels_mapping(image_files, labels_data, metadata)
     print('Joining:\tIntersection of tabular and image data.')
-    print('Joining train data.')
-    tab_data_train, image_data_train = join_multimodal(lab_train, image_files, metadata, tab_train)
-    print('Joining val data.')
-    tab_data_val, image_data_val = join_multimodal(lab_val, image_files, metadata, tab_val)
-    print('Joining test data.')
-    tab_data_test, image_data_test = join_multimodal(lab_test, image_files, metadata, tab_test)
+    tab_data_train, image_data_train = join_multimodal(image_labels_mapping, tab_train)
+    tab_data_val, image_data_val = join_multimodal(image_labels_mapping, tab_val)
+    tab_data_test, image_data_test = join_multimodal(image_labels_mapping, tab_test)
     tab_data = {'train': tab_data_train, 'val': tab_data_val, 'test': tab_data_test}
     image_data = {'train': image_data_train, 'val': image_data_val, 'test': image_data_test}
 
