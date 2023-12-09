@@ -450,6 +450,7 @@ class MultimodalDataset(Dataset):
         if idx >= len(self.organized_paths):
             raise IndexError(f"Index {idx} out of range. Dataset has {len(self.organized_paths)} samples.")
         
+
         # Get the subject_id and study_id for this index
         subject_study_pair = list(self.organized_paths.keys())[idx]
 
@@ -459,8 +460,14 @@ class MultimodalDataset(Dataset):
                                 (self.tabular['study_id'] == study_id)]
 
         tabular_row = tabular_row.drop(['subject_id', 'study_id'], axis=1).values
-        tabular_tensor = torch.tensor(tabular_row.float(), dtype=torch.float32).squeeze(0)
-        
+
+        # If the row cannot be converted to a tensor, print the row and raise an error
+        try:
+            tabular_tensor = torch.tensor(tabular_row, dtype=torch.float32)
+        except Exception as e:
+            print(tabular_row)
+            raise e
+
         # Get the paths for the PA and Lateral images
         pa_path = self.organized_paths[subject_study_pair]['PA']
         lateral_path = self.organized_paths[subject_study_pair]['LATERAL']
