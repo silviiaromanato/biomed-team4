@@ -37,6 +37,8 @@ DATA_DIR = os.path.join(BASE_DIR, 'data')
 NUM_LABELS = 3 # Neutral, Positive, Negative
 NUM_CLASSES = 14 # Radiology diagnoses
 
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
 # ---------------------------------------- W&B FUNCTIONS ---------------------------------------- #
 
 def build_group(tabular=False, 
@@ -156,9 +158,9 @@ def train(model, train_data, val_data, test_data,
     trainer = Trainer(
         model=model,
         args=training_args,
-        train_dataset=train_data,
-        eval_dataset=val_data,
-        compute_metrics=compute_metrics,
+        train_dataset=train_data.to(device),
+        eval_dataset=val_data.to(device),
+        compute_metrics=compute_metrics.to(device),
         data_collator=train_data.collate_fn,
     )
 
@@ -214,6 +216,12 @@ def grid_search(tabular=False,
     # Load data
     tab_data, image_data = prepare_data()
     train_data, val_data, test_data = load_data(tab_data, image_data, vision=vision)
+
+    # Load the data to the device
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    train_data.to(device)
+    val_data.to(device)
+    test_data.to(device)
 
     # Train model
     eval_results = train(model, train_data, val_data, test_data, run_name, CHECKPOINTS_DIR, epochs=num_epochs, lr=lr, seed=seed)
