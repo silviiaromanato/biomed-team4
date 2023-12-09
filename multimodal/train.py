@@ -209,6 +209,8 @@ def grid_search(tabular=False,
     
 
 if __name__ == '__main__':
+    # print whether cuda is available
+    print(f'cuda: {torch.cuda.is_available()}')
     parser = argparse.ArgumentParser()
     parser.add_argument('--tabular', action='store_true', default=False)
     parser.add_argument('--vision', type=str, default=None)
