@@ -461,12 +461,16 @@ class MultimodalDataset(Dataset):
 
         tabular_row = tabular_row.drop(['subject_id', 'study_id'], axis=1).values
 
-        # If the row cannot be converted to a tensor, print the row and raise an error
+        # replace any False by 0 and any True by 1
+        tabular_row = np.where(tabular_row == False, 0, tabular_row)
+        tabular_row = np.where(tabular_row == True, 1, tabular_row)
+
+        # Convert to tensor, if this cannot be done throw an error and print the row
         try:
             tabular_tensor = torch.tensor(tabular_row, dtype=torch.float32)
-        except Exception as e:
+        except:
             print(tabular_row)
-            raise e
+            raise ValueError('Error converting tabular data to tensor.')
 
         # Get the paths for the PA and Lateral images
         pa_path = self.organized_paths[subject_study_pair]['PA']

@@ -24,7 +24,7 @@ CLASSES = [
     'Lung Opacity', 'No Finding', 'Pleural Effusion', 
     'Pleural Other', 'Pneumonia', 'Pneumothorax', 'Support Devices'
     ]
-os.environ['WANDB_SILENT'] = 'true'
+#os.environ['WANDB_SILENT'] = 'true'
 # ---------------------------------------- GLOBAL VARIABLES ---------------------------------------- #
 
 # Path to data and results directories
