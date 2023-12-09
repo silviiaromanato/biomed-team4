@@ -86,6 +86,7 @@ def compute_metrics(eval_preds):
     Both prediction and labels are [batch_size, num_classes, num_labels] tensors.
     Computes accuracy, precision, recall, F1 score, AUC, and average precision.
     '''
+    print('Computing metrics')
     preds = eval_preds.predictions
     if isinstance(preds, tuple):
         preds = preds[0]
@@ -160,7 +161,7 @@ def train(model, train_data, val_data, test_data,
         compute_metrics=compute_metrics,
         data_collator=train_data.collate_fn,
     )
-    
+
     print('Training:\tStarting training')
     trainer.train(
         ignore_keys_for_eval=['logits']
@@ -182,6 +183,9 @@ def grid_search(tabular=False,
     '''
     Grid search for radiology diagnosis using joint image-tabular encoders. 
     '''
+    # Set seed
+    torch.manual_seed(seed)
+    np.random.seed(seed)
 
     # Create model
     tabular_params = {
@@ -217,8 +221,6 @@ def grid_search(tabular=False,
     
 
 if __name__ == '__main__':
-    # print whether cuda is available
-    print(f'cuda: {torch.cuda.is_available()}')
     parser = argparse.ArgumentParser()
     # store as boolean
     parser.add_argument('--tabular', type=int, default=None)
@@ -234,6 +236,8 @@ if __name__ == '__main__':
 
     if args.hidden_dims and type(args.hidden_dims) == str:
         args.hidden_dims = [int(x) for x in args.hidden_dims.split('-')]
+
+    print(f'Cuda is available: {torch.cuda.is_available()}')
 
     #kwargs = autoparse(grid_search, verbose=False)
     grid_search(**vars(args))
