@@ -51,6 +51,10 @@ def build_group(tabular=False,
         - vision (str): Type of vision encoder (Default: None --> No vision encoder)
         - tabular_params (dict): Parameters for tabular encoder {dim_input, hidden_dims, dropout_prob, batch_norm}
     '''
+    if tabular == 0:
+        tabular = False
+    elif tabular == 1:
+        tabular = True
     if tabular is None and vision is None: 
         raise ValueError('Error in build_group: tabular and/or vision must be specified.')  
 
@@ -216,7 +220,7 @@ if __name__ == '__main__':
     # print whether cuda is available
     print(f'cuda: {torch.cuda.is_available()}')
     parser = argparse.ArgumentParser()
-    parser.add_argument('--tabular', action='store_true', default=False)
+    parser.add_argument('--tabular', type=int, action='store_true', default=0)
     parser.add_argument('--vision', type=str, default=None)
     parser.add_argument('--hidden_dims', type=str, default=[256, 512])
     parser.add_argument('--dropout_prob', type=float, default=0.0)
