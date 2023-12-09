@@ -459,7 +459,7 @@ class MultimodalDataset(Dataset):
                                 (self.tabular['study_id'] == study_id)]
 
         tabular_row = tabular_row.drop(['subject_id', 'study_id'], axis=1).values
-        tabular_tensor = torch.tensor(tabular_row, dtype=torch.float32).squeeze(0)
+        tabular_tensor = torch.tensor(tabular_row.float(), dtype=torch.float32).squeeze(0)
         
         # Get the paths for the PA and Lateral images
         pa_path = self.organized_paths[subject_study_pair]['PA']
