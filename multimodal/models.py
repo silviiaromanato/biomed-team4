@@ -113,7 +113,7 @@ class ClassifierHead(nn.Module):
         self.classifier = nn.Linear(self.dim_input, self.dim_output)
 
     def forward(self, x):
-        print(f'ClassifierHead.forward() with x.shape={x.shape}')
+        # print(f'ClassifierHead.forward() with x.shape={x.shape}')
         x = self.classifier(x)
         x = x.view(-1, self.num_classes, self.num_labels)
         x = self.softmax(x)
@@ -232,18 +232,18 @@ class JointEncoder(nn.Module):
             x_lat (tensor): Lateral image
             x_tab (tensor): Tabular features
         '''
-        print(f'JointEncoder.forward() with vision {self.vision}')
+        # print(f'JointEncoder.forward() with vision {self.vision}')
 
         # Generate embeddings (image and/or tabular)
         if self.vision:
             if x_pa is None or x_lat is None:
                 raise ValueError('Vision encoder is specified but no images are provided.')
-            print('Generating vision embeddings')
+            # print('Generating vision embeddings')
             vision_embedding = self.vision_encoder(x_pa, x_lat)
         if self.tabular:
             if x_tab is None:
                 raise ValueError('Tabular encoder is specified but no tabular data is provided.')
-            print('Generating tabular embeddings')
+            # print('Generating tabular embeddings')
             tabular_embedding = self.tabular_encoder(x_tab)
 
         # Concatenate embeddings
