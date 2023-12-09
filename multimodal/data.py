@@ -39,8 +39,8 @@ TABULAR_PATH = os.path.join(DATA_PATH, 'mimic-iv')
 IMAGES_PATH = os.path.join(DATA_PATH, 'mimic-cxr')
 PROCESSED_PATH = os.path.join(DATA_PATH, 'processed_data')
 
-METADATA_PATH = os.path.join(IMAGES_PATH, 'mimic-cxr-2.0.0-metadata.csv')
-LABELS_PATH = os.path.join(IMAGES_PATH, 'mimic-cxr-2.0.0-chexpert.csv')
+METADATA_PATH = os.path.join(IMAGES_PATH, 'mimic-cxr-2.0.0-metadata.csv.gz')
+LABELS_PATH = os.path.join(IMAGES_PATH, 'mimic-cxr-2.0.0-chexpert.csv.gz')
 
 TAB_PATH = os.path.join(PROCESSED_PATH, 'tab_data_total.csv')
 TAB_TRAIN_PATH = os.path.join(PROCESSED_PATH, 'tab_data_train.csv')
