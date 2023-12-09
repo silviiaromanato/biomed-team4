@@ -11,8 +11,8 @@ command:
  - ${program}
  - ${args}
 parameters:
-  tabular: 
-    value: None
+  # tabular: 
+  #   value: None
   vision: 
     value: 'resnet50' 
   hidden_dims: 
