@@ -475,7 +475,7 @@ class MultimodalDataset(Dataset):
         tabular_row = np.where(tabular_row == True, 1.0, tabular_row)
 
         # Convert to tensor, if this cannot be done throw an error and print the row
-        tabular_tensor = torch.from_numpy(tabular_row.astype(np.float))
+        tabular_tensor = torch.from_numpy(tabular_row.astype(float))
 
         # Get the paths for the PA and Lateral images
         pa_path = self.organized_paths[subject_study_pair]['PA']
