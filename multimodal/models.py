@@ -233,14 +233,6 @@ class JointEncoder(nn.Module):
             x_tab (tensor): Tabular features
         '''
         print(f'JointEncoder.forward() with vision {self.vision}')
-        if torch.any(x_pa): 
-            print(f'\tx_pa.shape={x_pa.shape}')
-        if torch.any(x_lat):
-            print(f'\tx_lat.shape={x_lat.shape}')
-        if torch.any(x_tab):
-            print(f'\tx_tab.shape={x_tab.shape}')
-        if torch.any(labels):
-            print(f'\tlabels.shape={labels.shape}')
 
         # Generate embeddings (image and/or tabular)
         if self.vision:
