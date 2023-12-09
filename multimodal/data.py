@@ -13,6 +13,7 @@ from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
 from transformers import ViTImageProcessor
 import pickle
+from tqdm import tqdm
 
 from torchvision.transforms import (
     CenterCrop,
@@ -123,7 +124,7 @@ def create_image_labels_mapping(image_files, labels_data, info_data):
     '''
     image_labels_mapping = {}
 
-    for image_path in image_files:
+    for image_path in tqdm(image_files):
         # Extract subject_id, study_id, and dicom_id from the file path
         parts = image_path.split(os.sep)
         subject_id = parts[-3][1:]  # Assuming the subject_id is prefixed with a character to be removed
