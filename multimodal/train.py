@@ -220,7 +220,8 @@ if __name__ == '__main__':
     # print whether cuda is available
     print(f'cuda: {torch.cuda.is_available()}')
     parser = argparse.ArgumentParser()
-    parser.add_argument('--tabular', type=int, action='store_true', default=0)
+    # store as boolean
+    parser.add_argument('--tabular', type=int, default=None)
     parser.add_argument('--vision', type=str, default=None)
     parser.add_argument('--hidden_dims', type=str, default=[256, 512])
     parser.add_argument('--dropout_prob', type=float, default=0.0)
