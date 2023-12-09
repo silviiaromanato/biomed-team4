@@ -162,20 +162,25 @@ def join_multimodal(labels_data, image_files, info_jpg, tab_data):
         tab_data (DataFrame): tabular data
         dict_img (dict): keys = image file paths and values = dicts with labels and ViewPosition
     '''
+    print('Join multimodal data')
     # Tabular data
+    print('Tabular data')
     tab_data.loc[:, 'study_id'] = tab_data['study_id'].astype(int).astype(str)
     tab_data.loc[:, 'subject_id'] = tab_data['subject_id'].astype(int).astype(str)
 
     # Image data
+    print('Image data')
     image_labels_mapping = create_image_labels_mapping(image_files, labels_data, info_jpg)
     df_img = pd.DataFrame.from_dict(image_labels_mapping, orient='index').reset_index()
     df_img['study_id'] = df_img['study_id'].astype(int).astype(str)
     df_img['subject_id'] = df_img['subject_id'].astype(int).astype(str)
 
     # Keep only PA and LATERAL images
+    print('Keep only PA and LATERAL images')
     df_img = df_img[df_img['ViewPosition'].isin(['PA', 'LATERAL'])]
 
     # Group by study_id and subject_id and ViewPosition and keep the first row
+    print('Group by study_id and subject_id and ViewPosition and keep the first row')
     df_img = df_img.groupby(['study_id', 'subject_id', 'ViewPosition']).first().reset_index()
 
     # Function to check if both PA and Lateral images are present
@@ -183,20 +188,24 @@ def join_multimodal(labels_data, image_files, info_jpg, tab_data):
         return 'PA' in group['ViewPosition'].values and 'LATERAL' in group['ViewPosition'].values
 
     # Filter the DataFrame
+    print('Filter the DataFrame')
     df_img = df_img.groupby(['study_id', 'subject_id']).filter(has_both_views)
 
     # Filter on study
+    print('Filter on study')
     common_data = set(tab_data['study_id']).intersection(set(df_img['study_id']))
     tab_data = tab_data[tab_data['study_id'].isin(common_data)]
     df_img = df_img[df_img['study_id'].isin(common_data)]
 
     # Filter on subject
+    print('Filter on subject')
     common_data = set(tab_data['subject_id']).intersection(set(df_img['subject_id']))
     tab_data = tab_data[tab_data['subject_id'].isin(common_data)]
     df_img = df_img[df_img['subject_id'].isin(common_data)]
     print(f'Number of samples:\tTabular: {len(tab_data)}\tImage: {len(df_img)}')
 
     # Return the image data to a dictionary
+    print('Return the image data to a dictionary')
     dict_img = df_img.set_index('index').T.to_dict()
 
     return tab_data, dict_img
@@ -543,8 +552,11 @@ def prepare_data():
 
     # Get intersection of tabular and image data
     print('Joining:\tIntersection of tabular and image data.')
+    print('Joining train data.')
     tab_data_train, image_data_train = join_multimodal(lab_train, image_files, metadata, tab_train)
+    print('Joining val data.')
     tab_data_val, image_data_val = join_multimodal(lab_val, image_files, metadata, tab_val)
+    print('Joining test data.')
     tab_data_test, image_data_test = join_multimodal(lab_test, image_files, metadata, tab_test)
     tab_data = {'train': tab_data_train, 'val': tab_data_val, 'test': tab_data_test}
     image_data = {'train': image_data_train, 'val': image_data_val, 'test': image_data_test}
