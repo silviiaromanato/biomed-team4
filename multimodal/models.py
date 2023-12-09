@@ -220,6 +220,7 @@ class JointEncoder(nn.Module):
             self.tabular_encoder = FullyConnectedNetwork(**tabular_params)
             self.dim_input += TABULAR_EMBEDDING_DIM
 
+        print(f'\tClassifier head with num_labels={num_labels} and num_classes={num_classes}')
         self.classifier = ClassifierHead(self.dim_input, 
                                          num_labels=num_labels, 
                                          num_classes=num_classes)
