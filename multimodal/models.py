@@ -47,6 +47,9 @@ class FullyConnectedLayer(nn.Module):
         self.activation = nn.ReLU() 
         
     def forward(self, x):
+        # Convert to float
+        if x.dtype != torch.float:
+            x = x.to(torch.float)
         x = self.linear(x)
         if self.batch_norm:
             x = self.batchnorm(x)
