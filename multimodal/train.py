@@ -143,7 +143,7 @@ def train(model, train_data, val_data, test_data,
         logging_steps=1,
         logging_strategy='epoch',
         run_name=run_name,
-        use_mps_device=True # MIGHT NEED TO CHANGE THIS
+        #use_mps_device=True # MIGHT NEED TO CHANGE THIS
     )
     # Train the model
     trainer = Trainer(
@@ -169,7 +169,8 @@ def grid_search(tabular=False,
                 batch_norm=True,
                 lr=0.001, 
                 num_epochs=10,
-                seed=0):
+                seed=0,
+                **kwargs):
     '''
     Grid search for radiology diagnosis using joint image-tabular encoders. 
     '''
