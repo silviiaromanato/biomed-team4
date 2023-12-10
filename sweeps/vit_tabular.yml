@@ -16,12 +16,12 @@ parameters:
   hidden_dims: 
     value: '128-256-512'
   dropout_prob: 
-    value: 0.2 
-  weight_decay:
-    value: 0.001
+    value: 0.1
+   weight_decay:
+    value: 0.0
   vision: 
     value: 'vit' 
   lr: 
-    value: 0.0001
+    value: [1e-4, 1e-5]
   num_epochs: 
     value: 10
