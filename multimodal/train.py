@@ -38,6 +38,10 @@ DATA_DIR = os.path.join(BASE_DIR, 'data')
 NUM_LABELS = 3 # Neutral, Positive, Negative
 NUM_CLASSES = 14 # Radiology diagnoses
 
+WANDB_ENTITY = 'antoinebonnet'
+WANDB_PROJECT = 'biomed-team4'
+
+
 # ---------------------------------------- W&B FUNCTIONS ---------------------------------------- #
 
 def build_group(tabular=False, 
@@ -55,11 +59,8 @@ def build_group(tabular=False,
         - vision (str): Type of vision encoder (Default: None --> No vision encoder)
         - tabular_params (dict): Parameters for tabular encoder {dim_input, hidden_dims, dropout_prob, batch_norm}
     '''
-    if tabular == 0:
-        tabular = False
-    elif tabular == 1:
-        tabular = True
-    if tabular is None and vision is None: 
+    tabular = bool(tabular)
+    if tabular is False and vision is None: 
         raise ValueError('Error in build_group: tabular and/or vision must be specified.')  
 
     run_name = 'Tabular-' if tabular else ''
@@ -73,20 +74,10 @@ def build_group(tabular=False,
     if weight_decay > 0:
         run_name += f'-wd{weight_decay}'
     
-    config = {
-        'tabular': tabular, 
-        'vision': vision, 
-        'tabular_params': tabular_params,
-        'lr': lr,
-        'weight_decay': weight_decay,
-        }
-    # Log to organization project
+    config = {'tabular': tabular, 'vision': vision, 
+              'tabular_params': tabular_params, 'lr': lr, 'weight_decay': weight_decay,}
     print(f'W&B initialization: run {run_name}')
-    wandb.init(group=run_name, 
-               config=config, 
-               project='biomed-team4', 
-               entity='silvy-romanato'
-               )
+    wandb.init(group=run_name, config=config, project=WANDB_PROJECT, entity=WANDB_ENTITY,)
     return run_name
 
 # ---------------------------------------- TRAINING FUNCTIONS ---------------------------------------- #

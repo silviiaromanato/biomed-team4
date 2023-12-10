@@ -1,4 +1,7 @@
 # Grid Search: DenseNet only
+# Default hyperparameters taken from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8189817/
+# - Number of epochs: 10
+# - Learning rate: 1e-3
 program: multimodal/train.py
 method: grid
 project: biomed-team4
@@ -20,8 +23,8 @@ parameters:
   dropout_prob: 
     value: 0.2
   lr: 
-    values: [0.0001, 0.00001]
+    values: [0.001]
   weight_decay:
-    values: [0, 0.01, 0.001]
+    values: [0.001]
   num_epochs: 
     value: 10
