@@ -20,4 +20,4 @@ parameters:
   lr: 
     values: [0.001, 0.0001, 0.00001]
   num_epochs: 
-    value: [5, 10, 20]
+    value: 10

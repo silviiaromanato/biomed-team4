@@ -162,6 +162,13 @@ def train(model, train_data, val_data, test_data,
         eval_dataset=val_data,
         compute_metrics=compute_metrics,
         data_collator=train_data.collate_fn,
+        # do early stopping with patience of 3
+        metric_for_best_model='loss',
+        greater_is_better=False,
+        # early stopping
+        early_stopping_patience=3,
+        
+
     )
 
     print('Training:\tStarting training')
