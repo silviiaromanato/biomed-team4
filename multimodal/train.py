@@ -34,13 +34,11 @@ GRID_DIR = os.path.join(BASE_DIR, 'results')
 CHECKPOINTS_DIR = os.path.join(BASE_DIR, 'checkpoints')
 DATA_DIR = os.path.join(BASE_DIR, 'data')
 
-# Constants
 NUM_LABELS = 3 # Neutral, Positive, Negative
 NUM_CLASSES = 14 # Radiology diagnoses
 
 WANDB_ENTITY = 'antoinebonnet'
-WANDB_PROJECT = 'biomed-team4'
-
+WANDB_PROJECT = 'multimodal'
 
 # ---------------------------------------- W&B FUNCTIONS ---------------------------------------- #
 
