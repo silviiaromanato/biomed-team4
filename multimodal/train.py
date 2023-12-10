@@ -14,17 +14,23 @@ from data import *
 
 # ---------------------------------------- GLOBAL VARIABLES ---------------------------------------- #
 
-CLASSES = [
-    'Atelectasis', 'Cardiomegaly', 'Consolidation', 'Edema', 
-    'Enlarged Cardiomediastinum', 'Fracture', 'Lung Lesion', 
-    'Lung Opacity', 'No Finding', 'Pleural Effusion', 
-    'Pleural Other', 'Pneumonia', 'Pneumothorax', 'Support Devices'
-    ]
+CLASS_FREQUENCIES = {
+    'Atelectasis': {0.0: 171692, 2.0: 45808, 1.0: 10327},
+    'Cardiomegaly': {0.0: 176939, 2.0: 44845, 1.0: 6043},
+    'Consolidation': {0.0: 212718, 2.0: 10778, 1.0: 4331},
+    'Edema': {0.0: 187635, 2.0: 27018, 1.0: 13174},
+    'Enlarged Cardiomediastinum': {0.0: 211273, 1.0: 9375, 2.0: 7179},
+    'Fracture': {0.0: 222882, 2.0: 4390, 1.0: 555},
+    'Lung Lesion': {0.0: 220402, 2.0: 6284, 1.0: 1141},
+    'Lung Opacity': {0.0: 172471, 2.0: 51525, 1.0: 3831},
+    'No Finding': {0.0: 152372, 2.0: 75455},
+    'Pleural Effusion': {0.0: 167713, 2.0: 54300, 1.0: 5814},
+    'Pleural Other': {0.0: 225051, 2.0: 2011, 1.0: 765},
+    'Pneumonia': {0.0: 192980, 1.0: 18291, 2.0: 16556},
+    'Pneumothorax': {0.0: 216335, 2.0: 10358, 1.0: 1134},
+    'Support Devices': {0.0: 161032, 2.0: 66558, 1.0: 237}}
 
-CLASS_FREQUENCIES = [
-    45808, 44845, 10778, 27018, 7179, 4390, 6284,
-    51525, 75455, 54300, 2011, 16556, 10358, 66558
-]
+CLASSES = list(CLASS_FREQUENCIES.keys())
 
 #os.environ['WANDB_SILENT'] = 'true'
 
@@ -104,7 +110,11 @@ def compute_metrics(eval_preds):
     ''' 
     Compares the diagnosis matrix to the ground truth. 
     Both prediction and labels are [batch_size, num_classes, num_labels] tensors.
-    Computes accuracy, precision, recall, F1 score, AUC, and average precision.
+
+    Computes the following metrics (averaged over all diseases):
+    - Balanced accuracy (average of recall for each class)
+    - Macro F1 score (average of F1 scores for each class, same weight for each class)
+    - Weighted F1 score (weighted average of F1 scores for each class, weighted by inverse class frequency)
     '''
     preds = eval_preds.predictions
     if isinstance(preds, tuple):
@@ -113,13 +123,14 @@ def compute_metrics(eval_preds):
     preds = torch.argmax(torch.tensor(preds), dim=-1)
     labels = torch.argmax(torch.tensor(labels), dim=-1)
     metrics = {}
-    for i, disease in enumerate(CLASSES):
+    for i, (disease, freqs) in enumerate(CLASS_FREQUENCIES.items()):
         metrics['acc_'+disease] = balanced_accuracy_score(labels[:, i], preds[:, i])
-        metrics['wF1_'+disease] = f1_score(labels[:, i], preds[:, i], average='weighted')
         metrics['macroF1_'+disease] = f1_score(labels[:, i], preds[:, i], average='macro')
-    metrics['acc_avg'] = np.mean([metrics['acc_'+disease] for disease in CLASSES])
-    metrics['wF1_avg'] = np.mean([metrics['wF1_'+disease] for disease in CLASSES])
-    metrics['macroF1_avg'] = np.mean([metrics['macroF1_'+disease] for disease in CLASSES])
+        f1_scores = f1_score(labels[:, i], preds[:, i], average=None)
+        metrics['wF1_'+disease] = np.average(f1_scores, weights=[1/x for x in freqs])
+    metrics['acc_avg'] = np.mean([metrics['acc_'+disease] for disease in CLASS_FREQUENCIES.keys()])
+    metrics['macroF1_avg'] = np.mean([metrics['macroF1_'+disease] for disease in CLASS_FREQUENCIES.keys()])
+    metrics['wF1_avg'] = np.mean([metrics['wF1_'+disease] for disease in CLASS_FREQUENCIES.keys()])
     return metrics
 
 
