@@ -87,7 +87,7 @@ class FullyConnectedNetwork(nn.Module):
             self.layers.append(FullyConnectedLayer(self.dims[i], self.dims[i+1], dropout_prob, batch_norm))
 
     def forward(self, x):
-        print(f'FullyConnectedNetwork.forward() with x.shape={x.shape}')
+        # print(f'FullyConnectedNetwork.forward() with x.shape={x.shape}')
         for layer in self.layers:
             x = layer(x)
         x = self.sigmoid(x)
