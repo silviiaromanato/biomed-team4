@@ -89,16 +89,14 @@ class MultimodalTrainer(Trainer):
         super().__init__(*args, **kwargs)
         self.class_weights = torch.tensor([1/x for x in CLASS_FREQUENCIES]).to(self.args.device)
 
-    def compute_loss_balanced(self, model, inputs, return_outputs=False):
+    def compute_loss(self, model, inputs, return_outputs=False):
         '''
         Computes class-balanced cross-entropy loss.
         '''
         outputs = model(**inputs)
         logits = outputs.logits
         labels = inputs['labels']
-        loss = 0.0
-        for i in range(NUM_CLASSES):
-            loss += F.cross_entropy(logits[:, i, :], labels[:, i], weight=self.class_weights[i])
+        loss = F.cross_entropy(logits, labels, weight=self.class_weights)
         return (loss, outputs) if return_outputs else loss
     
 

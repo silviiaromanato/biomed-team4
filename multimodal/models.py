@@ -47,7 +47,6 @@ class FullyConnectedLayer(nn.Module):
         self.activation = nn.ReLU() 
         
     def forward(self, x):
-        # Convert to float
         if x.dtype != torch.float:
             x = x.to(torch.float)
         x = self.linear(x)
@@ -87,7 +86,6 @@ class FullyConnectedNetwork(nn.Module):
             self.layers.append(FullyConnectedLayer(self.dims[i], self.dims[i+1], dropout_prob, batch_norm))
 
     def forward(self, x):
-        print(f'FullyConnectedNetwork.forward() with x.shape={x.shape}')
         for layer in self.layers:
             x = layer(x)
         x = self.sigmoid(x)
@@ -113,7 +111,6 @@ class ClassifierHead(nn.Module):
         self.classifier = nn.Linear(self.dim_input, self.dim_output)
 
     def forward(self, x):
-        print(f'ClassifierHead.forward() with x.shape={x.shape}')
         x = self.classifier(x)
         x = x.view(-1, self.num_classes, self.num_labels)
         x = self.softmax(x)
@@ -159,7 +156,6 @@ class DualVisionEncoder(nn.Module):
             raise ValueError(f'Vision encoder type {vision} not supported.')
 
     def forward(self, x_pa, x_lat):
-        print(f'DualVisionEncoder.forward() with vision {self.vision}, x_pa={x_pa}, x_lat={x_lat}')
         if self.vision in ['resnet50', 'densenet121']:
             features_pa = self.model_pa(x_pa)
             features_lat = self.model_lateral(x_lat)
@@ -231,26 +227,14 @@ class JointEncoder(nn.Module):
             x_lat (tensor): Lateral image
             x_tab (tensor): Tabular features
         '''
-        print(f'JointEncoder.forward() with vision {self.vision}')
-        if x_pa is not None: 
-            print(f'\tx_pa.shape={x_pa.shape}')
-        if x_lat is not None:
-            print(f'\tx_lat.shape={x_lat.shape}')
-        if x_tab is not None:
-            print(f'\tx_tab.shape={x_tab.shape}')
-        if labels is not None:
-            print(f'\tlabels.shape={labels.shape}')
-
         # Generate embeddings (image and/or tabular)
         if self.vision:
             if x_pa is None or x_lat is None:
                 raise ValueError('Vision encoder is specified but no images are provided.')
-            print('Generating vision embeddings')
             vision_embedding = self.vision_encoder(x_pa, x_lat)
         if self.tabular:
             if x_tab is None:
                 raise ValueError('Tabular encoder is specified but no tabular data is provided.')
-            print('Generating tabular embeddings')
             tabular_embedding = self.tabular_encoder(x_tab)
 
         # Concatenate embeddings
