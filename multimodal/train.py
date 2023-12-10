@@ -1,22 +1,18 @@
 '''
 Grid search for radiology diagnosis using joint image-tabular encoders. 
-
-You might need to install autoparse from GitHub using 
-pip install git+https://github.com/latorrefabian/autoparse.git
 '''
 
 import os
 import wandb
-#from autoparse import autoparse
-import torch.optim as optim
 import argparse
-from sklearn.metrics import average_precision_score, f1_score, accuracy_score, precision_score, recall_score
+from sklearn.metrics import f1_score, balanced_accuracy_score
 from transformers import TrainingArguments, Trainer
-from transformers.trainer_utils import PredictionOutput 
 
 from train import *
 from models import *
 from data import *
+
+# ---------------------------------------- GLOBAL VARIABLES ---------------------------------------- #
 
 CLASSES = [
     'Atelectasis', 'Cardiomegaly', 'Consolidation', 'Edema', 
@@ -24,8 +20,13 @@ CLASSES = [
     'Lung Opacity', 'No Finding', 'Pleural Effusion', 
     'Pleural Other', 'Pneumonia', 'Pneumothorax', 'Support Devices'
     ]
+
+CLASS_FREQUENCIES = [
+    45808, 44845, 10778, 27018, 7179, 4390, 6284,
+    51525, 75455, 54300, 2011, 16556, 10358, 66558
+]
+
 #os.environ['WANDB_SILENT'] = 'true'
-# ---------------------------------------- GLOBAL VARIABLES ---------------------------------------- #
 
 # Path to data and results directories
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -36,8 +37,6 @@ DATA_DIR = os.path.join(BASE_DIR, 'data')
 # Constants
 NUM_LABELS = 3 # Neutral, Positive, Negative
 NUM_CLASSES = 14 # Radiology diagnoses
-
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # ---------------------------------------- W&B FUNCTIONS ---------------------------------------- #
 
@@ -81,6 +80,27 @@ def build_group(tabular=False,
 
 # ---------------------------------------- TRAINING FUNCTIONS ---------------------------------------- #
 
+class MultimodalTrainer(Trainer):
+    '''
+    Custom trainer for multimodal models.
+    Overriding for class-balanced cross-entropy loss.
+    '''
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.class_weights = torch.tensor([1/x for x in CLASS_FREQUENCIES]).to(self.args.device)
+
+    def compute_loss_balanced(self, model, inputs, return_outputs=False):
+        '''
+        Computes class-balanced cross-entropy loss.
+        '''
+        outputs = model(**inputs)
+        logits = outputs.logits
+        labels = inputs['labels']
+        loss = 0.0
+        for i in range(NUM_CLASSES):
+            loss += F.cross_entropy(logits[:, i, :], labels[:, i], weight=self.class_weights[i])
+        return (loss, outputs) if return_outputs else loss
+    
 
 def compute_metrics(eval_preds): 
     ''' 
@@ -95,15 +115,22 @@ def compute_metrics(eval_preds):
     labels = eval_preds.label_ids
     preds = torch.argmax(torch.tensor(preds), dim=-1)
     labels = torch.argmax(torch.tensor(labels), dim=-1)
-    accuracies = {}
+    metrics = {}
     for i, disease in enumerate(CLASSES):
-        accuracies[disease] = accuracy_score(labels[:, i], preds[:, i])
-    accuracies['Average'] = sum(accuracies.values()) / len(accuracies)
+        metrics['acc_'+disease] = balanced_accuracy_score(labels[:, i], preds[:, i])
+        metrics['f1_'+disease] = f1_score(labels[:, i], preds[:, i], average='weighted')
+
+    # Compute average metrics
+    accuracies = [metrics['acc_'+disease] for disease in CLASSES]
+    f1_scores = [metrics['f1_'+disease] for disease in CLASSES]
+    metrics['acc_avg'] = np.mean(accuracies)
+    metrics['f1_avg'] = np.mean(f1_scores)
+    print('Metrics:', metrics)
     return accuracies
 
 
 def train(model, train_data, val_data, test_data,
-          run_name, output_dir, epochs=10, lr=1e-5, seed=0):
+          run_name, output_dir, epochs=10, lr=1e-5, weight_decay=1e-2, seed=0):
     '''
     Trains a Joint Encoder model. 
     W&B logging is enabled by default.
@@ -128,7 +155,9 @@ def train(model, train_data, val_data, test_data,
         # Training
         num_train_epochs=epochs,
         learning_rate=lr,
-        #weight_decay=0.01,
+        weight_decay=0.01,
+        adam_beta1=0.9,
+        adam_beta2=0.999,
         per_device_train_batch_size=8,
         per_device_eval_batch_size=8,
         #warmup_steps=500,
@@ -180,6 +209,7 @@ def grid_search(tabular=False,
                 dropout_prob=0.0, 
                 batch_norm=True,
                 lr=0.001, 
+                weight_decay=0.01,
                 num_epochs=10,
                 seed=0,
                 **kwargs):

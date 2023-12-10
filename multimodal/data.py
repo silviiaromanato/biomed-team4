@@ -35,7 +35,7 @@ NORM_STD = [0.3006, 0.3006, 0.3006]     # MIMIC-CXR std (based on 2GB of images)
 
 # ---------------------------------------- GLOBAL VARIABLES ---------------------------------------- #
 
-DATA_PATH = 'data/'
+DATA_PATH = '../data/'
 TABULAR_PATH = os.path.join(DATA_PATH, 'mimic-iv')
 IMAGES_PATH = os.path.join(DATA_PATH, 'mimic-cxr')
 PROCESSED_PATH = os.path.join(DATA_PATH, 'processed_data')
