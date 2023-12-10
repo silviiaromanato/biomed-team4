@@ -22,4 +22,4 @@ parameters:
   weight_decay:
     value: 0.001
   num_epochs: 
-    value: 1
+    value: 10
