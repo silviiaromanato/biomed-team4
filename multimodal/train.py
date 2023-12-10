@@ -42,7 +42,10 @@ NUM_CLASSES = 14 # Radiology diagnoses
 
 def build_group(tabular=False, 
                 vision=None, 
-                tabular_params=None): 
+                tabular_params=None,
+                lr=0.001,
+                weight_decay=0.01,
+                ): 
     '''
     W&B group configuration for grid search.
     Initializes a new run with the specified group name and hyperparameters.
@@ -65,10 +68,18 @@ def build_group(tabular=False,
         dims = '-'.join([str(x) for x in tabular_params["hidden_dims"]])
         run_name += f'{dims}'
         run_name += f'-p{tabular_params["dropout_prob"]}'
+    if lr > 0:
+        run_name += f'-lr{lr}'
+    if weight_decay > 0:
+        run_name += f'-wd{weight_decay}'
     
-    config = {'tabular': tabular, 
-              'vision': vision, 
-              'tabular_params': tabular_params}
+    config = {
+        'tabular': tabular, 
+        'vision': vision, 
+        'tabular_params': tabular_params,
+        'lr': lr,
+        'weight_decay': weight_decay,
+        }
     # Log to organization project
     print(f'W&B initialization: run {run_name}')
     wandb.init(group=run_name, 
@@ -242,7 +253,8 @@ def grid_search(tabular=False,
     #        param.requires_grad = False
 
     # Build W&B group
-    run_name = build_group(tabular=tabular, vision=vision, tabular_params=tabular_params)
+    run_name = build_group(tabular=tabular, vision=vision, tabular_params=tabular_params, 
+                            lr=lr, weight_decay=weight_decay)
 
     # Load data
     tab_data, image_data = prepare_data()
@@ -262,6 +274,7 @@ if __name__ == '__main__':
     parser.add_argument('--dropout_prob', type=float, default=0.0)
     parser.add_argument('--batch_norm', action='store_true', default=False)
     parser.add_argument('--lr', type=float, default=0.001)
+    parser.add_argument('--weight_decay', type=float, default=0.01)
     parser.add_argument('--num_epochs', type=int, default=10)
     parser.add_argument('--device', type=str, default='cpu')
     parser.add_argument('--seed', type=int, default=0)
