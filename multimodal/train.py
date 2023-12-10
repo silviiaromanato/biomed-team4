@@ -143,7 +143,6 @@ def train(model, train_data, val_data, test_data,
         load_best_model_at_end=True,
         metric_for_best_model="loss",
         greater_is_better=False,
-        early_stopping_patience=3,
 
         # W&B logging
         report_to='wandb',
@@ -163,7 +162,7 @@ def train(model, train_data, val_data, test_data,
         eval_dataset=val_data,
         compute_metrics=compute_metrics,
         data_collator=train_data.collate_fn,
-
+        callbacks = [EarlyStoppingCallback(early_stopping_patience=3)]
     )
 
     print('Training:\tStarting training')
