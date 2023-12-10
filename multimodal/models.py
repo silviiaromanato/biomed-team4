@@ -41,7 +41,7 @@ class FullyConnectedLayer(nn.Module):
         self.batch_norm = batch_norm
         self.activation = nn.ReLU()
         
-        self.linear = nn.Linear(input_dim, output_dim)
+        self.linear = nn.Linear(input_dim, output_dim, bias=True)
         self.batchnorm = nn.BatchNorm1d(output_dim)
         self.dropout = nn.Dropout(dropout_prob)
         self.activation = nn.ReLU() 
@@ -84,6 +84,8 @@ class FullyConnectedNetwork(nn.Module):
         self.layers = nn.ModuleList()
         for i in range(len(self.dims)-1):
             self.layers.append(FullyConnectedLayer(self.dims[i], self.dims[i+1], dropout_prob, batch_norm))
+            nn.init.xavier_uniform_(self.layers[i].linear.weight)
+            nn.init.zeros_(self.layers[i].linear.bias)
 
     def forward(self, x):
         for layer in self.layers:
