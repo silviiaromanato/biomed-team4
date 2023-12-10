@@ -35,7 +35,7 @@ NORM_STD = [0.3006, 0.3006, 0.3006]     # MIMIC-CXR std (based on 2GB of images)
 
 # ---------------------------------------- GLOBAL VARIABLES ---------------------------------------- #
 
-DATA_PATH = 'data/'
+DATA_PATH = '../data/'
 TABULAR_PATH = os.path.join(DATA_PATH, 'mimic-iv')
 IMAGES_PATH = os.path.join(DATA_PATH, 'mimic-cxr')
 PROCESSED_PATH = os.path.join(DATA_PATH, 'processed_data')
@@ -468,8 +468,6 @@ class MultimodalDataset(Dataset):
         tabular_row = self.tabular[(self.tabular['subject_id'] == subject_id) & 
                                 (self.tabular['study_id'] == study_id)]
         tabular_row = tabular_row.drop(['subject_id', 'study_id'], axis=1).values
-
-        # replace any False by 0 and any True by 1
         tabular_row = np.where(tabular_row == False, 0.0, tabular_row)
         tabular_row = np.where(tabular_row == True, 1.0, tabular_row)
 

@@ -117,9 +117,11 @@ def compute_metrics(eval_preds):
     metrics = {}
     for i, disease in enumerate(CLASSES):
         metrics['acc_'+disease] = balanced_accuracy_score(labels[:, i], preds[:, i])
-        metrics['f1_'+disease] = f1_score(labels[:, i], preds[:, i], average='weighted')
+        metrics['wF1_'+disease] = f1_score(labels[:, i], preds[:, i], average='weighted')
+        metrics['macroF1_'+disease] = f1_score(labels[:, i], preds[:, i], average='macro')
     metrics['acc_avg'] = np.mean([metrics['acc_'+disease] for disease in CLASSES])
-    metrics['f1_avg'] = np.mean([metrics['f1_'+disease] for disease in CLASSES])
+    metrics['wF1_avg'] = np.mean([metrics['wF1_'+disease] for disease in CLASSES])
+    metrics['macroF1_avg'] = np.mean([metrics['macroF1_'+disease] for disease in CLASSES])
     return metrics
 
 
@@ -192,10 +194,7 @@ def train(model, train_data, val_data, test_data,
     trainer.train(
         ignore_keys_for_eval=['logits']
     )
-
-    print('Evaluation:\tEvaluating model on test set')
-    eval_results = trainer.evaluate(eval_dataset=test_data)
-    return eval_results
+    return trainer
 
 def grid_search(tabular=False, 
                 vision=None, 
@@ -206,6 +205,7 @@ def grid_search(tabular=False,
                 weight_decay=0.01,
                 num_epochs=10,
                 seed=0,
+                eval=False,
                 **kwargs):
     '''
     Grid search for radiology diagnosis using joint image-tabular encoders. 
@@ -213,7 +213,7 @@ def grid_search(tabular=False,
     # Set seed
     torch.manual_seed(seed)
     np.random.seed(seed)
-    
+
     # Create model
     tabular_params = {
         'dim_input': NUM_FEATURES,
@@ -244,8 +244,13 @@ def grid_search(tabular=False,
     train_data, val_data, test_data = load_data(tab_data, image_data, vision=vision)
 
     # Train model
-    eval_results = train(model, train_data, val_data, test_data, run_name, CHECKPOINTS_DIR, epochs=num_epochs, lr=lr, seed=seed)
-    return eval_results
+    trainer = train(model, train_data, val_data, test_data, run_name, CHECKPOINTS_DIR, epochs=num_epochs, lr=lr, seed=seed)
+
+    # Evaluate model
+    if eval:
+        print('Evaluation:\tEvaluating model on test set')
+        eval_results = trainer.evaluate(eval_dataset=test_data)
+        wandb.log(eval_results)
     
 
 if __name__ == '__main__':
