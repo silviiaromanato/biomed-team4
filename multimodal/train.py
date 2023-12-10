@@ -121,14 +121,12 @@ def compute_metrics(eval_preds):
     for i, disease in enumerate(CLASSES):
         metrics['acc_'+disease] = balanced_accuracy_score(labels[:, i], preds[:, i])
         metrics['f1_'+disease] = f1_score(labels[:, i], preds[:, i], average='weighted')
-
-    # Compute average metrics
-    accuracies = [metrics['acc_'+disease] for disease in CLASSES]
-    f1_scores = [metrics['f1_'+disease] for disease in CLASSES]
-    metrics['acc_avg'] = np.mean(accuracies)
-    metrics['f1_avg'] = np.mean(f1_scores)
-    print('Metrics:', metrics)
-    return accuracies
+    metrics['acc_avg'] = np.mean([metrics['acc_'+disease] for disease in CLASSES])
+    metrics['f1_avg'] = np.mean([metrics['f1_'+disease] for disease in CLASSES])
+    print('Metrics:')
+    for key, value in metrics.items():
+        print(f'\t{key}: {value:.3f}', end=' ')
+    return metrics
 
 
 def train(model, train_data, val_data, test_data,
