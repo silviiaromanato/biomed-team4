@@ -19,7 +19,7 @@ parameters:
   vision: 
     value: 'densenet121' 
   hidden_dims: 
-    value: '128-256-512' # Tune on tabular only
+    value: '128-256-512'
   dropout_prob: 
     value: 0.2
   lr: 

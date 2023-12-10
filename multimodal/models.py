@@ -87,7 +87,7 @@ class FullyConnectedNetwork(nn.Module):
             self.layers.append(FullyConnectedLayer(self.dims[i], self.dims[i+1], dropout_prob, batch_norm))
 
     def forward(self, x):
-        # print(f'FullyConnectedNetwork.forward() with x.shape={x.shape}')
+        print(f'FullyConnectedNetwork.forward() with x.shape={x.shape}')
         for layer in self.layers:
             x = layer(x)
         x = self.sigmoid(x)
@@ -113,7 +113,7 @@ class ClassifierHead(nn.Module):
         self.classifier = nn.Linear(self.dim_input, self.dim_output)
 
     def forward(self, x):
-        # print(f'ClassifierHead.forward() with x.shape={x.shape}')
+        print(f'ClassifierHead.forward() with x.shape={x.shape}')
         x = self.classifier(x)
         x = x.view(-1, self.num_classes, self.num_labels)
         x = self.softmax(x)
@@ -159,9 +159,9 @@ class DualVisionEncoder(nn.Module):
             raise ValueError(f'Vision encoder type {vision} not supported.')
 
     def forward(self, x_pa, x_lat):
-        # print(f'DualVisionEncoder.forward() with vision {self.vision}, x_pa.shape={x_pa.shape}, x_lat.shape={x_lat.shape}')
+        print(f'DualVisionEncoder.forward() with vision {self.vision}, x_pa={x_pa}, x_lat={x_lat}')
         if self.vision in ['resnet50', 'densenet121']:
-            features_pa = self.model_pa(x_pa) # x_pa was chacked and is a on cuda!
+            features_pa = self.model_pa(x_pa)
             features_lat = self.model_lateral(x_lat)
         elif self.vision == 'vit':
             features_pa = self.model_pa(x_pa).logits
@@ -211,16 +211,15 @@ class JointEncoder(nn.Module):
             raise ValueError(f'Vision encoder type {vision} not supported.')
         print('Model initialization')
         if vision:
-            # print(f'\tVision encoder: {vision}')
+            print(f'\tVision encoder: {vision}')
             self.vision_encoder = DualVisionEncoder(vision)
             self.dim_input += IMAGE_EMBEDDING_DIM * 2
 
         if tabular:
-            # print(f'\tTabular encoder with parameters: {tabular_params}')
+            print(f'\tTabular encoder with parameters: {tabular_params}')
             self.tabular_encoder = FullyConnectedNetwork(**tabular_params)
             self.dim_input += TABULAR_EMBEDDING_DIM
 
-        # print(f'\tClassifier head with num_labels={num_labels} and num_classes={num_classes}')
         self.classifier = ClassifierHead(self.dim_input, 
                                          num_labels=num_labels, 
                                          num_classes=num_classes)
@@ -232,18 +231,26 @@ class JointEncoder(nn.Module):
             x_lat (tensor): Lateral image
             x_tab (tensor): Tabular features
         '''
-        # print(f'JointEncoder.forward() with vision {self.vision}')
+        print(f'JointEncoder.forward() with vision {self.vision}')
+        if x_pa is not None: 
+            print(f'\tx_pa.shape={x_pa.shape}')
+        if x_lat is not None:
+            print(f'\tx_lat.shape={x_lat.shape}')
+        if x_tab is not None:
+            print(f'\tx_tab.shape={x_tab.shape}')
+        if labels is not None:
+            print(f'\tlabels.shape={labels.shape}')
 
         # Generate embeddings (image and/or tabular)
         if self.vision:
             if x_pa is None or x_lat is None:
                 raise ValueError('Vision encoder is specified but no images are provided.')
-            # print('Generating vision embeddings')
+            print('Generating vision embeddings')
             vision_embedding = self.vision_encoder(x_pa, x_lat)
         if self.tabular:
             if x_tab is None:
                 raise ValueError('Tabular encoder is specified but no tabular data is provided.')
-            # print('Generating tabular embeddings')
+            print('Generating tabular embeddings')
             tabular_embedding = self.tabular_encoder(x_tab)
 
         # Concatenate embeddings

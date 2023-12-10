@@ -13,15 +13,15 @@ command:
 parameters:
   tabular: 
     value: 1
-  vision: 
-    value: 'vit' 
   hidden_dims: 
-    value: '128-256-512' # Tune on tabular only
+    value: '128-256-512'
   dropout_prob: 
-    value: 0.2
-  lr: 
-    value: 0.0001
+    value: 0.2 
   weight_decay:
     value: 0.001
+  vision: 
+    value: 'vit' 
+  lr: 
+    value: 0.0001
   num_epochs: 
     value: 10

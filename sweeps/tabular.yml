@@ -14,11 +14,11 @@ parameters:
   tabular: 
     value: 1
   hidden_dims: 
-    values: ['512', '256-512', '128-256-512']
+    values: ['128-256-512']
   dropout_prob: 
     values: [0, 0.1, 0.2]
   lr: 
-    values: [.01, 0.001, 0.0001]
+    values: [.001, .0001, .00001]
   weight_decay:
     values: [0, 0.1, 0.01, 0.001]
   num_epochs: 

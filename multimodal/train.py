@@ -125,8 +125,9 @@ def compute_metrics(eval_preds):
     return metrics
 
 
-def train(model, train_data, val_data, test_data,
-          run_name, output_dir, epochs=10, lr=1e-5, weight_decay=1e-2, seed=0):
+def create_trainer(model, train_data, val_data,
+          run_name, output_dir, epochs=10, lr=1e-5, 
+          weight_decay=1e-2, seed=0):
     '''
     Trains a Joint Encoder model. 
     W&B logging is enabled by default.
@@ -151,11 +152,11 @@ def train(model, train_data, val_data, test_data,
         # Training
         num_train_epochs=epochs,
         learning_rate=lr,
-        weight_decay=0.01,
+        weight_decay=weight_decay,
         adam_beta1=0.9,
         adam_beta2=0.999,
-        per_device_train_batch_size=16,
-        per_device_eval_batch_size=16,
+        per_device_train_batch_size=32,
+        per_device_eval_batch_size=32,
         #warmup_steps=500,
         dataloader_num_workers=0, # MIGHT NEED TO CHANGE THIS
         seed=seed,
@@ -188,11 +189,6 @@ def train(model, train_data, val_data, test_data,
         compute_metrics=compute_metrics,
         data_collator=train_data.collate_fn,
         callbacks = [EarlyStoppingCallback(early_stopping_patience=3)]
-    )
-
-    print('Training:\tStarting training')
-    trainer.train(
-        ignore_keys_for_eval=['logits']
     )
     return trainer
 
@@ -244,7 +240,9 @@ def grid_search(tabular=False,
     train_data, val_data, test_data = load_data(tab_data, image_data, vision=vision)
 
     # Train model
-    trainer = train(model, train_data, val_data, test_data, run_name, CHECKPOINTS_DIR, epochs=num_epochs, lr=lr, seed=seed)
+    trainer = create_trainer(model, train_data, val_data, run_name, CHECKPOINTS_DIR, epochs=num_epochs, lr=lr, seed=seed)
+    print('Training:\tStarting training')
+    trainer.train(ignore_keys_for_eval=['logits'])
 
     # Evaluate model
     if eval:

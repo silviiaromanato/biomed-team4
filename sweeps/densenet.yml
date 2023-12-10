@@ -14,17 +14,9 @@ command:
  - ${program}
  - ${args}
 parameters:
-  tabular: 
-    value: 0
   vision: 
     value: 'densenet121' 
-  hidden_dims: 
-    value: '256-512' # Tune on tabular only
-  dropout_prob: 
-    value: 0.2
   lr: 
-    values: [0.001]
-  weight_decay:
     values: [0.001]
   num_epochs: 
     value: 10
