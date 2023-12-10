@@ -188,7 +188,7 @@ def create_trainer(model, train_data, val_data,
         eval_dataset=val_data,
         compute_metrics=compute_metrics,
         data_collator=train_data.collate_fn,
-        callbacks = [EarlyStoppingCallback(early_stopping_patience=3)]
+        callbacks = [EarlyStoppingCallback(early_stopping_patience=5)]
     )
     return trainer
 
@@ -201,8 +201,8 @@ def grid_search(tabular=False,
                 weight_decay=0.01,
                 num_epochs=10,
                 seed=0,
-                eval=False,
-                **kwargs):
+                eval=False
+                ):
     '''
     Grid search for radiology diagnosis using joint image-tabular encoders. 
     '''
@@ -253,16 +253,14 @@ def grid_search(tabular=False,
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    # store as boolean
     parser.add_argument('--tabular', type=int, default=None)
     parser.add_argument('--vision', type=str, default=None)
     parser.add_argument('--hidden_dims', type=str, default=[256, 512])
     parser.add_argument('--dropout_prob', type=float, default=0.0)
     parser.add_argument('--batch_norm', action='store_true', default=False)
     parser.add_argument('--lr', type=float, default=0.001)
-    parser.add_argument('--weight_decay', type=float, default=0.01)
+    parser.add_argument('--weight_decay', type=float, default=0.0)
     parser.add_argument('--num_epochs', type=int, default=10)
-    parser.add_argument('--device', type=str, default='cpu')
     parser.add_argument('--seed', type=int, default=0)
     args = parser.parse_args()
 
@@ -271,7 +269,6 @@ if __name__ == '__main__':
 
     print(f'Cuda is available: {torch.cuda.is_available()}')
 
-    #kwargs = autoparse(grid_search, verbose=False)
     grid_search(**vars(args))
     
     

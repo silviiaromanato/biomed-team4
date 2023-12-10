@@ -14,7 +14,7 @@ parameters:
   tabular: 
     value: 1
   hidden_dims: 
-    values: ['128-256-512']
+    values: ['512', '256-512', '128-256-512']
   dropout_prob: 
     values: [0, 0.1, 0.2]
   lr: 
