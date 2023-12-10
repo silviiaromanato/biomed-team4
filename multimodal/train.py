@@ -108,7 +108,6 @@ def compute_metrics(eval_preds):
     Both prediction and labels are [batch_size, num_classes, num_labels] tensors.
     Computes accuracy, precision, recall, F1 score, AUC, and average precision.
     '''
-    print('Computing metrics')
     preds = eval_preds.predictions
     if isinstance(preds, tuple):
         preds = preds[0]
@@ -121,9 +120,6 @@ def compute_metrics(eval_preds):
         metrics['f1_'+disease] = f1_score(labels[:, i], preds[:, i], average='weighted')
     metrics['acc_avg'] = np.mean([metrics['acc_'+disease] for disease in CLASSES])
     metrics['f1_avg'] = np.mean([metrics['f1_'+disease] for disease in CLASSES])
-    print('Metrics:')
-    for key, value in metrics.items():
-        print(f'\t{key}: {value:.3f}', end=' ')
     return metrics
 
 
@@ -214,10 +210,10 @@ def grid_search(tabular=False,
     '''
     Grid search for radiology diagnosis using joint image-tabular encoders. 
     '''
-    # Set seed
+    # Set seed
     torch.manual_seed(seed)
     np.random.seed(seed)
-
+    
     # Create model
     tabular_params = {
         'dim_input': NUM_FEATURES,

@@ -456,10 +456,10 @@ class MultimodalDataset(Dataset):
         return image
 
     def __getitem__(self, idx):
+
         if idx >= len(self.organized_paths):
             raise IndexError(f"Index {idx} out of range. Dataset has {len(self.organized_paths)} samples.")
         
-
         # Get the subject_id and study_id for this index
         subject_study_pair = list(self.organized_paths.keys())[idx]
 
@@ -467,7 +467,6 @@ class MultimodalDataset(Dataset):
         subject_id, study_id = subject_study_pair
         tabular_row = self.tabular[(self.tabular['subject_id'] == subject_id) & 
                                 (self.tabular['study_id'] == study_id)]
-
         tabular_row = tabular_row.drop(['subject_id', 'study_id'], axis=1).values
 
         # replace any False by 0 and any True by 1

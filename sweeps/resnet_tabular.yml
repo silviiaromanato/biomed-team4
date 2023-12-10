@@ -21,7 +21,7 @@ parameters:
   vision: 
     value: 'densenet121' 
   hidden_dims: 
-    value: '256-512'
+    value: '128-256-512'
   dropout_prob: 
     value: 0.2
   lr: 
