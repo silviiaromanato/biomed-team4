@@ -167,24 +167,24 @@ def create_trainer(model, train_data, val_data,
     model.to(device)
     print(f'Moving model to device: {device}')
 
-    print('Training:\tInitializing optimizers')
-    optimizers = []
-    if model.tabular: 
-        # Make an optimizer for tabular encoder and classifier
-        tab_optimizer = torch.optim.AdamW(
-            [{'params': model.tabular_encoder.parameters()},
-             {'params': model.classifier.parameters()}],
-            weight_decay=0.01,  # Tuned on tabular only
-            lr=1e-3,            # Tuned on tabular only  
-        )
-        optimizers.append(tab_optimizer)
-    if model.vision:
-        vision_optimizer = torch.optim.AdamW(
-            model.vision_encoder.parameters(),
-            lr=lr,
-            weight_decay=weight_decay,
-        )
-        optimizers.append(vision_optimizer)
+    #print('Training:\tInitializing optimizers')
+    #optimizers = []
+    #if model.tabular: 
+    #    # Make an optimizer for tabular encoder and classifier
+    #    tab_optimizer = torch.optim.AdamW(
+    #        [{'params': model.tabular_encoder.parameters()},
+    #         {'params': model.classifier.parameters()}],
+    #        weight_decay=0.01,  # Tuned on tabular only
+    #        lr=1e-3,            # Tuned on tabular only  
+    #    )
+    #    optimizers.append(tab_optimizer)
+    #if model.vision:
+    #    vision_optimizer = torch.optim.AdamW(
+    #        model.vision_encoder.parameters(),
+    #        lr=lr,
+    #        weight_decay=weight_decay,
+    #    )
+    #    optimizers.append(vision_optimizer)
 
     print('Training:\tInitializing training arguments')
     training_args = TrainingArguments(
@@ -229,7 +229,6 @@ def create_trainer(model, train_data, val_data,
         compute_metrics=compute_metrics,
         data_collator=train_data.collate_fn,
         callbacks = [EarlyStoppingCallback(early_stopping_patience=5)],
-        optimizers=optimizers,
     )
     return trainer
 
