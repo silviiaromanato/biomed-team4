@@ -126,14 +126,14 @@ def compute_metrics(eval_preds):
     for i, (disease, freqs) in enumerate(CLASS_FREQUENCIES.items()):
         metrics['acc_'+disease] = balanced_accuracy_score(labels[:, i], preds[:, i])
         metrics['macroF1_'+disease] = f1_score(labels[:, i], preds[:, i], average='macro')
-        f1_scores = f1_score(labels[:, i], preds[:, i], average=None)
-        # weight by inverse class frequency, freqs is a dictionary {class: frequency}
-        print('The f1 scores are: ', f1_scores)
-        print('The freqs are: ', freqs)
-        metrics['wF1_'+disease] = np.average(f1_scores, weights=[1/freqs[x] for x in range(len(freqs))])
+        print('The labels are: ', labels[:, i], 'The preds are: ', preds[:, i])
+        # f1_scores = f1_score(labels[:, i], preds[:, i], average=None)
+        # print('The f1 scores are: ', f1_scores)
+        # print('The freqs are: ', freqs)
+        # metrics['wF1_'+disease] = np.average(f1_scores, weights=[1/freqs[x] for x in range(len(freqs))])
     metrics['acc_avg'] = np.mean([metrics['acc_'+disease] for disease in CLASS_FREQUENCIES.keys()])
     metrics['macroF1_avg'] = np.mean([metrics['macroF1_'+disease] for disease in CLASS_FREQUENCIES.keys()])
-    metrics['wF1_avg'] = np.mean([metrics['wF1_'+disease] for disease in CLASS_FREQUENCIES.keys()])
+    # metrics['wF1_avg'] = np.mean([metrics['wF1_'+disease] for disease in CLASS_FREQUENCIES.keys()])
     return metrics
 
 
@@ -175,9 +175,8 @@ def create_trainer(model, train_data, val_data,
 
         # Evaluation & checkpointing
         output_dir=output_dir,
-        eval_steps=1,
-        evaluation_strategy="steps",
-        save_strategy="steps",
+        evaluation_strategy="epoch",
+        save_strategy="epoch",
         save_total_limit=1,
         load_best_model_at_end=True,
         metric_for_best_model="loss",
