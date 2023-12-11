@@ -17,6 +17,6 @@ parameters:
   vision: 
     value: 'densenet121' 
   lr: 
-    values: [1e-3] 
+    values: [1e-3, 1e-4] 
   num_epochs: 
     value: 10
