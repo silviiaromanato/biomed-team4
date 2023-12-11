@@ -107,7 +107,7 @@ class MultimodalTrainer(Trainer):
         '''
         outputs = model(**inputs)
         logits = outputs['logits']
-        labels = inputs['labels'].to(logits.device)
+        labels = inputs['labels']
         loss = F.cross_entropy(
             logits.permute(0, 2, 1),
             labels.permute(0, 2, 1),
@@ -135,7 +135,10 @@ def compute_metrics(eval_preds):
     for i, (disease, freqs) in enumerate(CLASS_FREQUENCIES.items()):
         metrics['acc_'+disease] = balanced_accuracy_score(labels[:, i], preds[:, i])
         metrics['macroF1_'+disease] = f1_score(labels[:, i], preds[:, i], average='macro')
-        metrics['wF1_'+disease] = f1_score(labels[:, i], preds[:, i], average='weighted', sample_weight=CLASS_WEIGHTS)
+        inv_freqs = np.array([0 if x == 0 else 1/x for x in freqs.values()])
+        inv_freqs = inv_freqs / inv_freqs.sum()
+        metrics['wF1_'+disease] = f1_score(
+            labels[:, i], preds[:, i], average='weighted', sample_weight=inv_freqs[labels[:, i]])
     metrics['acc_avg'] = np.mean([metrics['acc_'+disease] for disease in CLASS_FREQUENCIES.keys()])
     metrics['macroF1_avg'] = np.mean([metrics['macroF1_'+disease] for disease in CLASS_FREQUENCIES.keys()])
     metrics['wF1_avg'] = np.mean([metrics['wF1_'+disease] for disease in CLASS_FREQUENCIES.keys()])
