@@ -128,6 +128,8 @@ def compute_metrics(eval_preds):
         metrics['macroF1_'+disease] = f1_score(labels[:, i], preds[:, i], average='macro')
         f1_scores = f1_score(labels[:, i], preds[:, i], average=None)
         # weight by inverse class frequency, freqs is a dictionary {class: frequency}
+        print('The f1 scores are: ', f1_scores)
+        print('The freqs are: ', freqs)
         metrics['wF1_'+disease] = np.average(f1_scores, weights=[1/freqs[x] for x in range(len(freqs))])
     metrics['acc_avg'] = np.mean([metrics['acc_'+disease] for disease in CLASS_FREQUENCIES.keys()])
     metrics['macroF1_avg'] = np.mean([metrics['macroF1_'+disease] for disease in CLASS_FREQUENCIES.keys()])
@@ -173,7 +175,8 @@ def create_trainer(model, train_data, val_data,
 
         # Evaluation & checkpointing
         output_dir=output_dir,
-        evaluation_strategy="batch",
+        eval_steps=1,
+        evaluation_strategy="steps",
         save_strategy="epoch",
         save_total_limit=1,
         load_best_model_at_end=True,
