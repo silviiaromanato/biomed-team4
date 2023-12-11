@@ -31,6 +31,7 @@ CLASS_FREQUENCIES = {
     'Support Devices': {0.0: 161032, 2.0: 66558, 1.0: 237}}
 
 CLASSES = list(CLASS_FREQUENCIES.keys())
+batch_size = 8
 
 #os.environ['WANDB_SILENT'] = 'true'
 
@@ -167,8 +168,8 @@ def create_trainer(model, train_data, val_data,
         weight_decay=weight_decay,
         adam_beta1=0.9,
         adam_beta2=0.999,
-        per_device_train_batch_size=16,
-        per_device_eval_batch_size=16,
+        per_device_train_batch_size=batch_size,
+        per_device_eval_batch_size=batch_size,
         #warmup_steps=500,
         dataloader_num_workers=0, # MIGHT NEED TO CHANGE THIS
         seed=seed,
