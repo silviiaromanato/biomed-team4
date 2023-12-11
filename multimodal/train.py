@@ -178,7 +178,7 @@ def create_trainer(model, train_data, val_data,
             lr=1e-3,            # Tuned on tabular only  
         )
         optimizers.append(tab_optimizer)
-    if model.vision_encoder:
+    if model.vision:
         vision_optimizer = torch.optim.AdamW(
             model.vision_encoder.parameters(),
             lr=lr,
