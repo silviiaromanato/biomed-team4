@@ -163,13 +163,14 @@ def create_trainer(model, train_data, val_data,
     tab_optimizer = torch.optim.AdamW(
         [{'params': model.train_encoder.parameters()},
          {'params': model.classifier.parameters()}],
-        weight_decay=weight_decay,
-        lr=1e-3 # Fine-tuned on tabular only
+        weight_decay=0.01,  # Fine-tuned on tabular only
+        lr=1e-3             # Fine-tuned on tabular only
     )
     if model.vision_encoder:
         vision_optimizer = torch.optim.AdamW(
             model.vision_encoder.parameters(),
-            lr=lr, weight_decay=weight_decay
+            lr=lr, 
+            weight_decay=weight_decay
         )
         optimizer = (tab_optimizer, vision_optimizer)
     else:
