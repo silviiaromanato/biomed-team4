@@ -16,10 +16,10 @@ parameters:
   hidden_dims: 
     values: ['512', '256-512', '128-256-512']
   dropout_prob: 
-    values: [0, 0.1, 0.2]
+    values: [0, 0.1]
   lr: 
-    values: [.001, .0001, .00001]
+    values: [.01, .001, .0001]
   weight_decay:
-    values: [0, 0.1, 0.01, 0.001]
+    values: [0, 0.01]
   num_epochs: 
     value: 20

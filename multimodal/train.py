@@ -107,11 +107,11 @@ class MultimodalTrainer(Trainer):
         '''
         outputs = model(**inputs)
         logits = outputs['logits']
-        labels = inputs['labels']
+        labels = inputs['labels'].to(logits.device)
         loss = F.cross_entropy(
             logits.permute(0, 2, 1),
             labels.permute(0, 2, 1),
-            weight=self.class_weights)
+            weight=self.class_weights.to(logits.device))
         return (loss, outputs) if return_outputs else loss
     
 
