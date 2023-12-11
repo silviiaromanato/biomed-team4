@@ -31,6 +31,9 @@ CLASS_FREQUENCIES = {
     'Support Devices': {0.0: 161032, 2.0: 66558, 1.0: 237}
     }
 
+FREQUENCIES = [0.84384047, 0.1326398 , 0.02351973]
+CLASS_WEIGHTS = torch.tensor([1.185058118257697, 6.403707815765645, 6.403707815765645])
+
 CLASSES = list(CLASS_FREQUENCIES.keys())
 batch_size = 8
 
@@ -95,15 +98,7 @@ class MultimodalTrainer(Trainer):
     '''
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.class_weights = []
-        for disease in CLASS_FREQUENCIES:
-            freqs = CLASS_FREQUENCIES[disease]
-            negative = freqs[0.0]
-            pos_neutral = freqs[1.0] + freqs[2.0]
-            weights = [1/negative, 1/pos_neutral, 1/pos_neutral]
-            self.class_weights.append(weights)
-        self.class_weights = torch.tensor(self.class_weights).to(self.args.device)
-
+        self.class_weights = CLASS_WEIGHTS
 
     def compute_loss(self, model, inputs, return_outputs=False):
         '''
@@ -113,8 +108,10 @@ class MultimodalTrainer(Trainer):
         logits = outputs['logits']
         labels = inputs['labels']
         loss = 0
-        for i in range(logits.shape[1]):
-            loss += F.cross_entropy(logits[:, i, :], labels[:, i, :], weight=self.class_weights[i, :], reduction='mean')
+        loss = F.cross_entropy(
+            logits.permute(0, 2, 1),
+            labels.permute(0, 2, 1),
+            weight=self.class_weights)
         return (loss, outputs) if return_outputs else loss
     
 
@@ -138,10 +135,7 @@ def compute_metrics(eval_preds):
     for i, (disease, freqs) in enumerate(CLASS_FREQUENCIES.items()):
         metrics['acc_'+disease] = balanced_accuracy_score(labels[:, i], preds[:, i])
         metrics['macroF1_'+disease] = f1_score(labels[:, i], preds[:, i], average='macro')
-        inv_freqs = np.array([0 if x == 0 else 1/x for x in freqs.values()])
-        inv_freqs = inv_freqs / inv_freqs.sum()
-        metrics['wF1_'+disease] = f1_score(
-            labels[:, i], preds[:, i], average='weighted', sample_weight=inv_freqs[labels[:, i]])
+        metrics['wF1_'+disease] = f1_score(labels[:, i], preds[:, i], average='weighted', sample_weight=CLASS_WEIGHTS)
     metrics['acc_avg'] = np.mean([metrics['acc_'+disease] for disease in CLASS_FREQUENCIES.keys()])
     metrics['macroF1_avg'] = np.mean([metrics['macroF1_'+disease] for disease in CLASS_FREQUENCIES.keys()])
     metrics['wF1_avg'] = np.mean([metrics['wF1_'+disease] for disease in CLASS_FREQUENCIES.keys()])
@@ -205,8 +199,9 @@ def create_trainer(model, train_data, val_data,
 
         # Evaluation & checkpointing
         output_dir=output_dir,
-        evaluation_strategy="epoch",
-        save_strategy="epoch",
+        evaluation_strategy="steps",
+        eval_steps=5,
+        save_strategy="steps",
         save_total_limit=1,
         load_best_model_at_end=True,
         metric_for_best_model="loss",
