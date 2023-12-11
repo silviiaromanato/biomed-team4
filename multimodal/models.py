@@ -136,15 +136,15 @@ class DualVisionEncoder(nn.Module):
             self.model_pa = models.resnet50(weights=ResNet50_Weights.DEFAULT)
             self.model_lateral = models.resnet50(weights=ResNet50_Weights.DEFAULT)
             self.num_features = self.model_pa.fc.in_features # 2048
-            self.model_pa.fc = nn.Linear(self.num_features, IMAGE_EMBEDDING_DIM)
-            self.model_lateral.fc = nn.Linear(self.num_features, IMAGE_EMBEDDING_DIM)
+            #self.model_pa.fc = nn.Linear(self.num_features, IMAGE_EMBEDDING_DIM)
+            #self.model_lateral.fc = nn.Linear(self.num_features, IMAGE_EMBEDDING_DIM)
 
         elif vision == 'densenet121':
             self.model_pa = models.densenet121(weights=DenseNet121_Weights.IMAGENET1K_V1)
             self.model_lateral = models.densenet121(weights=DenseNet121_Weights.IMAGENET1K_V1)
             self.num_features = self.model_pa.classifier.in_features # 1024
-            self.model_pa.classifier = nn.Linear(self.num_features, IMAGE_EMBEDDING_DIM)
-            self.model_lateral.classifier = nn.Linear(self.num_features, IMAGE_EMBEDDING_DIM)
+            #self.model_pa.classifier = nn.Linear(self.num_features, IMAGE_EMBEDDING_DIM)
+            #self.model_lateral.classifier = nn.Linear(self.num_features, IMAGE_EMBEDDING_DIM)
 
         elif vision == 'vit': 
             self.model_pa = ViTForImageClassification.from_pretrained(
@@ -152,8 +152,8 @@ class DualVisionEncoder(nn.Module):
             self.model_lateral = ViTForImageClassification.from_pretrained(
                 'google/vit-large-patch32-384', image_size=384, patch_size=32, ignore_mismatched_sizes=True)
             self.num_features = self.model_pa.classifier.in_features # 1024
-            self.model_pa.classifier = nn.Linear(self.num_features, IMAGE_EMBEDDING_DIM)
-            self.model_lateral.classifier = nn.Linear(self.num_features, IMAGE_EMBEDDING_DIM)
+            #self.model_pa.classifier = nn.Linear(self.num_features, IMAGE_EMBEDDING_DIM)
+            #self.model_lateral.classifier = nn.Linear(self.num_features, IMAGE_EMBEDDING_DIM)
         else: 
             raise ValueError(f'Vision encoder type {vision} not supported.')
 
@@ -208,19 +208,24 @@ class JointEncoder(nn.Module):
         if vision and vision not in ['resnet50', 'densenet121', 'vit']:
             raise ValueError(f'Vision encoder type {vision} not supported.')
         print('Model initialization')
+        num_params = 0
         if vision:
             print(f'\tVision encoder: {vision}')
             self.vision_encoder = DualVisionEncoder(vision)
             self.dim_input += IMAGE_EMBEDDING_DIM * 2
+            num_params += sum(p.numel() for p in self.vision_encoder.parameters())
 
         if tabular:
             print(f'\tTabular encoder with parameters: {tabular_params}')
             self.tabular_encoder = FullyConnectedNetwork(**tabular_params)
             self.dim_input += TABULAR_EMBEDDING_DIM
-
+            num_params += sum(p.numel() for p in self.tabular_encoder.parameters())
+        
         self.classifier = ClassifierHead(self.dim_input, 
                                          num_labels=num_labels, 
                                          num_classes=num_classes)
+        num_params += sum(p.numel() for p in self.classifier.parameters())
+        print('Total number of parameters:', num_params)
 
     def forward(self, x_pa=None, x_lat=None, x_tab=None, labels=None):
         '''
