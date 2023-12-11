@@ -549,13 +549,17 @@ def prepare_data():
     print('Loading:\tImage data (labels, files, metadata).')
     labels_data, image_files, metadata = load_images_data()
 
+
     # Get intersection of tabular and image data
     print('\tCreating image labels mapping.')
-    image_labels_mapping = create_image_labels_mapping(image_files, labels_data, metadata)
+    image_labels_mapping_test = create_image_labels_mapping(image_files, lab_test, metadata)
+    image_labels_mapping_val = create_image_labels_mapping(image_files, lab_val, metadata)
+    image_labels_mapping_train = create_image_labels_mapping(image_files, lab_train, metadata)
+
     print('Joining:\tIntersection of tabular and image data.')
-    tab_data_train, image_data_train = join_multimodal(image_labels_mapping, tab_train)
-    tab_data_val, image_data_val = join_multimodal(image_labels_mapping, tab_val)
-    tab_data_test, image_data_test = join_multimodal(image_labels_mapping, tab_test)
+    tab_data_train, image_data_train = join_multimodal(image_labels_mapping_train, tab_train)
+    tab_data_val, image_data_val = join_multimodal(image_labels_mapping_val, tab_val)
+    tab_data_test, image_data_test = join_multimodal(image_labels_mapping_test, tab_test)
     tab_data = {'train': tab_data_train, 'val': tab_data_val, 'test': tab_data_test}
     image_data = {'train': image_data_train, 'val': image_data_val, 'test': image_data_test}
 
