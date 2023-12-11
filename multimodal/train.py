@@ -45,8 +45,9 @@ GRID_DIR = os.path.join(BASE_DIR, 'results')
 CHECKPOINTS_DIR = os.path.join(BASE_DIR, 'checkpoints')
 DATA_DIR = os.path.join(BASE_DIR, 'data')
 
-NUM_LABELS = 3 # Neutral, Positive, Negative
-NUM_CLASSES = 14 # Radiology diagnoses
+NUM_FEATURES = 87   # Tabular features
+NUM_LABELS = 3      # Neutral, Positive, Negative
+NUM_CLASSES = 14    # Radiology diagnoses
 
 WANDB_ENTITY = 'antoinebonnet'
 WANDB_PROJECT = 'multimodal'
