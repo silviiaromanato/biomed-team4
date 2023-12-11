@@ -113,8 +113,9 @@ class MultimodalTrainer(Trainer):
         logits = outputs['logits']
         labels = inputs['labels']
         loss = 0
-        for i in range(len(CLASSES)):
-            loss += F.cross_entropy(logits[:, i, :], labels[:, i], weight=self.class_weights[i], reduction='mean')
+        for i in range(logits.shape[1]):
+            loss += F.cross_entropy(logits[:, i, :], labels[:, i, :], weight=self.class_weights[i, :], reduction='mean')
+        loss = F.cross_entropy(logits, labels, weight=self.class_weights, reduction='mean')
         return (loss, outputs) if return_outputs else loss
     
 
