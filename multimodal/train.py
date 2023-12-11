@@ -23,12 +23,13 @@ CLASS_FREQUENCIES = {
     'Fracture': {0.0: 222882, 2.0: 4390, 1.0: 555},
     'Lung Lesion': {0.0: 220402, 2.0: 6284, 1.0: 1141},
     'Lung Opacity': {0.0: 172471, 2.0: 51525, 1.0: 3831},
-    'No Finding': {0.0: 152372, 2.0: 75455, 1.0: 0.00001},
+    'No Finding': {0.0: 152372, 2.0: 75455, 1.0: 0},
     'Pleural Effusion': {0.0: 167713, 2.0: 54300, 1.0: 5814},
     'Pleural Other': {0.0: 225051, 2.0: 2011, 1.0: 765},
     'Pneumonia': {0.0: 192980, 1.0: 18291, 2.0: 16556},
     'Pneumothorax': {0.0: 216335, 2.0: 10358, 1.0: 1134},
-    'Support Devices': {0.0: 161032, 2.0: 66558, 1.0: 237}}
+    'Support Devices': {0.0: 161032, 2.0: 66558, 1.0: 237}
+    }
 
 CLASSES = list(CLASS_FREQUENCIES.keys())
 batch_size = 8
@@ -94,7 +95,15 @@ class MultimodalTrainer(Trainer):
     '''
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.class_weights = torch.tensor([1/x for x in CLASS_FREQUENCIES]).to(self.args.device)
+        self.class_weights = []
+        for disease in CLASS_FREQUENCIES:
+            freqs = CLASS_FREQUENCIES[disease]
+            negative = freqs[0.0]
+            pos_neutral = freqs[1.0] + freqs[2.0]
+            weights = [1/negative, 1/pos_neutral, 1/pos_neutral]
+            self.class_weights.append(weights)
+        self.class_weights = torch.tensor(self.class_weights).to(self.args.device)
+
 
     def compute_loss(self, model, inputs, return_outputs=False):
         '''
@@ -103,7 +112,9 @@ class MultimodalTrainer(Trainer):
         outputs = model(**inputs)
         logits = outputs.logits
         labels = inputs['labels']
-        loss = F.cross_entropy(logits, labels, weight=self.class_weights)
+        loss = 0
+        for i in range(len(CLASSES)):
+            loss += F.cross_entropy(logits[:, i, :], labels[:, i], weight=self.class_weights[i], reduction='mean')
         return (loss, outputs) if return_outputs else loss
     
 
@@ -127,14 +138,11 @@ def compute_metrics(eval_preds):
     for i, (disease, freqs) in enumerate(CLASS_FREQUENCIES.items()):
         metrics['acc_'+disease] = balanced_accuracy_score(labels[:, i], preds[:, i])
         metrics['macroF1_'+disease] = f1_score(labels[:, i], preds[:, i], average='macro')
-        print('The labels are: ', labels[:, i], 'The preds are: ', preds[:, i])
-        # f1_scores = f1_score(labels[:, i], preds[:, i], average=None)
-        # print('The f1 scores are: ', f1_scores)
-        # print('The freqs are: ', freqs)
-        # metrics['wF1_'+disease] = np.average(f1_scores, weights=[1/freqs[x] for x in range(len(freqs))])
+        f1_scores = f1_score(labels[:, i], preds[:, i], average=None)
+        metrics['wF1_'+disease] = np.average(f1_scores, weights=[1/freqs[x] for x in range(len(freqs))])
     metrics['acc_avg'] = np.mean([metrics['acc_'+disease] for disease in CLASS_FREQUENCIES.keys()])
     metrics['macroF1_avg'] = np.mean([metrics['macroF1_'+disease] for disease in CLASS_FREQUENCIES.keys()])
-    # metrics['wF1_avg'] = np.mean([metrics['wF1_'+disease] for disease in CLASS_FREQUENCIES.keys()])
+    metrics['wF1_avg'] = np.mean([metrics['wF1_'+disease] for disease in CLASS_FREQUENCIES.keys()])
     return metrics
 
 
@@ -210,8 +218,8 @@ def create_trainer(model, train_data, val_data,
         #use_mps_device=True # MIGHT NEED TO CHANGE THIS
     )
 
-    print('Training:\tInitializing trainer')
-    trainer = Trainer(
+    print('Training:\tInitializing MultimodalTrainer')
+    trainer = MultimodalTrainer(
         model=model,
         args=training_args,
         train_dataset=train_data,
