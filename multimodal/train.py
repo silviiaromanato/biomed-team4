@@ -210,9 +210,8 @@ def create_trainer(model, train_data, val_data,
 
         # Evaluation & checkpointing
         output_dir=output_dir,
-        evaluation_strategy="steps",
-        eval_steps=1,
-        save_strategy="steps",
+        evaluation_strategy="epoch",
+        save_strategy="epoch",
         save_total_limit=1,
         load_best_model_at_end=True,
         metric_for_best_model="loss",
