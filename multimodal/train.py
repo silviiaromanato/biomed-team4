@@ -118,6 +118,7 @@ def weighted_F1(preds, labels):
     '''
     # Compute inverse frequency in the labels
     weights = np.array([])
+    
     for i in range(NUM_LABELS):
         freq = np.sum(np.where(labels == i, 1, 0))
         inv_freq = 0 if freq == 0 else 1/freq
@@ -126,6 +127,13 @@ def weighted_F1(preds, labels):
 
     # Compute F1 score for each class and return weighted average
     f1s = f1_score(labels, preds, average=None)
+
+    # check if length f1s is equal to weights
+    if len(f1s) != len(weights):
+        # at the position where weights is 0, insert a 0 in f1s
+        for i in range(len(weights)):
+            if weights[i] == 0:
+                f1s = np.insert(f1s, i, 0)
     weighted_f1 = np.sum(f1s * weights)
     return weighted_f1
 
