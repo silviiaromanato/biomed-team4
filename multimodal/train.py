@@ -6,8 +6,7 @@ import os
 import wandb
 import argparse
 from sklearn.metrics import f1_score, balanced_accuracy_score
-from transformers import TrainingArguments, Trainer
-
+from transformers import TrainingArguments, Trainer, get_linear_schedule_with_warmup
 from train import *
 from models import *
 from data import *
@@ -35,7 +34,6 @@ FREQUENCIES = [0.84384047, 0.1326398 , 0.02351973]
 CLASS_WEIGHTS = torch.tensor([1.185058118257697, 6.403707815765645, 6.403707815765645])
 
 CLASSES = list(CLASS_FREQUENCIES.keys())
-batch_size = 16
 
 #os.environ['WANDB_SILENT'] = 'true'
 
@@ -146,8 +144,8 @@ def compute_metrics(eval_preds):
 
 
 def create_trainer(model, train_data, val_data,
-          run_name, output_dir, epochs=10, lr=1e-5, 
-          weight_decay=1e-2, seed=0):
+          run_name, output_dir, epochs=10, lr=1e-5,
+          batch_size=16, weight_decay=1e-2, seed=0):
     '''
     Trains a Joint Encoder model. 
     W&B logging is enabled by default.
@@ -166,24 +164,19 @@ def create_trainer(model, train_data, val_data,
     model.to(device)
     print(f'Moving model to device: {device}')
 
-    #print('Training:\tInitializing optimizers')
-    #optimizers = []
-    #if model.tabular: 
-    #    # Make an optimizer for tabular encoder and classifier
-    #    tab_optimizer = torch.optim.AdamW(
-    #        [{'params': model.tabular_encoder.parameters()},
-    #         {'params': model.classifier.parameters()}],
-    #        weight_decay=0.01,  # Tuned on tabular only
-    #        lr=1e-3,            # Tuned on tabular only  
-    #    )
-    #    optimizers.append(tab_optimizer)
-    #if model.vision:
-    #    vision_optimizer = torch.optim.AdamW(
-    #        model.vision_encoder.parameters(),
-    #        lr=lr,
-    #        weight_decay=weight_decay,
-    #    )
-    #    optimizers.append(vision_optimizer)
+    print('Training:\tInitializing optimizer and scheduler')
+    params = [{'params': model.classifier.parameters(), 
+                'lr': 0.001, 'weight_decay': 0.01}] # Fine-tuned on tabular only
+    if model.tabular:
+        params.append({
+            'params': model.tabular_encoder.parameters(),
+            'lr': 0.001, 'weight_decay': 0.01       # Fine-tuned on tabular only
+            })
+    if model.vision:
+        params.append({'params': model.vision_encoder.parameters()}) 
+    optimizer = torch.optim.AdamW(params, lr=lr, weight_decay=weight_decay)
+    scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=0, 
+                                                num_training_steps=len(train_data)*epochs)
 
     print('Training:\tInitializing training arguments')
     training_args = TrainingArguments(
@@ -228,6 +221,7 @@ def create_trainer(model, train_data, val_data,
         compute_metrics=compute_metrics,
         data_collator=train_data.collate_fn,
         callbacks = [EarlyStoppingCallback(early_stopping_patience=5)],
+        optimizers=(optimizer, scheduler)
     )
     return trainer
 
