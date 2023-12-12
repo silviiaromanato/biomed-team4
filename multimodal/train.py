@@ -218,9 +218,9 @@ def create_trainer(model, train_data, val_data,
 
         # Evaluation & checkpointing
         output_dir=output_dir,
-        evaluation_strategy="steps",
-        eval_steps=1,
-        save_strategy="steps",
+        evaluation_strategy="epoch",
+        # eval_steps=1,
+        save_strategy="epoch",
         save_total_limit=1,
         load_best_model_at_end=True,
         metric_for_best_model="loss",
@@ -275,6 +275,7 @@ def grid_search(tabular=False,
         'batch_norm': batch_norm
     }
 
+    print('Training:\tInitializing model')
     model = JointEncoder(
         tabular=tabular, 
         tabular_params=tabular_params,
@@ -289,10 +290,12 @@ def grid_search(tabular=False,
     #        param.requires_grad = False
 
     # Build W&B group
+    print('W&B:\tBuilding group')
     run_name = build_group(tabular=tabular, vision=vision, tabular_params=tabular_params, 
                             lr=lr, weight_decay=weight_decay)
 
     # Load data
+    print('Data:\tLoading data')
     tab_data, image_data = prepare_data()
     train_data, val_data, test_data = load_data(tab_data, image_data, vision=vision)
 
@@ -311,8 +314,10 @@ def grid_search(tabular=False,
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    print('Grid search for radiology diagnosis using joint image-tabular encoders.')
     parser.add_argument('--tabular', type=int, default=None)
     parser.add_argument('--vision', type=str, default=None)
+    print('Tabular encoder parameters: dim_input, hidden_dims, dropout_prob, batch_norm')
     parser.add_argument('--hidden_dims', type=str, default=[256, 512])
     parser.add_argument('--dropout_prob', type=float, default=0.0)
     parser.add_argument('--batch_norm', action='store_true', default=False)
@@ -320,8 +325,10 @@ if __name__ == '__main__':
     parser.add_argument('--weight_decay', type=float, default=0.0)
     parser.add_argument('--num_epochs', type=int, default=10)
     parser.add_argument('--seed', type=int, default=0)
+    print('Evaluation: evaluate model on test set')
     args = parser.parse_args()
 
+    print('Parsing arguments')
     if args.hidden_dims and type(args.hidden_dims) == str:
         args.hidden_dims = [int(x) for x in args.hidden_dims.split('-')]
 
