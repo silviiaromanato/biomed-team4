@@ -17,11 +17,11 @@ parameters:
     value: '128-256-512'
   dropout_prob: 
     value: 0.1
-   weight_decay:
+  weight_decay:
     value: 0.0
   vision: 
     value: 'vit' 
   lr: 
-    value: [1e-4, 1e-5]
+    value: 1e-5
   num_epochs: 
     value: 10

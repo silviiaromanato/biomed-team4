@@ -19,6 +19,6 @@ parameters:
   vision: 
     value: 'resnet50'
   lr: 
-    values: [1e-3, 1e-4] 
+    value: 1e-4
   num_epochs: 
     value: 10

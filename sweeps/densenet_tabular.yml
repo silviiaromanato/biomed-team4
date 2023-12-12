@@ -22,9 +22,9 @@ parameters:
     value: '128-256-512'
   dropout_prob: 
     value: 0.1
-   weight_decay:
+  weight_decay:
     value: 0.0
   lr: 
-    values: [1e-3, 1e-4] 
+    value: 0.0001
   num_epochs: 
     value: 10
