@@ -110,7 +110,24 @@ class MultimodalTrainer(Trainer):
             labels.permute(0, 2, 1),
             weight=self.class_weights.to(logits.device))
         return (loss, outputs) if return_outputs else loss
-    
+
+def weighted_F1(preds, labels): 
+    '''
+    Given a tensor of predictions and a tensor of labels (1D and of same size)
+    returns the weighted average F1 score by inverse label frequency. 
+    '''
+    # Compute inverse frequency in the labels
+    weights = np.array([])
+    for i in range(NUM_LABELS):
+        freq = np.sum(np.where(labels == i, 1, 0))
+        inv_freq = 0 if freq == 0 else 1/freq
+        weights = np.append(weights, inv_freq)
+    weights = weights / weights.sum()
+
+    # Compute F1 score for each class and return weighted average
+    f1s = f1_score(labels, preds, average=None)
+    weighted_f1 = np.sum(f1s * weights)
+    return weighted_f1
 
 def compute_metrics(eval_preds): 
     ''' 
@@ -126,13 +143,13 @@ def compute_metrics(eval_preds):
     if isinstance(preds, tuple):
         preds = preds[0]
     labels = eval_preds.label_ids
-    preds = torch.argmax(torch.tensor(preds), dim=-1)
+    preds = torch.argmax(torch.tensor(preds), dim=-1) 
     labels = torch.argmax(torch.tensor(labels), dim=-1)
     metrics = {}
     for i, disease in enumerate(CLASSES):
-        metrics['acc_'+disease] = balanced_accuracy_score(labels[:, i], preds[:, i])
-        metrics['macroF1_'+disease] = f1_score(labels[:, i], preds[:, i], average='macro')
-        metrics['wF1_'+disease] = f1_score(labels[:, i], preds[:, i], average='weighted')
+        metrics['acc_'+disease] = balanced_accuracy_score(labels[:, i], preds[:, i])        # Average of recall for each class
+        metrics['macroF1_'+disease] = f1_score(labels[:, i], preds[:, i], average='macro')  # Same weight for each class
+        metrics['wF1_'+disease] = weighted_F1(preds[:, i], labels[:, i])                    # Weighted average of F1 scores for each class
 
     metrics['acc_avg'] = np.mean([metrics['acc_'+disease] for disease in CLASS_FREQUENCIES.keys()])
     metrics['macroF1_avg'] = np.mean([metrics['macroF1_'+disease] for disease in CLASS_FREQUENCIES.keys()])
