@@ -6,7 +6,7 @@ import os
 import wandb
 import argparse
 from sklearn.metrics import f1_score, balanced_accuracy_score
-from transformers import TrainingArguments, Trainer, get_linear_schedule_with_warmup
+from transformers import TrainingArguments, Trainer, get_linear_schedule_with_warmup, get_cosine_schedule_with_warmup
 from train import *
 from models import *
 from data import *
@@ -175,7 +175,7 @@ def create_trainer(model, train_data, val_data,
     if model.vision:
         params.append({'params': model.vision_encoder.parameters()}) 
     optimizer = torch.optim.AdamW(params, lr=lr, weight_decay=weight_decay)
-    scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=0, 
+    scheduler = get_cosine_schedule_with_warmup(optimizer, num_warmup_steps=200, 
                                                 num_training_steps=len(train_data)*epochs)
 
     print('Training:\tInitializing training arguments')
