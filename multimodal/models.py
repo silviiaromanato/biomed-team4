@@ -243,7 +243,10 @@ class JointEncoder(nn.Module):
 
         # Concatenate embeddings
         if self.vision and self.tabular:
+            print('The shape of the vision embedding is:', vision_embedding.shape)
+            print('The shape of the tabular embedding is:', tabular_embedding.shape)
             embedding = torch.cat((vision_embedding, tabular_embedding), dim=1)
+            print('The shape of the concatenated embedding is:', embedding.shape)
         elif self.vision:
             embedding = vision_embedding
         elif self.tabular:
