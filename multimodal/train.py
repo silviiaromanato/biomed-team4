@@ -125,7 +125,7 @@ def compute_metrics(eval_preds):
     preds = eval_preds.predictions
     if isinstance(preds, tuple):
         preds = preds[0]
-    logits = eval_preds.logits
+    # logits = eval_preds.logits
     labels = eval_preds.label_ids
     preds = torch.argmax(torch.tensor(preds), dim=-1)
     labels = torch.argmax(torch.tensor(labels), dim=-1)
@@ -136,12 +136,12 @@ def compute_metrics(eval_preds):
         metrics['acc_'+disease] = balanced_accuracy_score(labels[:, i], preds[:, i])
         metrics['macroF1_'+disease] = f1_score(labels[:, i], preds[:, i], average='macro')
         metrics['wF1_'+disease] = f1_score(labels[:, i], preds[:, i], average='weighted')
-        metrics['wAUC_'+disease] = roc_auc_score(labels[:, i], logits[:, i, :], average='weighted', multi_class='ovr', labels=[0, 1, 2])
+        # metrics['wAUC_'+disease] = roc_auc_score(labels[:, i], logits[:, i, :], average='weighted', multi_class='ovr', labels=[0, 1, 2])
 
     metrics['acc_avg'] = np.mean([metrics['acc_'+disease] for disease in CLASS_FREQUENCIES.keys()])
     metrics['macroF1_avg'] = np.mean([metrics['macroF1_'+disease] for disease in CLASS_FREQUENCIES.keys()])
     metrics['wF1_avg'] = np.mean([metrics['wF1_'+disease] for disease in CLASS_FREQUENCIES.keys()])
-    metrics['wAUC_avg'] = np.mean([metrics['wAUC_'+disease] for disease in CLASS_FREQUENCIES.keys()])
+    # metrics['wAUC_avg'] = np.mean([metrics['wAUC_'+disease] for disease in CLASS_FREQUENCIES.keys()])
 
     return metrics
 
