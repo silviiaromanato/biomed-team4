@@ -5,7 +5,7 @@ Grid search for radiology diagnosis using joint image-tabular encoders.
 import os
 import wandb
 import argparse
-from sklearn.metrics import f1_score, balanced_accuracy_score, roc_auc_score
+from sklearn.metrics import f1_score, balanced_accuracy_score, roc_auc_score, precision_score, recall_score
 from transformers import TrainingArguments, Trainer, get_linear_schedule_with_warmup, get_cosine_schedule_with_warmup
 from models import *
 from data import *
@@ -116,7 +116,6 @@ def weighted_F1(preds, labels):
     Given a tensor of predictions and a tensor of labels (1D and of same size)
     returns the weighted average F1 score by inverse label frequency. 
     '''
-    # Compute inverse frequency in the labels
     weights = np.array([])
     
     for i in range(NUM_LABELS):
@@ -124,8 +123,6 @@ def weighted_F1(preds, labels):
         inv_freq = 0 if freq == 0 else 1/freq
         weights = np.append(weights, inv_freq)
     weights = weights / weights.sum()
-
-    # Compute F1 score for each class and return weighted average
     f1s = f1_score(labels, preds, average=None)
 
     # check if length f1s is equal to weights
@@ -151,18 +148,23 @@ def compute_metrics(eval_preds):
     if isinstance(preds, tuple):
         preds = preds[0]
     labels = eval_preds.label_ids
+
+    # Convert one-hot encoding to class labels
     preds = torch.argmax(torch.tensor(preds), dim=-1) 
     labels = torch.argmax(torch.tensor(labels), dim=-1)
+
+    # For each disease, compute metrics
     metrics = {}
     for i, disease in enumerate(CLASSES):
         metrics['acc_'+disease] = balanced_accuracy_score(labels[:, i], preds[:, i])        # Average of recall for each class
         metrics['macroF1_'+disease] = f1_score(labels[:, i], preds[:, i], average='macro')  # Same weight for each class
         metrics['wF1_'+disease] = weighted_F1(preds[:, i], labels[:, i])                    # Weighted average of F1 scores for each class
+        metrics['macroPrec_'+disease] = precision_score(labels[:, i], preds[:, i], average='macro') # Same weight for each class
+        metrics['macroRec_'+disease] = recall_score(labels[:, i], preds[:, i], average='macro') # Same weight for each class
 
-    metrics['acc_avg'] = np.mean([metrics['acc_'+disease] for disease in CLASS_FREQUENCIES.keys()])
-    metrics['macroF1_avg'] = np.mean([metrics['macroF1_'+disease] for disease in CLASS_FREQUENCIES.keys()])
-    metrics['wF1_avg'] = np.mean([metrics['wF1_'+disease] for disease in CLASS_FREQUENCIES.keys()])
-
+    # Average over all diseases
+    for metric in ['acc', 'macroF1', 'wF1', 'macroPrec', 'macroRec']:
+        metrics[metric+'_avg'] = np.mean([metrics[metric+'_'+disease] for disease in CLASS_FREQUENCIES.keys()])
     return metrics
 
 
@@ -173,14 +175,17 @@ def create_trainer(model, train_data, val_data,
     Trains a Joint Encoder model. 
     W&B logging is enabled by default.
 
-    Arguments: 
-        model (JointEncoder): model to train
-        train_data, val_data, test_data: Datasets
-        run_name (str): Name of W&B run
-        output_dir (str): Output directory for model checkpoints
-        epochs (int): Number of training epochs
-        lr (float): Learning rate
-        seed (int): Random seed
+    Arguments:
+        - model (JointEncoder): Joint encoder model
+        - train_data (torch.utils.data.Dataset): Training data
+        - val_data (torch.utils.data.Dataset): Validation data
+        - run_name (str): W&B group name
+        - output_dir (str): Path to directory where checkpoints will be saved
+        - epochs (int): Number of epochs
+        - lr (float): Learning rate
+        - batch_size (int): Batch size
+        - weight_decay (float): Weight decay
+        - seed (int): Random seed
     '''
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -198,8 +203,8 @@ def create_trainer(model, train_data, val_data,
     if model.vision:
         params.append({'params': model.vision_encoder.parameters()}) 
     optimizer = torch.optim.AdamW(params, lr=lr, weight_decay=weight_decay)
-    scheduler = get_cosine_schedule_with_warmup(optimizer, num_warmup_steps=200, 
-                                                num_training_steps=len(train_data)*epochs)
+    scheduler = get_cosine_schedule_with_warmup(
+        optimizer, num_warmup_steps=200, num_training_steps=len(train_data)*epochs)
 
     print('Training:\tInitializing training arguments')
     training_args = TrainingArguments(
@@ -212,21 +217,13 @@ def create_trainer(model, train_data, val_data,
         adam_beta2=0.999,
         per_device_train_batch_size=batch_size,
         per_device_eval_batch_size=batch_size,
-        #warmup_steps=500,
         dataloader_num_workers=0, # MIGHT NEED TO CHANGE THIS
         seed=seed,
 
         # Evaluation & checkpointing
         output_dir=output_dir,
         evaluation_strategy="epoch",
-        # eval_steps=1,
-        save_strategy="epoch",
-        save_total_limit=1,
-        load_best_model_at_end=True,
-        metric_for_best_model="loss",
-        greater_is_better=False,
-
-        # W&B logging
+        save_strategy="no",
         report_to='wandb',
         logging_dir='./logs',
         logging_first_step=True,
