@@ -7,7 +7,7 @@ In this project, we propose a multi-modal model for radiology diagnosis by combi
 
 <img src="figures/architecture.png" width="100%">
 
-####**Repository breakdown**
+#### **Repository breakdown**
 
 - `report.pdf` contains our final report
 - `multimodal` folder contains the code for the multi-modal model
