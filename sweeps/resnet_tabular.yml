@@ -27,6 +27,6 @@ parameters:
   weight_decay:
     value: 0.0
   lr: 
-    value: 1e-4
+    values: [1e-3, 1e-4]
   num_epochs: 
     value: 10
