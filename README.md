@@ -14,7 +14,6 @@ In this project, we propose a multi-modal model for radiology diagnosis by combi
   - `models.py` : model architectures for the joint encoder, dual vision encoder and tabular encoder models
   - `train.py` : training and grid search functionalities using Weights and Biases and Huggingface trainers
   - `biomed.ipynb` : quickly shows our data pre-processing and model architectures
-  - `visualization.ipynb` : visualization scripts to generate the figures in the report
 - `sweeps/` : grid search hyperparameter configurations
 - `project_proposal.pdf` : initial project proposal
 - `report.pdf` : final report
