@@ -301,7 +301,8 @@ def grid_search(tabular=False,
 
     # Train model
     trainer = create_trainer(model, train_data, val_data, run_name, CHECKPOINTS_DIR, 
-                             epochs=num_epochs, lr=lr, weight_decay=weight_decay, seed=seed)
+                             epochs=num_epochs, lr=lr, batch_size = 8, 
+                             weight_decay=weight_decay, seed=seed)
     print('Training:\tStarting training')
     trainer.train(ignore_keys_for_eval=['logits'])
 
