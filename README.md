@@ -9,19 +9,29 @@ In this project, we propose a multi-modal model for radiology diagnosis by combi
 
 #### **Repository breakdown**
 
-- `report.pdf` contains our final report
-- `multimodal` folder contains the code for the multi-modal model
-  - `data.py` contains the multimodal (vision-tabular) data pre-processing and dataset class
-  - `models.py` contains the model architectures for the joint encoder, dual vision encoder and tabular encoder models
-  - `train.py` contains the training and grid search functionalities using Weights and Biases and Huggingface trainers
-  - `biomed.ipynb` quickly shows our data pre-processing and model architectures
-  - `visualization.ipynb` contains the code for the visualization scripts to generate the figures in the report
+- `multimodal/` : code for the multi-modal model
+  - `data.py` : multimodal (vision and tabular) data pre-processing and dataset class
+  - `models.py` : model architectures for the joint encoder, dual vision encoder and tabular encoder models
+  - `train.py` : training and grid search functionalities using Weights and Biases and Huggingface trainers
+  - `biomed.ipynb` : quickly shows our data pre-processing and model architectures
+  - `visualization.ipynb` : visualization scripts to generate the figures in the report
+- `sweeps/` : grid search hyperparameter configurations
+- `project_proposal.pdf` : initial project proposal
+- `report.pdf` : final report
 
 #### **How to run our code**
+
 To run our code, you will need to request access and download the [MIMIC-IV](https://physionet.org/content/mimiciv/2.2/) and [MIMIC-CXR-JPG](https://www.physionet.org/content/mimic-cxr-jpg/2.0.0/) datasets in the `data/mimic-iv` and `data/mimic-cxr-jpg` folders respectively.
 
-You can then run the training script by running `multimodal/train.py` as follows: 
+You will also need to install the required packages in a virtual environment as follows:
+
+```bash
+pip install -r requirements.txt
 ```
+
+You can then run the training script by running the following command:
+
+```python
 python multimodal/train.py \
     --- tabular 1 \
     --- vision 'densenet121' \
